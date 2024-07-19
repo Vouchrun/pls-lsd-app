@@ -1,22 +1,23 @@
 {
   "chain": {
-    "id": 943,
-    "name": "PulsechainTestnetV4"
+    "id": 1,
+    "name": "Ethereum"
   },
-  "rpc": "https://rpc-testnet-pulsechain.g4mm4.io",
-  "explorer": "https://otter-testnet-pulsechain.g4mm4.io",
+  "rpc": "https://mainnet.infura.io/v3/b3611f564322439ab2491e04ddd55b39",
+  "explorer": "https://etherscan.io",
+  "blockSeconds": 12,
   "contracts": {
     "lsdTokenContract": {
-      "address": "0x61135C59A4Eb452b89963188eD6B6a7487049764"
+      "address": "0x9559aaa82d9649c7a7b220e7c461d2e74c9a3593"
     },
     "depositContract": {
-      "address": "0x1B10731Ec91267e9Fd85c042a3a2961580837d1F"
+      "address": "0x70C5744d377aE6E9926CcBCF19D501340CB26285"
     },
     "withdrawContract": {
-      "address": "0x555E33C8782A0CeF14d2e9064598CE991f58Bc74"
+      "address": "0xE773dbe9d073dBEfdC147fbdCCB06dBD4f5AAF54"
     },
     "networkBalanceContract": {
-      "address": "0x47e97e7971D13936667EE0E0b44a4Fc1eBD871Ff"
+      "address": "0xda9726Fd1B125a3923f9D9521e28fE888091698d"
     }
   }
 }

@@ -45,6 +45,13 @@ export function getLsdEthMetamaskParam() {
   };
 }
 
+export function getBlockSeconds() {
+  if (isDev()) {
+    return appDevConfig.blockSeconds;
+  }
+  return appProdConfig.blockSeconds;
+}
+
 export function getWagmiChainConfig() {
   return {
     id: getEthereumChainId(),
