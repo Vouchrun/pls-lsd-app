@@ -14,7 +14,7 @@ import {
   usePopupState,
 } from "material-ui-popup-state/hooks";
 import Image from "next/image";
-import auditIcon from "public/images/audit.svg";
+import appIcon from "public/images/appIcon.png";
 import defaultAvatar from "public/images/default_avatar.png";
 import noticeIcon from "public/images/notice.png";
 import { useEffect, useMemo, useState } from "react";
@@ -60,7 +60,7 @@ const Navbar = () => {
           className={classNames("absolute top-[.11rem] w-[.82rem] h-[.2rem]")}
         ></div>
 
-        <div className={classNames("flex items-center")}>
+        <div className={classNames("flex items-center relative")}>
           <AuditComponent
             expand={auditExpand}
             onExpandChange={setAuditExpand}
@@ -287,7 +287,7 @@ const ConnectButton = () => {
       await (switchNetworkAsync && switchNetworkAsync(getEthereumChainId()));
     }
 
-    const metamaskConnector = connectors.find((c) => c.name === "MetaMask");
+    const metamaskConnector = connectors.find((c) => c.name === "MetaMask" || c.name === "Rabby Wallet");
     if (!metamaskConnector) {
       return;
     }
@@ -339,18 +339,18 @@ const AuditComponent = (props: AuditComponentProps) => {
   return (
     <div
       className={classNames(
-        "h-[.42rem] rounded-[.3rem] border-[#6C86AD]/20 flex items-center",
+        "h-[.42rem] rounded-[.3rem] border-[#6C86AD]/20 flex items-center ",
         expand ? "border-[0.01rem]" : ""
       )}
     >
       <div
-        className="cursor-pointer ml-[.04rem] w-[.34rem] h-[.34rem] p-[.06rem] relative rounded-full bg-color-bg1"
+        className="cursor-pointer ml-[.04rem] w-[1.54rem] h-[.34rem] p-[.06rem] relative rounded-full"
         onClick={() => {
           onExpandChange(!expand);
         }}
       >
-        <div className="w-full h-full relative">
-          <Image src={auditIcon} alt="audit" layout="fill" />
+        <div className="w-full h-full relative flex items-center justify-center">
+          <Image src={appIcon} alt="audit"  className="relative h-auto w-auto"/>
         </div>
       </div>
 
