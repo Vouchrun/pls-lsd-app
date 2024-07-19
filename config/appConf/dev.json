@@ -8,16 +8,16 @@
   "blockSeconds": 10,
   "contracts": {
     "lsdTokenContract": {
-      "address": "0x21072f1Fe1f8B2b0d88ea2cba9209Ad955262b70"
+      "address": "0x61135C59A4Eb452b89963188eD6B6a7487049764"
     },
     "depositContract": {
-      "address": "0x80C6840611C36B1656E4D36BcbA29F965d7043F9"
+      "address": "0x1B10731Ec91267e9Fd85c042a3a2961580837d1F"
     },
     "withdrawContract": {
-      "address": "0x93564AEBDd016c9cF621e7366Ae7F9bFF554C08E"
+      "address": "0x555E33C8782A0CeF14d2e9064598CE991f58Bc74"
     },
     "networkBalanceContract": {
-      "address": "0x5912ECE81449Dd83257F242A10B66b10981434E2"
+      "address": "0x47e97e7971D13936667EE0E0b44a4Fc1eBD871Ff"
     }
   }
 }
