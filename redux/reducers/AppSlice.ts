@@ -6,8 +6,10 @@ import {
   updateNoticeInternal,
 } from "utils/noticeUtils";
 import {
+  getStorage,
   removeStorage,
   saveStorage,
+  STORAGE_KEY_DARK_MODE,
   STORAGE_KEY_UNREAD_NOTICE,
 } from "utils/storageUtils";
 
@@ -88,8 +90,10 @@ export const appSlice = createSlice({
   name: "app",
   initialState,
   reducers: {
-    setDarkMode: (state: AppState, aciton: PayloadAction<boolean>) => {
-      state.darkMode = aciton.payload;
+    setDarkMode: (state: AppState, action: PayloadAction<boolean>) => {
+      saveStorage(STORAGE_KEY_DARK_MODE, JSON.stringify(action.payload));
+      const darkMode = JSON.parse(getStorage(STORAGE_KEY_DARK_MODE) || "false");
+      state.darkMode = action.payload ?? darkMode;
     },
     setCollapseOpenId: (
       state: AppState,
