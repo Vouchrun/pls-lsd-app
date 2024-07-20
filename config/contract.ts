@@ -8,7 +8,7 @@ import depositContractAbi from "./abi/deposit.json";
 import { AbiItem } from "web3-utils";
 
 /**
- * get lsdETH token contract address
+ * get lsdETH token contract address.
  */
 export function getLsdEthTokenContract() {
   if (isDev()) {
