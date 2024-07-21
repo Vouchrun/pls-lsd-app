@@ -7,7 +7,7 @@
     "supportChains": ["Pulse"],
     "lsdTokenIconUri": "https://cdn.stafi.io/rtoken/logo/rPLS.png",
     "tokenIcon": "/images/token/PLS.svg",
-    "lsdTokenIcon": "/images/token/rPLS.svg"
+    "lsdTokenIcon": "/images/token/vPLS.svg"
   },
   "unstake": {
     "lockTipLink": "https://docs.stafi.io/stakingeth/unstake/",
