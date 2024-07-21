@@ -64,8 +64,7 @@
 }
 
 .button-purple {
-  /* background: linear-gradient(140.73deg, #a091ff 4.72%, #6758ff 96.52%);*/
-  background: linear-gradient(225deg, hsla(217, 77%, 58%, 1) 0%, hsla(347, 16%, 60%, 1) 66%, hsla(24, 100%, 60%, 1) 100%);
+  background: linear-gradient(140.73deg, #a091ff 4.72%, #6758ff 96.52%);
   border: 0.01rem solid rgba(38, 73, 78, 0.5);
   backdrop-filter: blur(1.35px);
 
