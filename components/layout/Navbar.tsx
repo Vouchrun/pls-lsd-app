@@ -14,9 +14,9 @@ import {
   usePopupState,
 } from "material-ui-popup-state/hooks";
 import Image from "next/image";
-import appIcon from "public/images/appIconDark.png";
+import appIcon from "public/images/appIconDark.svg";
 // import appIconLight from "public/images/appIconLight.svg";
-import defaultAvatar from "public/images/default_avatar.svg";
+import defaultAvatar from "public/images/default_avatar.png";
 import noticeIcon from "public/images/notice.png";
 import { useEffect, useMemo, useState } from "react";
 import {
