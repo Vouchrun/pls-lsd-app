@@ -183,7 +183,7 @@ export const LsdTokenUnstake = () => {
     if (isWrongMetaMaskNetwork) {
       await (switchNetworkAsync && switchNetworkAsync(getEthereumChainId()));
     } else {
-      const metamaskConnector = connectors.find((c) => c.name === "MetaMask");
+      const metamaskConnector = connectors.find((c) => c.name === "MetaMask" || c.name === "Rabby Wallet");
       if (!metamaskConnector) {
         return;
       }
