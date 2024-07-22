@@ -157,6 +157,7 @@ export const LsdTokenStake = () => {
     walletNotConnected,
     estimateFee,
     ethMinimumDeposit,
+    depositEnabled,
   ]);
 
   const newRTokenBalance = useMemo(() => {

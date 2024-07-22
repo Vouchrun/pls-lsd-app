@@ -18,7 +18,7 @@ import {
   TRANSACTION_FAILED_MESSAGE,
 } from "constants/common";
 import { LocalNotice } from "utils/noticeUtils";
-import { formatNumber } from "utils/numberUtils";
+import { formatNumber, formatScientificNumber } from "utils/numberUtils";
 import snackbarUtil from "utils/snackbarUtils";
 import { createWeb3, getEthWeb3 } from "utils/web3Utils";
 import Web3 from "web3";
@@ -156,7 +156,10 @@ export const handleEthStake =
         }
       );
 
-      const stakeAmountInWei = web3.utils.toWei(stakeAmount, "ether");
+      const stakeAmountInWei = web3.utils.toWei(
+        formatScientificNumber(stakeAmount),
+        "ether"
+      );
       const result = await contract.methods
         .deposit()
         .send({ value: stakeAmountInWei });

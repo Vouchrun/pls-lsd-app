@@ -9,6 +9,7 @@ import Web3 from "web3";
 import { useAppSelector } from "./common";
 import { useAppSlice } from "./selector";
 import { useWalletAccount } from "./useWalletAccount";
+import { formatScientificNumber } from "utils/numberUtils";
 
 export function useEthUnclaimedWithdrawls() {
   const { updateFlag } = useAppSlice();
@@ -87,10 +88,12 @@ export function useEthUnclaimedWithdrawls() {
           (withdrawIndex: string, index: number) => {
             const withdrawal = withdrawalList[index];
             if (withdrawal) {
-              overallAmount += Number(Web3.utils.fromWei(withdrawal._amount));
+              overallAmount += Number(
+                Web3.utils.fromWei(formatScientificNumber(withdrawal._amount))
+              );
               if (Number(withdrawIndex) <= Number(maxClaimableWithdrawIndex)) {
                 claimableAmount += Number(
-                  Web3.utils.fromWei(withdrawal._amount)
+                  Web3.utils.fromWei(formatScientificNumber(withdrawal._amount))
                 );
                 claimableWithdrawals.push(withdrawIndex);
               }
@@ -98,8 +101,8 @@ export function useEthUnclaimedWithdrawls() {
           }
         );
 
-        setOverallAmount(overallAmount + "");
-        setClaimableAmount(claimableAmount + "");
+        setOverallAmount(formatScientificNumber(overallAmount));
+        setClaimableAmount(formatScientificNumber(claimableAmount));
         setClaimableWithdrawals(claimableWithdrawals);
       } catch (err: any) {
         console.log(err);

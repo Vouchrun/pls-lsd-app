@@ -36,8 +36,8 @@ export const WithdrawUnstaked = (props: Props) => {
     return (
       claimableWithdrawals.length === 0 ||
       !claimableAmount ||
-      isNaN(Number(formatNumber(claimableAmount))) ||
-      Number(formatNumber(claimableAmount)) === 0 ||
+      isNaN(Number(claimableAmount)) ||
+      Number(claimableAmount) === 0 ||
       withdrawLoading
     );
   }, [claimableWithdrawals, claimableAmount, withdrawLoading]);
