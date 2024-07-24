@@ -83,19 +83,19 @@
   "externalLinkList": [
     {
       "name": "Docs",
-      "link": "https://app.vouch.run/" //"https://docs.stafi.io/"
+      "link": "https://app.vouch.run/"
     },
     {
       "name": "Website",
-      "link": "https://app.vouch.run/" //"https://www.stafi.io/"
+      "link": "https://app.vouch.run/"
     },
     {
       "name": "DAO Forum",
-      "link": "https://app.vouch.run/" //"https://dao.stafi.io/"
+      "link": "https://app.vouch.run/" 
     },
     {
       "name": "Dune Dashboard",
-      "link": "https://app.vouch.run/" // "https://dune.com/stafi-analysis/stafi"
+      "link": "https://app.vouch.run/" 
     }
   ],
   "contactList": [
