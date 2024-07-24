@@ -33,7 +33,7 @@
       "iconDark": "/images/audit/block_sec_dark.svg"
     }
   ],
-  // "faqList": [
+ "faqList": [
   //   {
   //     "title": "What are the factors that affect the staking rewards?",
   //     "contents": [
@@ -79,7 +79,7 @@
   //       }
   //     ]
   //   }
-  // ],
+ ],
   "externalLinkList": [
     {
       "name": "Docs",
