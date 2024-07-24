@@ -34,51 +34,51 @@
     }
   ],
  "faqList": [
-  //   {
-  //     "title": "What are the factors that affect the staking rewards?",
-  //     "contents": [
-  //       {
-  //         "type": "text",
-  //         "content": "Staking rewards in the Vouch protocol are influenced by various factors including the total amount of native tokens staked and redeemed, the staking rewards earned, slash occurrences, penalties, and the commission ratio. Slashing events, caused by disconnection or malicious behavior of validator nodes, could potentially reduce rewards; however, StaFi mitigates this risk by diversifying the staking funds across multiple validators with clean records and requiring them to provide additional deposits as collaterals. The staking reward claim status and the timing of claims on the original chain can also affect staking rewards.\n"
-  //       },
-  //       {
-  //         "type": "text",
-  //         "content": "To learn more about how staking rewards are calculated, please read:\n"
-  //       },
-  //       {
-  //         "type": "link",
-  //         "content": "https://docs.stafi.io/rtoken/#rtoken-exchange-rate\n",
-  //         "link": "https://docs.stafi.io/rtoken/#rtoken-exchange-rate"
-  //       }
-  //     ]
-  //   },
-  //   {
-  //     "title": "How much time is needed for PLS withdrawals?",
-  //     "contents": [
-  //       {
-  //         "type": "text",
-  //         "content": "If the unstaking pool's PLS balance exceeds your withdrawal amount, you will instantly receive your PLS upon transaction approval.\n"
-  //       },
-  //       {
-  //         "type": "text",
-  //         "content": "However, if the unstaking pool's PLS balance is less than your withdrawal amount, the withdrawal process will take 1-5 days. After this period, you can claim your PLS using the withdraw function.\n"
-  //       }
-  //     ]
-  //   },
-  //   {
-  //     "title": "What's the exchange rate of vPLS?",
-  //     "contents": [
-  //       {
-  //         "type": "text",
-  //         "content": "To learn more about the exchange rate of rTokens and how they are calculated, please read:\n"
-  //       },
-  //       {
-  //         "type": "link",
-  //         "content": "https://docs.stafi.io/rtoken/#rtoken-exchange-rate\n",
-  //         "link": "https://docs.stafi.io/rtoken/#rtoken-exchange-rate"
-  //       }
-  //     ]
-  //   }
+    {
+      "title": "What are the factors that affect the staking rewards?",
+      "contents": [
+        {
+          "type": "text",
+          "content": "Staking rewards in the Vouch protocol are influenced by various factors including the total amount of native tokens staked and redeemed, the staking rewards earned, slash occurrences, penalties, and the commission ratio. Slashing events, caused by disconnection or malicious behavior of validator nodes, could potentially reduce rewards; however, StaFi mitigates this risk by diversifying the staking funds across multiple validators with clean records and requiring them to provide additional deposits as collaterals. The staking reward claim status and the timing of claims on the original chain can also affect staking rewards.\n"
+        },
+        {
+          "type": "text",
+          "content": "To learn more about how staking rewards are calculated, please read:\n"
+        },
+        {
+          "type": "link",
+          "content": "https://docs.stafi.io/rtoken/#rtoken-exchange-rate\n",
+          "link": "https://docs.stafi.io/rtoken/#rtoken-exchange-rate"
+        }
+      ]
+    },
+    {
+      "title": "How much time is needed for PLS withdrawals?",
+      "contents": [
+        {
+          "type": "text",
+          "content": "If the unstaking pool's PLS balance exceeds your withdrawal amount, you will instantly receive your PLS upon transaction approval.\n"
+        },
+        {
+          "type": "text",
+          "content": "However, if the unstaking pool's PLS balance is less than your withdrawal amount, the withdrawal process will take 1-5 days. After this period, you can claim your PLS using the withdraw function.\n"
+        }
+      ]
+    },
+    {
+      "title": "What's the exchange rate of vPLS?",
+      "contents": [
+        {
+          "type": "text",
+          "content": "To learn more about the exchange rate of rTokens and how they are calculated, please read:\n"
+        },
+        {
+          "type": "link",
+          "content": "https://docs.stafi.io/rtoken/#rtoken-exchange-rate\n",
+          "link": "https://docs.stafi.io/rtoken/#rtoken-exchange-rate"
+        }
+      ]
+    }
  ],
   "externalLinkList": [
     {
