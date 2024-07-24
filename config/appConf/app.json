@@ -83,19 +83,19 @@
   "externalLinkList": [
     {
       "name": "Docs",
-      //"link": "https://docs.stafi.io/"
+      "link": "https://docs.stafi.io/"
     },
     {
       "name": "Website",
-      //"link": "https://www.stafi.io/"
+      "link": "https://www.stafi.io/"
     },
     {
       "name": "DAO Forum",
-      //"link": "https://dao.stafi.io/"
+      "link": "https://dao.stafi.io/"
     },
     {
       "name": "Dune Dashboard",
-      //"link": "https://dune.com/stafi-analysis/stafi"
+      "link": "https://dune.com/stafi-analysis/stafi"
     }
   ],
   "contactList": [
