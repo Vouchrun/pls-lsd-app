@@ -4,7 +4,7 @@
   "token": {
     "tokenName": "PLS",
     "lsdTokenName": "vPLS",
-    "supportChains": ["Pulse"],
+    "supportChains": ["Testnet v4 Pulse"],
     "lsdTokenIconUri": "https://cdn.stafi.io/rtoken/logo/rPLS.png",
     "tokenIcon": "/images/token/PLS.svg",
     "lsdTokenIcon": "/images/token/vPLS.svg"
@@ -39,7 +39,7 @@
       "contents": [
         {
           "type": "text",
-          "content": "Staking rewards in the Vouch protocol are influenced by various factors including the total amount of native tokens staked and redeemed, the staking rewards earned, slash occurrences, penalties, and the commission ratio. Slashing events, caused by disconnection or malicious behavior of validator nodes, could potentially reduce rewards; however, StaFi mitigates this risk by diversifying the staking funds across multiple validators with clean records and requiring them to provide additional deposits as collaterals. The staking reward claim status and the timing of claims on the original chain can also affect staking rewards.\n"
+          "content": "Staking rewards in the Vouch protocol are influenced by various factors including the total amount of native tokens staked and redeemed, the staking rewards earned, slash occurrences, penalties, and the commission ratio. Slashing events, caused by disconnection or malicious behavior of validator nodes, could potentially reduce rewards; however, Vouch mitigates this risk by diversifying the staking funds across multiple validators with clean records and requiring them to provide additional deposits as collaterals. The staking reward claim status and the timing of claims on the original chain can also affect staking rewards.\n"
         },
         {
           "type": "text",
