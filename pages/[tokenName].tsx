@@ -171,7 +171,7 @@ const ETHPage = () => {
               <div className="ml-[.16rem]">
                 <CustomTag type="stroke">
                   <div className="text-[.16rem] scale-75 origin-center">
-                    ERC20
+                    PRC20
                   </div>
                 </CustomTag>
               </div>
