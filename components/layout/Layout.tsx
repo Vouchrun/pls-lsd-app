@@ -15,6 +15,7 @@ import { StakeLoadingSidebar } from "components/modal/StakeLoadingSidebar";
 import { UnstakeLoadingSidebar } from "components/modal/UnstakeLoadingSidebar";
 import { WithdrawLoadingSidebar } from "components/modal/WithdrawLoadingSidebar";
 import { getAppTitle } from "utils/configUtils";
+import Footer from "./Footer";
 
 const Navbar = dynamic(() => import("./Navbar"), { ssr: false });
 
@@ -63,6 +64,7 @@ export const Layout = (props: React.PropsWithChildren) => {
 
         <main className="flex flex-col items-center pt-[1.16rem] h-[100vh]">
           <div className="mb-[1rem] w-full">{props.children}</div>
+          <Footer />
         </main>
 
         <StakeLoadingModal />
