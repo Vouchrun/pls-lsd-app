@@ -9,7 +9,7 @@ export default function Footer() {
   return (
     <div className='w-smallContentW xl:w-contentW 2xl:w-largeContentW mx-auto pb-1'>
         <a href='https://www.stafi.io/' target='_blank' className='flex items-center justify-end'>
-            <div style={{ color: darkMode ? "#fff" : "#000" }}>Powered by staFi LSaaS</div>
+            <div style={{ color: darkMode ? "#fff" : "#000" }}>Powered by StaFi LSaaS</div>
             <Image
                 src={darkMode ? appLogo : appLogoLight}
                 alt="stafi"
