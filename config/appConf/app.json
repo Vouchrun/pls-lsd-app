@@ -7,7 +7,7 @@
     "supportChains": ["Testnet v4 Pulse"],
     "lsdTokenIconUri": "https://cdn.stafi.io/rtoken/logo/rPLS.png",
     "tokenIcon": "/images/token/PLS.svg",
-    "lsdTokenIcon": "/images/token/vPLS.svg"
+    "lsdTokenIcon": "/images/token/vPLS_trans.svg"
   },
   "unstake": {
     "lockTipLink": "https://docs.stafi.io/stakingeth/unstake/",
