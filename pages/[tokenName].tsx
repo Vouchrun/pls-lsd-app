@@ -182,7 +182,7 @@ const ETHPage = () => {
                     <span className="font-[700]">
                       {formatNumber(apr, { decimals: 2 })}%
                     </span>
-                    <span className="ml-[.02rem]">APR</span>
+                    <span className="ml-[.02rem]">LST APR</span>
                   </div>
                 </CustomTag>
               </div>
