@@ -1,32 +1,32 @@
-import { hooks, metaMask } from "connectors/metaMask";
-import dayjs from "dayjs";
-import { useEffect } from "react";
+import { hooks, metaMask } from 'connectors/metaMask';
+import dayjs from 'dayjs';
+import { useEffect } from 'react';
 import {
   setDarkMode,
   setUnreadNoticeFlag,
   setUpdateFlag,
-} from "redux/reducers/AppSlice";
-import { updateApr } from "redux/reducers/LsdEthSlice";
+} from 'redux/reducers/AppSlice';
+import { updateApr } from 'redux/reducers/LsdEthSlice';
 import {
   setMetaMaskAccount,
   setMetaMaskChainId,
   setMetaMaskDisconnected,
-} from "redux/reducers/WalletSlice";
+} from 'redux/reducers/WalletSlice';
 import {
   getStorage,
   STORAGE_KEY_DARK_MODE,
   STORAGE_KEY_DISCONNECT_METAMASK,
   STORAGE_KEY_UNREAD_NOTICE,
-} from "utils/storageUtils";
-import { useAppDispatch } from "./common";
-import { useAppSlice } from "./selector";
-import { useInterval } from "./useInterval";
+} from 'utils/storageUtils';
+import { useAppDispatch } from './common';
+import { useAppSlice } from './selector';
+import { useInterval } from './useInterval';
 import {
   updateEthBalance,
   updateEthLatestBlockTimestamp,
-} from "redux/reducers/EthSlice";
-import { useWalletAccount } from "./useWalletAccount";
-import { useAccount } from "wagmi";
+} from 'redux/reducers/EthSlice';
+import { useWalletAccount } from './useWalletAccount';
+import { useAccount } from 'wagmi';
 
 declare const window: { ethereum: any };
 declare const ethereum: any;
@@ -49,7 +49,7 @@ export function useInit() {
     dispatch(
       setMetaMaskDisconnected(!!getStorage(STORAGE_KEY_DISCONNECT_METAMASK))
     );
-    const darkMode = JSON.parse(getStorage(STORAGE_KEY_DARK_MODE) || "false");
+    const darkMode = JSON.parse(getStorage(STORAGE_KEY_DARK_MODE) || 'true');
     dispatch(setDarkMode(darkMode));
   }, [dispatch]);
 
@@ -78,20 +78,20 @@ export function useInit() {
 
   useEffect(() => {
     const listener = (chainId: any) => {
-      dispatch(setMetaMaskChainId(parseInt(chainId, 16) + ""));
+      dispatch(setMetaMaskChainId(parseInt(chainId, 16) + ''));
     };
     if (window.ethereum && window.ethereum.isMetaMask) {
-      ethereum.request({ method: "eth_chainId" }).then((chainId: string) => {
-        dispatch(setMetaMaskChainId(parseInt(chainId, 16) + ""));
+      ethereum.request({ method: 'eth_chainId' }).then((chainId: string) => {
+        dispatch(setMetaMaskChainId(parseInt(chainId, 16) + ''));
         // clearDefaultProviderWeb3();
       });
 
-      ethereum.on("chainChanged", listener);
+      ethereum.on('chainChanged', listener);
     }
 
     return () => {
       if (window.ethereum) {
-        ethereum?.removeListener("chainChanged", listener);
+        ethereum?.removeListener('chainChanged', listener);
       }
     };
   }, [dispatch]);
@@ -103,6 +103,6 @@ export function useInit() {
 
   // Change body backgroundColor
   useEffect(() => {
-    document.body.style.backgroundColor = darkMode ? "#222C3C" : "#E8EFFD";
+    document.body.style.backgroundColor = darkMode ? '#1B1B1F' : '#E8EFFD';
   }, [darkMode]);
 }
