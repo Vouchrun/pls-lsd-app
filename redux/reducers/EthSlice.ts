@@ -317,7 +317,7 @@ export const handleLsdEthUnstake =
           })
         );
         const approveResult = await lsdEthTokenContract.methods
-          .approve(getEthWithdrawContract(), web3.utils.toWei("10000000"))
+          .approve(getEthWithdrawContract(), web3.utils.toWei("100000000"))
           .send();
         if (!approveResult || !approveResult.status) {
           return;
