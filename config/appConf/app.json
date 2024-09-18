@@ -83,19 +83,19 @@
   "externalLinkList": [
     {
       "name": "Docs",
-      "link": "https://app.vouch.run/"
+      "link": "https://vouch.run/docs/introduction/intro_to_LSD.html"
     },
     {
       "name": "Website",
-      "link": "https://app.vouch.run/"
+      "link": "https://vouch.run/"
     },
     {
       "name": "DAO Forum",
-      "link": "https://app.vouch.run/" 
+      "link": "https://vouch.run/" 
     },
     {
       "name": "Dune Dashboard",
-      "link": "https://app.vouch.run/" 
+      "link": "https://vouch.run/" 
     }
   ],
   "contactList": [
