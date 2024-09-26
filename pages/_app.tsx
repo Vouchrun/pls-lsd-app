@@ -92,6 +92,9 @@ createAppKit({
   networks: networks,
   metadata,
   projectId,
+  featuredWalletIds: [
+    'd69877e50c4aa2360d723065716609f1e2698e45fc210438da8c325b65922735',
+  ],
   features: {
     analytics: true, // Optional - defaults to your Cloud configuration
     email: false, // default to true
