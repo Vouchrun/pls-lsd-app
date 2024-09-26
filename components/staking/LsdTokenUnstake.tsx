@@ -27,7 +27,7 @@ import {
   getUnstakeTipLink,
 } from 'utils/configUtils';
 import { formatLargeAmount, formatNumber } from 'utils/numberUtils';
-import { useConnect, useSwitchNetwork } from 'wagmi';
+import { useConnect, useSwitchChain } from 'wagmi';
 import Web3 from 'web3';
 import { CustomButton } from '../common/CustomButton';
 import { CustomNumberInput } from '../common/CustomNumberInput';
@@ -38,7 +38,7 @@ export const LsdTokenUnstake = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { darkMode } = useAppSlice();
-  const { switchNetworkAsync } = useSwitchNetwork();
+  const { switchChainAsync } = useSwitchChain();
   const { connectAsync, connectors } = useConnect();
 
   const { metaMaskAccount, metaMaskChainId } = useWalletAccount();
@@ -181,7 +181,8 @@ export const LsdTokenUnstake = () => {
 
   const clickConnectWallet = async () => {
     if (isWrongMetaMaskNetwork) {
-      await (switchNetworkAsync && switchNetworkAsync(getEthereumChainId()));
+      await (switchChainAsync &&
+        switchChainAsync({ chainId: getEthereumChainId() }));
     } else {
       const metamaskConnector = connectors.find(
         (c) => c.name === 'MetaMask' || c.name === 'Rabby Wallet'

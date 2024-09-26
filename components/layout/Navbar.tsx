@@ -27,7 +27,6 @@ import { RootState } from 'redux/store';
 import { getAuditList } from 'utils/configUtils';
 import { getChainIcon } from 'utils/iconUtils';
 import { getShortAddress } from 'utils/stringUtils';
-import { useConnect, useSwitchNetwork } from 'wagmi';
 
 const Navbar = () => {
   const { unreadNoticeFlag } = useAppSlice();
@@ -70,11 +69,12 @@ const Navbar = () => {
 
         <div className={classNames('flex items-center')}>
           <div className={classNames('ml-[.16rem]')}>
-            {metaMaskAccount ? (
+            {/* {metaMaskAccount ? (
               <UserInfo auditExpand={auditExpand} />
             ) : (
               <ConnectButton />
-            )}
+            )} */}
+            <w3m-button />
           </div>
 
           <div
@@ -273,55 +273,56 @@ const UserInfo = (props: { auditExpand: boolean }) => {
   );
 };
 
-const ConnectButton = () => {
-  const dispatch = useAppDispatch();
-  const { metaMaskChainId } = useWalletAccount();
-  const { switchNetworkAsync } = useSwitchNetwork();
-  const { connectAsync, connectors } = useConnect();
+// const ConnectButton = () => {
+//   const dispatch = useAppDispatch();
+//   const { metaMaskChainId } = useWalletAccount();
+//   const { switchChainAsync } = useSwitchChain();
+//   const { connectAsync, connectors } = useConnect();
 
-  const isWrongMetaMaskNetwork = useMemo(() => {
-    return Number(metaMaskChainId) !== getEthereumChainId();
-  }, [metaMaskChainId]);
+//   const isWrongMetaMaskNetwork = useMemo(() => {
+//     return Number(metaMaskChainId) !== getEthereumChainId();
+//   }, [metaMaskChainId]);
 
-  const clickConnectWallet = async () => {
-    if (isWrongMetaMaskNetwork) {
-      await (switchNetworkAsync && switchNetworkAsync(getEthereumChainId()));
-    }
+//   const clickConnectWallet = async () => {
+//     if (isWrongMetaMaskNetwork) {
+//       await (switchChainAsync &&
+//         switchChainAsync({ chainId: getEthereumChainId() }));
+//     }
 
-    const metamaskConnector = connectors.find(
-      (c) => c.name === 'MetaMask' || c.name === 'Rabby Wallet'
-    );
-    if (!metamaskConnector) {
-      return;
-    }
-    try {
-      dispatch(setMetaMaskDisconnected(false));
-      await connectAsync({
-        chainId: getEthereumChainId(),
-        connector: metamaskConnector,
-      });
-    } catch (err: any) {
-      if (err.code === 4001) {
-      } else {
-        console.error(err);
-      }
-    }
-  };
+//     const metamaskConnector = connectors.find(
+//       (c) => c.name === 'MetaMask' || c.name === 'Rabby Wallet'
+//     );
+//     if (!metamaskConnector) {
+//       return;
+//     }
+//     try {
+//       dispatch(setMetaMaskDisconnected(false));
+//       await connectAsync({
+//         chainId: getEthereumChainId(),
+//         connector: metamaskConnector,
+//       });
+//     } catch (err: any) {
+//       if (err.code === 4001) {
+//       } else {
+//         console.error(err);
+//       }
+//     }
+//   };
 
-  return (
-    <CustomButton
-      type='small'
-      height='.42rem'
-      onClick={() => {
-        clickConnectWallet();
-      }}
-      border='none'
-      // textColor={darkMode ? "#E8EFFD" : ""}
-    >
-      Connect Wallet
-    </CustomButton>
-  );
-};
+//   return (
+//     <CustomButton
+//       type='small'
+//       height='.42rem'
+//       onClick={() => {
+//         clickConnectWallet();
+//       }}
+//       border='none'
+//       // textColor={darkMode ? "#E8EFFD" : ""}
+//     >
+//       Connect Wallet
+//     </CustomButton>
+//   );
+// };
 
 interface AuditComponentProps {
   expand: boolean;

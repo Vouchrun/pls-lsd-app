@@ -1,12 +1,12 @@
-import Web3 from "web3";
-import { getEthereumRpc, getLsdEthMetamaskParam } from "config/env";
-import snackbarUtil from "./snackbarUtils";
-import { AbiItem } from "web3-utils";
+import Web3 from 'web3';
+import { getEthereumRpc, getLsdEthMetamaskParam } from 'config/env';
+import snackbarUtil from './snackbarUtils';
+import { AbiItem } from 'web3-utils';
 
 declare const window: any;
 
 export function createWeb3(provider?: any) {
-  return new Web3(provider || Web3.givenProvider);
+  return new Web3(provider || (window.ethereum as any) || Web3.givenProvider);
 }
 
 let ethWeb3: Web3 | undefined = undefined;
@@ -17,7 +17,7 @@ let ethWeb3: Web3 | undefined = undefined;
 export function getEthWeb3() {
   const rpcLink = getEthereumRpc();
   if (!ethWeb3) {
-    const useWebsocket = rpcLink.startsWith("wss");
+    const useWebsocket = rpcLink.startsWith('wss');
     ethWeb3 = createWeb3(
       useWebsocket
         ? new Web3.providers.WebsocketProvider(rpcLink)
@@ -41,7 +41,7 @@ export async function getErc20AssetBalance(
       from: userAddress,
     });
     const result = await contract.methods.balanceOf(userAddress).call();
-    let balance = web3.utils.fromWei(result + "", "ether");
+    let balance = web3.utils.fromWei(result + '', 'ether');
 
     return balance;
   } catch (err: any) {
@@ -62,9 +62,9 @@ export async function addLsdEthToMetaMask() {
   try {
     window.ethereum
       .request({
-        method: "wallet_watchAsset",
+        method: 'wallet_watchAsset',
         params: {
-          type: "ERC20", // Initially only supports ERC20, but eventually more!
+          type: 'ERC20', // Initially only supports ERC20, but eventually more!
           options: {
             address: params.tokenAddress, // The address that the token is at.
             symbol: params.tokenSymbol, // A ticker symbol or shorthand, up to 5 chars.
@@ -75,7 +75,7 @@ export async function addLsdEthToMetaMask() {
       })
       .then((wasAdded: boolean) => {
         if (wasAdded) {
-          snackbarUtil.success("Add token success");
+          snackbarUtil.success('Add token success');
         }
       });
   } catch (err: any) {}
@@ -92,20 +92,20 @@ export function decodeBalancesUpdatedLog(data: string, topics: string[]) {
   const values = web3.eth.abi.decodeLog(
     [
       {
-        name: "block",
-        type: "uint256",
+        name: 'block',
+        type: 'uint256',
       },
       {
-        name: "totalEth",
-        type: "uint256",
+        name: 'totalEth',
+        type: 'uint256',
       },
       {
-        name: "lsdTokenSupply",
-        type: "uint256",
+        name: 'lsdTokenSupply',
+        type: 'uint256',
       },
       {
-        name: "time",
-        type: "uint256",
+        name: 'time',
+        type: 'uint256',
       },
     ],
     data,

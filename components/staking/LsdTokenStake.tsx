@@ -21,7 +21,7 @@ import { RootState } from 'redux/store';
 import { getLsdEthName, getTokenName } from 'utils/configUtils';
 import { getTokenIcon } from 'utils/iconUtils';
 import { formatLargeAmount, formatNumber } from 'utils/numberUtils';
-import { useConnect, useSwitchNetwork } from 'wagmi';
+import { useConnect, useSwitchChain } from 'wagmi';
 import Web3 from 'web3';
 import { CustomButton } from '../common/CustomButton';
 import { CustomNumberInput } from '../common/CustomNumberInput';
@@ -31,7 +31,7 @@ import { setMetaMaskDisconnected } from 'redux/reducers/WalletSlice';
 
 export const LsdTokenStake = () => {
   const dispatch = useAppDispatch();
-  const { switchNetworkAsync } = useSwitchNetwork();
+  const { switchChainAsync } = useSwitchChain();
   const { connectAsync, connectors } = useConnect();
   const { darkMode } = useAppSlice();
   const { ethPrice } = usePrice();
@@ -173,7 +173,8 @@ export const LsdTokenStake = () => {
 
   const clickConnectWallet = async () => {
     if (isWrongMetaMaskNetwork) {
-      await (switchNetworkAsync && switchNetworkAsync(getEthereumChainId()));
+      await (switchChainAsync &&
+        switchChainAsync({ chainId: getEthereumChainId() }));
     } else {
       const metamaskConnector = connectors.find(
         (c) => c.name === 'MetaMask' || c.name === 'Rabby Wallet'
