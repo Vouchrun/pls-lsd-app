@@ -37,7 +37,7 @@ export function useInit() {
 
   // const { useAccount: useMetaMaskAccount } = hooks;
   // const metaMaskAccount = useMetaMaskAccount();
-  const { address: metaMaskAccount } = useAccount();
+  const { address: metaMaskAccount, chainId } = useAccount();
 
   const { metaMaskAccount: walletMetaMaskAccount, metaMaskChainId } =
     useWalletAccount();
@@ -83,24 +83,10 @@ export function useInit() {
   }, [dispatch, metaMaskAccount]);
 
   useEffect(() => {
-    const listener = (chainId: any) => {
-      dispatch(setMetaMaskChainId(parseInt(chainId, 16) + ''));
-    };
-    if (window.ethereum && window.ethereum.isMetaMask) {
-      ethereum.request({ method: 'eth_chainId' }).then((chainId: string) => {
-        dispatch(setMetaMaskChainId(parseInt(chainId, 16) + ''));
-        // clearDefaultProviderWeb3();
-      });
-
-      ethereum.on('chainChanged', listener);
+    if (chainId) {
+      dispatch(setMetaMaskChainId(chainId.toString()));
     }
-
-    return () => {
-      if (window.ethereum) {
-        ethereum?.removeListener('chainChanged', listener);
-      }
-    };
-  }, [dispatch]);
+  }, [dispatch, chainId]);
 
   // Update wallet balances.
   useEffect(() => {
