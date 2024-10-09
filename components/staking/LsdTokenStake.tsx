@@ -14,20 +14,38 @@ import { bindPopover } from 'material-ui-popup-state';
 import HoverPopover from 'material-ui-popup-state/HoverPopover';
 import { bindHover, usePopupState } from 'material-ui-popup-state/hooks';
 import Image from 'next/image';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { handleEthStake, updateEthBalance } from 'redux/reducers/EthSlice';
 import { updateLsdEthBalance } from 'redux/reducers/LsdEthSlice';
 import { RootState } from 'redux/store';
 import { getLsdEthName, getTokenName } from 'utils/configUtils';
 import { getTokenIcon } from 'utils/iconUtils';
 import { formatLargeAmount, formatNumber } from 'utils/numberUtils';
-import { useConnect, useSwitchChain } from 'wagmi';
+import {
+  useAccount,
+  useConnect,
+  useSwitchChain,
+  useWaitForTransactionReceipt,
+  useWriteContract,
+} from 'wagmi';
+import { parseEther } from 'viem';
 import Web3 from 'web3';
 import { CustomButton } from '../common/CustomButton';
 import { CustomNumberInput } from '../common/CustomNumberInput';
 import { DataLoading } from '../common/DataLoading';
 import { useDepositEnabled } from 'hooks/useDepositEnabled';
 import { setMetaMaskDisconnected } from 'redux/reducers/WalletSlice';
+import {
+  getEthDepositContract,
+  getEthDepositContractAbi,
+} from 'config/contract';
+import {
+  setStakeLoading,
+  setStakeLoadingParams,
+} from 'redux/reducers/AppSlice';
+import { uuid } from 'utils/commonUtils';
+import { CANCELLED_MESSAGE } from 'constants/common';
+import snackbarUtil from 'utils/snackbarUtils';
 
 export const LsdTokenStake = () => {
   const dispatch = useAppDispatch();
@@ -37,11 +55,10 @@ export const LsdTokenStake = () => {
   const { ethPrice } = usePrice();
   const { gasPrice } = useGasPrice();
   const lsdEthRate = useLsdEthRate();
-
   const { lsdBalance } = useBalance();
   const { apr } = useApr();
   const [stakeAmount, setStakeAmount] = useState('');
-  const { metaMaskChainId, metaMaskAccount } = useWalletAccount();
+  const { chainId: metaMaskChainId, address: metaMaskAccount } = useAccount();
 
   const { minimumDeposit: ethMinimumDeposit } = useMinimumStakeLimit();
   const { depositEnabled } = useDepositEnabled();
@@ -220,28 +237,106 @@ export const LsdTokenStake = () => {
     }
   };
 
-  const clickStake = () => {
+  const noticeUuid = uuid();
+  const [stakeTxHash, setStakeTxHash] = useState<`0x${string}`>('0x');
+  const { isSuccess } = useWaitForTransactionReceipt({
+    hash: stakeTxHash,
+  });
+
+  useEffect(() => {
+    const maketx = async () => {
+      dispatch(
+        handleEthStake(
+          Number(stakeAmount) + '',
+          willReceiveAmount,
+          newRTokenBalance,
+          false,
+          stakeTxHash || '',
+          noticeUuid,
+          (success) => {
+            dispatch(updateEthBalance());
+            if (success) {
+              setStakeAmount('');
+              dispatch(updateLsdEthBalance());
+            }
+          }
+        )
+      );
+    };
+
+    if (isSuccess) {
+      maketx();
+    }
+  }, [isSuccess]);
+
+  const { writeContractAsync } = useWriteContract({
+    mutation: {
+      onSettled(data, error) {
+        if (error) {
+          dispatch(setStakeLoading(false));
+
+          return;
+        } else if (data) {
+          setStakeTxHash(data);
+        }
+      },
+
+      onError: (error) => {
+        dispatch(setStakeLoading(false));
+        snackbarUtil.error(CANCELLED_MESSAGE);
+        dispatch(setStakeLoadingParams(undefined));
+        return;
+      },
+    },
+  });
+
+  const clickStake = async () => {
     // Connect Wallet
     if (walletNotConnected || isWrongMetaMaskNetwork) {
       clickConnectWallet();
       return;
     }
 
-    dispatch(
-      handleEthStake(
-        Number(stakeAmount) + '',
-        willReceiveAmount,
-        newRTokenBalance,
-        false,
-        (success) => {
-          dispatch(updateEthBalance());
-          if (success) {
-            setStakeAmount('');
-            dispatch(updateLsdEthBalance());
-          }
-        }
-      )
-    );
+    try {
+      dispatch(setStakeLoading(true));
+      dispatch(
+        setStakeLoadingParams({
+          modalVisible: true,
+          noticeUuid,
+          status: 'loading',
+          amount: Number(stakeAmount) + '',
+          willReceiveAmount,
+          newLsdTokenBalance: newRTokenBalance,
+        })
+      );
+
+      await writeContractAsync({
+        abi: getEthDepositContractAbi(),
+        address: getEthDepositContract() as `0x${string}`,
+        functionName: 'deposit',
+        args: [],
+        value: parseEther(stakeAmount),
+      });
+    } catch (error) {
+      dispatch(setStakeLoading(false));
+      console.error(error);
+    }
+
+    // dispatch(
+    //   handleEthStake(
+    //     Number(stakeAmount) + '',
+    //     willReceiveAmount,
+    //     newRTokenBalance,
+    //     false,
+    //     (success) => {
+    //       dispatch(updateEthBalance());
+    //       if (success) {
+    //         setStakeAmount('');
+    //         dispatch(updateLsdEthBalance());
+    //       }
+    //     }
+    //   )
+    // );
   };
 
   const ratePopupState = usePopupState({
@@ -310,27 +405,29 @@ export const LsdTokenStake = () => {
         </div>
       </div>
 
-      <CustomButton
-        loading={stakeLoading}
-        disabled={buttonDisabled}
-        mt='.18rem'
-        className='mx-[.24rem]'
-        height='.56rem'
-        type={isButtonSecondary ? 'secondary' : 'primary'}
-        onClick={clickStake}
-        border='none'
-      >
-        <div className='flex items-center'>
-          {buttonText}
+      {buttonText && (
+        <CustomButton
+          loading={stakeLoading}
+          disabled={buttonDisabled}
+          mt='.18rem'
+          className='mx-[.24rem]'
+          height='.56rem'
+          type={isButtonSecondary ? 'secondary' : 'primary'}
+          onClick={clickStake}
+          border='none'
+        >
+          <div className='flex items-center'>
+            {buttonText}
 
-          {(buttonText.indexOf('Wrong network') >= 0 ||
-            buttonText.indexOf('Insufficient FIS.') >= 0) && (
-            <div className='ml-[.12rem] flex items-center'>
-              <Icomoon icon='arrow-right' size='.12rem' color='#1B1B1F' />
-            </div>
-          )}
-        </div>
-      </CustomButton>
+            {(buttonText.indexOf('Wrong network') >= 0 ||
+              buttonText.indexOf('Insufficient FIS.') >= 0) && (
+              <div className='ml-[.12rem] flex items-center'>
+                <Icomoon icon='arrow-right' size='.12rem' color='#1B1B1F' />
+              </div>
+            )}
+          </div>
+        </CustomButton>
+      )}
 
       <div
         className='mx-[.75rem] my-[.24rem] grid items-stretch font-[500]'
