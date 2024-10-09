@@ -14,7 +14,7 @@ import HoverPopover from 'material-ui-popup-state/HoverPopover';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { handleLsdEthUnstake } from 'redux/reducers/EthSlice';
 import { updateLsdEthBalance } from 'redux/reducers/LsdEthSlice';
 import { setMetaMaskDisconnected } from 'redux/reducers/WalletSlice';
@@ -27,12 +27,33 @@ import {
   getUnstakeTipLink,
 } from 'utils/configUtils';
 import { formatLargeAmount, formatNumber } from 'utils/numberUtils';
-import { useConnect, useSwitchChain } from 'wagmi';
+import {
+  useAccount,
+  useConnect,
+  useReadContract,
+  useSwitchChain,
+  useWaitForTransactionReceipt,
+  useWriteContract,
+} from 'wagmi';
 import Web3 from 'web3';
 import { CustomButton } from '../common/CustomButton';
 import { CustomNumberInput } from '../common/CustomNumberInput';
 import { DataLoading } from '../common/DataLoading';
 import { getLsdTokenIcon } from 'utils/iconUtils';
+import {
+  setUnstakeLoading,
+  setUnstakeLoadingParams,
+  updateUnstakeLoadingParams,
+} from 'redux/reducers/AppSlice';
+import {
+  getEthWithdrawContract,
+  getEthWithdrawContractAbi,
+  getLsdEthTokenContract,
+  getLsdEthTokenContractAbi,
+} from 'config/contract';
+import { parseEther } from 'viem';
+import { CANCELLED_MESSAGE, LOADING_MESSAGE_UNSTAKING } from 'constants/common';
+import snackbarUtil from 'utils/snackbarUtils';
 
 export const LsdTokenUnstake = () => {
   const router = useRouter();
@@ -41,7 +62,8 @@ export const LsdTokenUnstake = () => {
   const { switchChainAsync } = useSwitchChain();
   const { connectAsync, connectors } = useConnect();
 
-  const { metaMaskAccount, metaMaskChainId } = useWalletAccount();
+  const { chainId: metaMaskChainId, address: metaMaskAccount } = useAccount();
+  // const { metaMaskAccount, metaMaskChainId } = useWalletAccount();
   const { balance } = useBalance();
   const { ethPrice, lsdEthPrice } = usePrice();
   const { gasPrice } = useGasPrice();
@@ -165,6 +187,13 @@ export const LsdTokenUnstake = () => {
     balance,
   ]);
 
+  const { data: allowance } = useReadContract({
+    abi: getLsdEthTokenContractAbi(),
+    address: getLsdEthTokenContract() as `0x${string}`,
+    functionName: 'allowance',
+    args: [metaMaskAccount, getEthWithdrawContract()],
+  });
+
   const newRTokenBalance = useMemo(() => {
     if (isNaN(Number(availableBalance))) {
       return '--';
@@ -231,30 +260,159 @@ export const LsdTokenUnstake = () => {
     });
   };
 
-  const clickUnstake = () => {
+  const [approvetxHash, setApprovetxHash] = useState<`0x${string}`>('0x');
+  const { isSuccess } = useWaitForTransactionReceipt({
+    hash: approvetxHash,
+  });
+
+  useEffect(() => {
+    const maketx = async () => {
+      const txHash = await writeUnstakeContractAsync({
+        abi: getEthWithdrawContractAbi(),
+        address: getEthWithdrawContract() as `0x${string}`,
+        functionName: 'unstake',
+        args: [parseEther(unstakeAmount)],
+      });
+
+      dispatch(
+        handleLsdEthUnstake(
+          unstakeAmount,
+          willReceiveAmount,
+          newRTokenBalance,
+          false,
+          txHash,
+          (success, needWithdraw) => {
+            dispatch(updateLsdEthBalance());
+            if (success) {
+              resetState();
+              if (needWithdraw) {
+                jumpToWithdraw();
+              }
+            }
+          }
+        )
+      );
+    };
+    console.log(isSuccess);
+    if (isSuccess) {
+      maketx();
+    }
+  }, [isSuccess]);
+
+  const { writeContractAsync } = useWriteContract({
+    mutation: {
+      onSuccess: async (data) => {
+        setApprovetxHash(data);
+      },
+      onError: (error) => {
+        dispatch(setUnstakeLoading(false));
+        snackbarUtil.error(CANCELLED_MESSAGE);
+        dispatch(setUnstakeLoadingParams(undefined));
+        return;
+      },
+    },
+  });
+
+  const [unstakeTxHash, setUnstakeTxHash] = useState<`0x${string}`>('0x');
+  const { isSuccess: unstakeSuccess } = useWaitForTransactionReceipt({
+    hash: unstakeTxHash,
+  });
+
+  useEffect(() => {
+    const maketx = async () => {
+      dispatch(
+        handleLsdEthUnstake(
+          unstakeAmount,
+          willReceiveAmount,
+          newRTokenBalance,
+          false,
+          unstakeTxHash,
+          (success, needWithdraw) => {
+            dispatch(updateLsdEthBalance());
+            if (success) {
+              resetState();
+              if (needWithdraw) {
+                jumpToWithdraw();
+              }
+            }
+          }
+        )
+      );
+    };
+    if (unstakeSuccess) {
+      maketx();
+    }
+  }, [unstakeSuccess]);
+
+  const { writeContractAsync: writeUnstakeContractAsync } = useWriteContract({
+    mutation: {
+      onSettled(data, error) {
+        if (error) {
+          dispatch(setUnstakeLoading(false));
+          dispatch(
+            updateUnstakeLoadingParams({
+              customMsg: 'Unstake failed, please try again later',
+            })
+          );
+          return;
+        } else if (data) {
+          setUnstakeTxHash(data);
+        }
+      },
+      onError: (error) => {
+        dispatch(setUnstakeLoading(false));
+        snackbarUtil.error(CANCELLED_MESSAGE);
+        dispatch(setUnstakeLoadingParams(undefined));
+        return;
+      },
+    },
+  });
+
+  const clickUnstake = async () => {
     // Connect Wallet
     if (walletNotConnected || isWrongMetaMaskNetwork) {
       clickConnectWallet();
       return;
     }
 
-    dispatch(
-      handleLsdEthUnstake(
-        unstakeAmount,
-        willReceiveAmount,
-        newRTokenBalance,
-        false,
-        (success, needWithdraw) => {
-          dispatch(updateLsdEthBalance());
-          if (success) {
-            resetState();
-            if (needWithdraw) {
-              jumpToWithdraw();
-            }
-          }
-        }
-      )
-    );
+    try {
+      dispatch(setUnstakeLoading(true));
+      dispatch(
+        setUnstakeLoadingParams({
+          modalVisible: true,
+          status: 'loading',
+          targetAddress: metaMaskAccount,
+          amount: unstakeAmount,
+          willReceiveAmount,
+          newLsdTokenBalance: newRTokenBalance,
+          customMsg: LOADING_MESSAGE_UNSTAKING,
+        })
+      );
+
+      if (Number(allowance) < Number(parseEther(unstakeAmount))) {
+        dispatch(
+          updateUnstakeLoadingParams({
+            customMsg:
+              'Please approve the fund allowance request in your wallet',
+          })
+        );
+        await writeContractAsync({
+          abi: getLsdEthTokenContractAbi(),
+          address: getLsdEthTokenContract() as `0x${string}`,
+          functionName: 'approve',
+          args: [getEthWithdrawContract(), parseEther('10000000')],
+        });
+      } else {
+        await writeUnstakeContractAsync({
+          abi: getEthWithdrawContractAbi(),
+          address: getEthWithdrawContract() as `0x${string}`,
+          functionName: 'unstake',
+          args: [parseEther(unstakeAmount)],
+        });
+      }
+    } catch (error) {
+      dispatch(setUnstakeLoading(false));
+    }
   };
 
   const ratePopupState = usePopupState({
