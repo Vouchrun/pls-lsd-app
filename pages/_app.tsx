@@ -76,7 +76,7 @@ const networks = [
     rpcUrl: 'https://rpc.v4.testnet.pulsechain.com',
     network: 'testnet',
     imageUrl: 'https://avatars.githubusercontent.com/u/179229932',
-  } as CaipNetwork,
+  } as unknown as CaipNetwork,
 ];
 
 // 3. Create Wagmi Adapter
@@ -89,7 +89,7 @@ const wagmiAdapter = new WagmiAdapter({
 // 4. Create modal
 createAppKit({
   adapters: [wagmiAdapter],
-  networks: networks,
+  networks: networks as any,
   metadata,
   projectId,
   featuredWalletIds: [
