@@ -267,7 +267,15 @@ export const LsdTokenStake = () => {
     if (isSuccess) {
       maketx();
     }
-  }, [isSuccess]);
+  }, [
+    isSuccess,
+    dispatch,
+    newRTokenBalance,
+    noticeUuid,
+    stakeAmount,
+    stakeTxHash,
+    willReceiveAmount,
+  ]);
 
   const { writeContractAsync } = useWriteContract({
     mutation: {
@@ -281,7 +289,7 @@ export const LsdTokenStake = () => {
         }
       },
 
-      onError: (error) => {
+      onError: () => {
         dispatch(setStakeLoading(false));
         snackbarUtil.error(CANCELLED_MESSAGE);
         dispatch(setStakeLoadingParams(undefined));
