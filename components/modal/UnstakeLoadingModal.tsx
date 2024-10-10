@@ -99,31 +99,6 @@ export const UnstakeLoadingModal = () => {
     hash: approvetxHash,
   });
 
-  useEffect(() => {
-    const maketx = async () => {
-      const txHash = await writeUnstakeContractAsync({
-        abi: getEthWithdrawContractAbi(),
-        address: getEthWithdrawContract() as `0x${string}`,
-        functionName: 'unstake',
-        args: [parseEther(unstakeLoadingParams?.amount + '')],
-      });
-
-      dispatch(
-        handleLsdEthUnstake(
-          unstakeLoadingParams?.amount + '',
-          unstakeLoadingParams?.willReceiveAmount + '',
-          unstakeLoadingParams?.newLsdTokenBalance + '',
-          true,
-          unstakeTxHash
-        )
-      );
-    };
-    console.log(isSuccess);
-    if (isSuccess) {
-      maketx();
-    }
-  }, [isSuccess]);
-
   const { writeContractAsync } = useWriteContract({
     mutation: {
       onSuccess: async (data) => {
@@ -158,7 +133,7 @@ export const UnstakeLoadingModal = () => {
     if (unstakeSuccess && unstakeLoadingParams) {
       maketx();
     }
-  }, [unstakeSuccess]);
+  }, [unstakeSuccess, dispatch, unstakeLoadingParams, unstakeTxHash]);
 
   const { writeContractAsync: writeUnstakeContractAsync } = useWriteContract({
     mutation: {
@@ -244,6 +219,39 @@ export const UnstakeLoadingModal = () => {
       dispatch(setUnstakeLoading(false));
     }
   };
+
+  useEffect(() => {
+    const maketx = async () => {
+      await writeUnstakeContractAsync({
+        abi: getEthWithdrawContractAbi(),
+        address: getEthWithdrawContract() as `0x${string}`,
+        functionName: 'unstake',
+        args: [parseEther(unstakeLoadingParams?.amount + '')],
+      });
+
+      dispatch(
+        handleLsdEthUnstake(
+          unstakeLoadingParams?.amount + '',
+          unstakeLoadingParams?.willReceiveAmount + '',
+          unstakeLoadingParams?.newLsdTokenBalance + '',
+          true,
+          unstakeTxHash
+        )
+      );
+    };
+    console.log(isSuccess);
+    if (isSuccess) {
+      maketx();
+    }
+  }, [
+    isSuccess,
+    dispatch,
+    unstakeLoadingParams?.amount,
+    unstakeLoadingParams?.newLsdTokenBalance,
+    unstakeLoadingParams?.willReceiveAmount,
+    unstakeTxHash,
+    writeUnstakeContractAsync,
+  ]);
 
   return (
     <Modal

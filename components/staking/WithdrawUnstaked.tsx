@@ -95,7 +95,16 @@ export const WithdrawUnstaked = (props: Props) => {
     if (isSuccess) {
       maketx();
     }
-  }, [isSuccess]);
+  }, [
+    isSuccess,
+    claimableAmount,
+    claimableWithdrawals,
+    dispatch,
+    overallAmount,
+    router,
+    willReceiveAmount,
+    withdrawTxHash,
+  ]);
 
   const { writeContractAsync } = useWriteContract({
     mutation: {

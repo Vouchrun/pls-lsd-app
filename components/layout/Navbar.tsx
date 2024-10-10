@@ -52,7 +52,7 @@ const Navbar = () => {
         dispatch(setMetaMaskDisconnected(false));
       }
     }
-  }, [isDisconnected, address]);
+  }, [isDisconnected, address, dispatch]);
 
   const resizeListener = () => {
     const clientW = document.documentElement.clientWidth;
