@@ -27,7 +27,7 @@ import {
   getUnstakeTipLink,
 } from 'utils/configUtils';
 import { formatLargeAmount, formatNumber } from 'utils/numberUtils';
-import { useConnect, useSwitchChain } from 'wagmi';
+import { useConnect, useSwitchChain, useWriteContract } from 'wagmi';
 import Web3 from 'web3';
 import { CustomButton } from '../common/CustomButton';
 import { CustomNumberInput } from '../common/CustomNumberInput';
@@ -49,7 +49,7 @@ export const LsdTokenUnstake = () => {
   const lsdEthRate = useLsdEthRate();
 
   const { lsdBalance } = useBalance();
-
+  const { writeContractAsync } = useWriteContract();
   const { apr } = useApr();
 
   const [unstakeAmount, setUnstakeAmount] = useState('');
@@ -240,6 +240,7 @@ export const LsdTokenUnstake = () => {
 
     dispatch(
       handleLsdEthUnstake(
+        writeContractAsync,
         unstakeAmount,
         willReceiveAmount,
         newRTokenBalance,
