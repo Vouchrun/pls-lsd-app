@@ -455,6 +455,86 @@ export const handleLsdEthUnstake =
             },
           }
         );
+      } else {
+        const nextWithdrawIndex = await contract.methods
+          .nextWithdrawIndex()
+          .call();
+        // console.log("nextWithdrawIndex", nextWithdrawIndex);
+
+        dispatch(
+          updateUnstakeLoadingParams({
+            customMsg: `Please confirm the ${Number(
+              unstakeAmount
+            )} ${getLsdEthName()} unstaking transaction in your MetaMask wallet`,
+          })
+        );
+
+        await writeContractAsync(
+          {
+            abi: getEthWithdrawContractAbi(),
+            address: getEthWithdrawContract() as `0x${string}`,
+            functionName: 'unstake',
+            args: [parseEther(unstakeAmount)],
+          },
+          {
+            onSuccess: (data: any) => {
+              console.log('Transaction successful!', data);
+            },
+            onSettled: async (data: any, error: any) => {
+              if (error) {
+                console.error('Transaction settled with error:', error);
+              } else {
+                const result = await waitForTransactionReceipt(web3, data);
+                if (result && result.status) {
+                  const unclaimedWithdrawsOfUser = await contract.methods
+                    .getUnclaimedWithdrawalsOfUser(metaMaskAccount)
+                    .call();
+
+                  const needWithdraw =
+                    unclaimedWithdrawsOfUser.indexOf(nextWithdrawIndex) >= 0;
+                  const customMsg = !needWithdraw
+                    ? `Unstaking ${Number(
+                        unstakeAmount
+                      )} ${getTokenName()} operation was successful.`
+                    : `Unstaking operation was successful. Withdraw function will be shown in the page later, please wait for the withdraw opening to get your unstaked ${getTokenName()}.`;
+
+                  cb && cb(result.status, needWithdraw, result);
+
+                  const txHash = result.transactionHash;
+                  dispatch(
+                    updateUnstakeLoadingParams({
+                      status: 'success',
+                      txHash: txHash,
+                      scanUrl: getEtherScanTxUrl(txHash),
+                      customMsg,
+                    })
+                  );
+                  const newNotice: LocalNotice = {
+                    id: noticeUuid || uuid(),
+                    type: 'Unstake',
+                    txDetail: {
+                      transactionHash: txHash,
+                      sender: metaMaskAccount,
+                    },
+                    data: {
+                      amount: Number(unstakeAmount) + '',
+                      willReceiveAmount: Number(willReceiveAmount) + '',
+                      needWithdraw,
+                    },
+                    scanUrl: getEtherScanTxUrl(result.transactionHash),
+                    status: 'Confirmed',
+                  };
+                  dispatch(addNotice(newNotice));
+                } else {
+                  throw new Error(TRANSACTION_FAILED_MESSAGE);
+                }
+              }
+            },
+            onError: (error: any) => {
+              throw new Error(TRANSACTION_FAILED_MESSAGE);
+            },
+          }
+        );
       }
     } catch (err: any) {
       {
