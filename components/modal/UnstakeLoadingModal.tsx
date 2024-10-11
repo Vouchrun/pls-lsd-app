@@ -2,6 +2,7 @@ import { Box, Modal } from '@mui/material';
 import classNames from 'classnames';
 import { PrimaryLoading } from 'components/common/PrimaryLoading';
 import { Icomoon } from 'components/icon/Icomoon';
+
 import { roboto } from 'config/font';
 import { useAppDispatch, useAppSelector } from 'hooks/common';
 import Image from 'next/image';
@@ -72,7 +73,7 @@ export const UnstakeLoadingModal = () => {
     }
   };
 
-  const clickRetry = () => {
+  const clickRetry = async () => {
     if (!unstakeLoadingParams) {
       return;
     }

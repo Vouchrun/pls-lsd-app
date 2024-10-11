@@ -67,7 +67,7 @@ export const StakeLoadingModal = () => {
     }
   };
 
-  const clickRetry = () => {
+  const clickRetry = async () => {
     if (!stakeLoadingParams) {
       return;
     }

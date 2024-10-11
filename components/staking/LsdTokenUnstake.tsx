@@ -27,7 +27,12 @@ import {
   getUnstakeTipLink,
 } from 'utils/configUtils';
 import { formatLargeAmount, formatNumber } from 'utils/numberUtils';
-import { useConnect, useSwitchChain, useWriteContract } from 'wagmi';
+import {
+  useAccount,
+  useConnect,
+  useSwitchChain,
+  useWriteContract,
+} from 'wagmi';
 import Web3 from 'web3';
 import { CustomButton } from '../common/CustomButton';
 import { CustomNumberInput } from '../common/CustomNumberInput';
@@ -41,7 +46,7 @@ export const LsdTokenUnstake = () => {
   const { switchChainAsync } = useSwitchChain();
   const { connectAsync, connectors } = useConnect();
 
-  const { metaMaskAccount, metaMaskChainId } = useWalletAccount();
+  const { address: metaMaskAccount, chainId: metaMaskChainId } = useAccount();
   const { balance } = useBalance();
   const { ethPrice, lsdEthPrice } = usePrice();
   const { gasPrice } = useGasPrice();
