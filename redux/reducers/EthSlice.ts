@@ -147,7 +147,7 @@ export const handleEthStake =
         })
       );
 
-      const web3 = createWeb3();
+      const web3 = getEthWeb3();
       const metaMaskAccount = getState().wallet.metaMaskAccount;
       if (!metaMaskAccount) {
         throw new Error('Please connect MetaMask');
@@ -170,7 +170,8 @@ export const handleEthStake =
         },
         {
           onSuccess: (data: any) => {
-            console.log('Transaction successful!', data);
+            if (data.Message == 'deny')
+              throw new Error(TRANSACTION_FAILED_MESSAGE);
           },
           onSettled: async (data: any, error: any) => {
             if (error) {
@@ -298,7 +299,7 @@ export const handleLsdEthUnstake =
         throw new Error('Please connect MetaMask');
       }
 
-      const web3 = createWeb3();
+      const web3 = getEthWeb3();
       const contract = new web3.eth.Contract(
         getEthWithdrawContractAbi(),
         getEthWithdrawContract(),
@@ -348,7 +349,8 @@ export const handleLsdEthUnstake =
           },
           {
             onSuccess: (data: any) => {
-              console.log('Transaction successful!', data);
+              if (data.Message == 'deny')
+                throw new Error(TRANSACTION_FAILED_MESSAGE);
             },
             onSettled: async (data: any, error: any) => {
               if (error) {
@@ -378,7 +380,8 @@ export const handleLsdEthUnstake =
                     },
                     {
                       onSuccess: (data: any) => {
-                        console.log('Transaction successful!', data);
+                        if (data.Message == 'deny')
+                          throw new Error(TRANSACTION_FAILED_MESSAGE);
                       },
                       onSettled: async (data: any, error: any) => {
                         if (error) {
@@ -478,7 +481,8 @@ export const handleLsdEthUnstake =
           },
           {
             onSuccess: (data: any) => {
-              console.log('Transaction successful!', data);
+              if (data.Message == 'deny')
+                throw new Error(TRANSACTION_FAILED_MESSAGE);
             },
             onSettled: async (data: any, error: any) => {
               if (error) {
@@ -588,7 +592,7 @@ export const handleEthWithdraw =
         throw new Error('Please connect MetaMask');
       }
 
-      const web3 = createWeb3();
+      const web3 = getEthWeb3();
       const contract = new web3.eth.Contract(
         getEthWithdrawContractAbi(),
         getEthWithdrawContract(),
@@ -624,7 +628,8 @@ export const handleEthWithdraw =
         },
         {
           onSuccess: (data: any) => {
-            console.log('Transaction successful!', data);
+            if (data.Message == 'deny')
+              throw new Error(TRANSACTION_FAILED_MESSAGE);
           },
           onSettled: async (data: any, error: any) => {
             if (error) {

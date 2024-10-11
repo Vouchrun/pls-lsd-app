@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
-import { useWalletAccount } from "./useWalletAccount";
-import { createWeb3, getEthWeb3 } from "utils/web3Utils";
+import { useEffect, useState } from 'react';
+import { useWalletAccount } from './useWalletAccount';
+import { createWeb3, getEthWeb3 } from 'utils/web3Utils';
 import {
   getEthWithdrawContract,
   getEthWithdrawContractAbi,
-} from "config/contract";
+} from 'config/contract';
 
 /**
  * @deprecated
@@ -12,18 +12,18 @@ import {
 export function useEthWithdrawLimit() {
   const { metaMaskAccount } = useWalletAccount();
 
-  const [withdrawLimitPerCycle, setWithdrawLimitPerCycle] = useState("");
+  const [withdrawLimitPerCycle, setWithdrawLimitPerCycle] = useState('');
   const [userWithdrawLimitPerCycle, setUserWithdrawLimitPerCycle] =
-    useState("");
+    useState('');
   const [totalWithdrawAmountAtCycle, setTotalWithdrawAmountAtCycle] =
-    useState("");
+    useState('');
   const [userWithdrawAmountAtCycle, setUserWithdrawAmountAtCycle] =
-    useState("");
+    useState('');
 
   useEffect(() => {
     if (metaMaskAccount) {
       (async () => {
-        const web3 = createWeb3();
+        const web3 = getEthWeb3();
         const customWeb3 = getEthWeb3();
         const contract = new web3.eth.Contract(
           getEthWithdrawContractAbi(),
