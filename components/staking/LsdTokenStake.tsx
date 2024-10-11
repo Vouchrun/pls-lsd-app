@@ -21,7 +21,7 @@ import { RootState } from 'redux/store';
 import { getLsdEthName, getTokenName } from 'utils/configUtils';
 import { getTokenIcon } from 'utils/iconUtils';
 import { formatLargeAmount, formatNumber } from 'utils/numberUtils';
-import { useConnect, useSwitchChain } from 'wagmi';
+import { useConnect, useSwitchChain, useWriteContract } from 'wagmi';
 import Web3 from 'web3';
 import { CustomButton } from '../common/CustomButton';
 import { CustomNumberInput } from '../common/CustomNumberInput';
@@ -47,7 +47,7 @@ export const LsdTokenStake = () => {
   const { depositEnabled } = useDepositEnabled();
 
   const { balance } = useBalance();
-
+  const { writeContractAsync } = useWriteContract();
   const { stakeLoading } = useAppSelector((state: RootState) => {
     return {
       stakeLoading: state.app.stakeLoading,
@@ -229,11 +229,13 @@ export const LsdTokenStake = () => {
 
     dispatch(
       handleEthStake(
+        writeContractAsync,
         Number(stakeAmount) + '',
         willReceiveAmount,
         newRTokenBalance,
         false,
         (success) => {
+          console.log(success);
           dispatch(updateEthBalance());
           if (success) {
             setStakeAmount('');

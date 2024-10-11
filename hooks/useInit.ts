@@ -37,10 +37,10 @@ export function useInit() {
 
   // const { useAccount: useMetaMaskAccount } = hooks;
   // const metaMaskAccount = useMetaMaskAccount();
-  const { address: metaMaskAccount } = useAccount();
+  const { address: metaMaskAccount, chainId: metaMaskChainId } = useAccount();
 
-  const { metaMaskAccount: walletMetaMaskAccount, metaMaskChainId } =
-    useWalletAccount();
+  // const { metaMaskAccount: walletMetaMaskAccount, metaMaskChainId } =
+  //   useWalletAccount();
 
   useEffect(() => {
     // Init local data.
@@ -66,7 +66,7 @@ export function useInit() {
 
   useInterval(() => {
     dispatch(setUpdateFlag(dayjs().unix()));
-  }, 15000); // 12s
+  }, 30000); // 30s
 
   useInterval(() => {
     if (metaMaskAccount) {
@@ -105,7 +105,7 @@ export function useInit() {
   // Update wallet balances.
   useEffect(() => {
     dispatch(updateEthBalance());
-  }, [dispatch, walletMetaMaskAccount, metaMaskChainId, updateFlag]);
+  }, [dispatch, metaMaskAccount, metaMaskChainId, updateFlag]);
 
   // Change body backgroundColor
   useEffect(() => {
