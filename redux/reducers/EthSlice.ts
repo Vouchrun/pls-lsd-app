@@ -35,7 +35,9 @@ import {
   updateUnstakeLoadingParams,
 } from './AppSlice';
 import { getLsdEthName, getTokenName } from 'utils/configUtils';
-import { useWriteContract } from 'wagmi';
+import { parseEther } from 'viem';
+import { useWaitForTransactionReceipt } from 'wagmi';
+import { waitForTransactionReceipt } from 'utils/web3receipt';
 
 export interface EthState {
   txLoading: boolean;
@@ -121,82 +123,98 @@ export const updateEthBalance = (): AppThunk => async (dispatch, getState) => {
  */
 export const handleEthStake =
   (
+    writeContractAsync: Function,
     stakeAmount: string,
     willReceiveAmount: string,
     newLsdTokenBalance: string,
     isReTry: boolean,
-    txHash: string,
-    noticeUuidValue: string,
     cb?: (success: boolean, result: any) => void
   ): AppThunk =>
   async (dispatch, getState) => {
     const noticeUuid = isReTry
       ? getState().app.stakeLoadingParams?.noticeUuid
-      : noticeUuidValue;
+      : uuid();
     try {
-      // dispatch(setStakeLoading(true));
-      // dispatch(
-      //   setStakeLoadingParams({
-      //     modalVisible: true,
-      //     noticeUuid,
-      //     status: 'loading',
-      //     amount: Number(stakeAmount) + '',
-      //     willReceiveAmount,
-      //     newLsdTokenBalance,
-      //   })
-      // );
+      dispatch(setStakeLoading(true));
+      dispatch(
+        setStakeLoadingParams({
+          modalVisible: true,
+          noticeUuid,
+          status: 'loading',
+          amount: Number(stakeAmount) + '',
+          willReceiveAmount,
+          newLsdTokenBalance,
+        })
+      );
 
-      // const web3 = createWeb3();
-      const metaMaskAccount: any = getState().wallet.metaMaskAccount;
-      // if (!metaMaskAccount) {
-      //   throw new Error('Please connect MetaMask');
-      // }
-      // let contract = new web3.eth.Contract(
-      //   getEthDepositContractAbi(),
-      //   getEthDepositContract(),
-      //   {
-      //     from: metaMaskAccount,
-      //   }
-      // );
-
-      // const stakeAmountInWei = web3.utils.toWei(
-      //   formatScientificNumber(stakeAmount),
-      //   'ether'
-      // );
-      // const result = await contract.methods
-      //   .deposit()
-      //   .send({ value: stakeAmountInWei });
-
-      cb && cb(true, txHash);
-
-      if (txHash) {
-        dispatch(
-          updateStakeLoadingParams(
-            {
-              status: 'success',
-              txHash: txHash,
-              scanUrl: getEtherScanTxUrl(txHash),
-            },
-            (newParams) => {
-              const newNotice: LocalNotice = {
-                id: noticeUuid || uuid(),
-                type: 'Stake',
-                txDetail: { transactionHash: txHash, sender: metaMaskAccount },
-                data: {
-                  amount: Number(stakeAmount) + '',
-                  willReceiveAmount: Number(willReceiveAmount) + '',
-                },
-                scanUrl: getEtherScanTxUrl(txHash),
-                status: 'Confirmed',
-                stakeLoadingParams: newParams,
-              };
-              dispatch(addNotice(newNotice));
-            }
-          )
-        );
-      } else {
-        throw new Error(TRANSACTION_FAILED_MESSAGE);
+      const web3 = createWeb3();
+      const metaMaskAccount = getState().wallet.metaMaskAccount;
+      if (!metaMaskAccount) {
+        throw new Error('Please connect MetaMask');
       }
+      let contract = new web3.eth.Contract(
+        getEthDepositContractAbi(),
+        getEthDepositContract(),
+        {
+          from: metaMaskAccount,
+        }
+      );
+
+      await writeContractAsync(
+        {
+          abi: getEthDepositContractAbi(),
+          address: getEthDepositContract() as `0x${string}`,
+          functionName: 'deposit',
+          args: [],
+          value: parseEther(stakeAmount),
+        },
+        {
+          onSuccess: (data: any) => {
+            console.log('Transaction successful!', data);
+          },
+          onSettled: async (data: any, error: any) => {
+            if (error) {
+              console.error('Transaction settled with error:', error);
+            } else {
+              const result = await waitForTransactionReceipt(web3, data);
+              if (result.status) {
+                cb && cb(result.status, result);
+                const txHash = result.transactionHash;
+                dispatch(
+                  updateStakeLoadingParams(
+                    {
+                      status: 'success',
+                      txHash: txHash,
+                      scanUrl: getEtherScanTxUrl(txHash),
+                    },
+                    (newParams) => {
+                      const newNotice: LocalNotice = {
+                        id: noticeUuid || uuid(),
+                        type: 'Stake',
+                        txDetail: {
+                          transactionHash: txHash,
+                          sender: metaMaskAccount,
+                        },
+                        data: {
+                          amount: Number(stakeAmount) + '',
+                          willReceiveAmount: Number(willReceiveAmount) + '',
+                        },
+                        scanUrl: getEtherScanTxUrl(txHash),
+                        status: 'Confirmed',
+                        stakeLoadingParams: newParams,
+                      };
+                      dispatch(addNotice(newNotice));
+                    }
+                  )
+                );
+              }
+            }
+          },
+          onError: (error: any) => {
+            throw new Error(TRANSACTION_FAILED_MESSAGE);
+          },
+        }
+      );
     } catch (err: any) {
       let displayMsg = TRANSACTION_FAILED_MESSAGE;
       if (err.code === -32603) {
@@ -260,26 +278,21 @@ export const updateEthLatestBlockTimestamp =
  */
 export const handleLsdEthUnstake =
   (
+    writeContractAsync: Function,
     unstakeAmount: string,
     willReceiveAmount: string,
     newLsdTokenBalance: string,
     isReTry: boolean,
-    txHash: string,
-    cb?: (
-      success: boolean,
-      needWithdraw: boolean,
-      needApprove: boolean,
-      unstake: boolean,
-      result: any
-    ) => void
+    cb?: (success: boolean, needWithdraw: boolean, result: any) => void
   ): AppThunk =>
   async (dispatch, getState) => {
     const noticeUuid = isReTry
       ? getState().app.unstakeLoadingParams?.noticeUuid
       : uuid();
+    const unstakeAmountInWei = Web3.utils.toWei(unstakeAmount);
 
     try {
-      // dispatch(setUnstakeLoading(true));
+      dispatch(setUnstakeLoading(true));
       const metaMaskAccount = getState().wallet.metaMaskAccount;
       if (!metaMaskAccount) {
         throw new Error('Please connect MetaMask');
@@ -294,80 +307,154 @@ export const handleLsdEthUnstake =
         }
       );
 
-      // dispatch(
-      //   setUnstakeLoadingParams({
-      //     modalVisible: true,
-      //     status: 'loading',
-      //     targetAddress: metaMaskAccount,
-      //     amount: unstakeAmount,
-      //     willReceiveAmount,
-      //     newLsdTokenBalance,
-      //     customMsg: LOADING_MESSAGE_UNSTAKING,
-      //   })
-      // );
-
-      // const lsdEthTokenContract = new web3.eth.Contract(
-      //   getLsdEthTokenContractAbi(),
-      //   getLsdEthTokenContract(),
-      //   {
-      //     from: metaMaskAccount,
-      //   }
-      // );
-
-      const nextWithdrawIndex = await contract.methods
-        .nextWithdrawIndex()
-        .call();
-      // console.log("nextWithdrawIndex", nextWithdrawIndex);
-
       dispatch(
-        updateUnstakeLoadingParams({
-          customMsg: `Please confirm the ${Number(
-            unstakeAmount
-          )} ${getLsdEthName()} unstaking transaction in your MetaMask wallet`,
+        setUnstakeLoadingParams({
+          modalVisible: true,
+          status: 'loading',
+          targetAddress: metaMaskAccount,
+          amount: unstakeAmount,
+          willReceiveAmount,
+          newLsdTokenBalance,
+          customMsg: LOADING_MESSAGE_UNSTAKING,
         })
       );
 
-      // const result = await contract.methods.unstake(unstakeAmountInWei).send();
+      const lsdEthTokenContract = new web3.eth.Contract(
+        getLsdEthTokenContractAbi(),
+        getLsdEthTokenContract(),
+        {
+          from: metaMaskAccount,
+        }
+      );
 
-      if (txHash) {
-        const unclaimedWithdrawsOfUser = await contract.methods
-          .getUnclaimedWithdrawalsOfUser(metaMaskAccount)
-          .call();
-        // console.log("unclaimedWithdrawsOfUser", unclaimedWithdrawsOfUser);
+      const allowance = await lsdEthTokenContract.methods
+        .allowance(metaMaskAccount, getEthWithdrawContract())
+        .call();
 
-        const needWithdraw =
-          unclaimedWithdrawsOfUser.indexOf(nextWithdrawIndex) >= 0;
-        const customMsg = !needWithdraw
-          ? `Unstaking ${Number(
-              unstakeAmount
-            )} ${getTokenName()} operation was successful.`
-          : `Unstaking operation was successful. Withdraw function will be shown in the page later, please wait for the withdraw opening to get your unstaked ${getTokenName()}.`;
-
-        cb && cb(true, needWithdraw, false, false, undefined);
-
+      if (Number(allowance) < Number(unstakeAmountInWei)) {
         dispatch(
           updateUnstakeLoadingParams({
-            status: 'success',
-            txHash: txHash,
-            scanUrl: getEtherScanTxUrl(txHash),
-            customMsg,
+            customMsg:
+              'Please approve the fund allowance request in your wallet',
           })
         );
-        const newNotice: LocalNotice = {
-          id: noticeUuid || uuid(),
-          type: 'Unstake',
-          txDetail: { transactionHash: txHash, sender: metaMaskAccount },
-          data: {
-            amount: Number(unstakeAmount) + '',
-            willReceiveAmount: Number(willReceiveAmount) + '',
-            needWithdraw,
+
+        await writeContractAsync(
+          {
+            abi: getLsdEthTokenContractAbi(),
+            address: getLsdEthTokenContract() as `0x${string}`,
+            functionName: 'approve',
+            args: [getEthWithdrawContract(), parseEther('10000000')],
           },
-          scanUrl: getEtherScanTxUrl(txHash),
-          status: 'Confirmed',
-        };
-        dispatch(addNotice(newNotice));
-      } else {
-        throw new Error(TRANSACTION_FAILED_MESSAGE);
+          {
+            onSuccess: (data: any) => {
+              console.log('Transaction successful!', data);
+            },
+            onSettled: async (data: any, error: any) => {
+              if (error) {
+                console.error('Transaction settled with error:', error);
+              } else {
+                const result = await waitForTransactionReceipt(web3, data);
+                if (result.status) {
+                  const nextWithdrawIndex = await contract.methods
+                    .nextWithdrawIndex()
+                    .call();
+                  // console.log("nextWithdrawIndex", nextWithdrawIndex);
+
+                  dispatch(
+                    updateUnstakeLoadingParams({
+                      customMsg: `Please confirm the ${Number(
+                        unstakeAmount
+                      )} ${getLsdEthName()} unstaking transaction in your MetaMask wallet`,
+                    })
+                  );
+
+                  await writeContractAsync(
+                    {
+                      abi: getEthWithdrawContractAbi(),
+                      address: getEthWithdrawContract() as `0x${string}`,
+                      functionName: 'unstake',
+                      args: [parseEther(unstakeAmount)],
+                    },
+                    {
+                      onSuccess: (data: any) => {
+                        console.log('Transaction successful!', data);
+                      },
+                      onSettled: async (data: any, error: any) => {
+                        if (error) {
+                          console.error(
+                            'Transaction settled with error:',
+                            error
+                          );
+                        } else {
+                          const result = await waitForTransactionReceipt(
+                            web3,
+                            data
+                          );
+                          if (result && result.status) {
+                            const unclaimedWithdrawsOfUser =
+                              await contract.methods
+                                .getUnclaimedWithdrawalsOfUser(metaMaskAccount)
+                                .call();
+
+                            const needWithdraw =
+                              unclaimedWithdrawsOfUser.indexOf(
+                                nextWithdrawIndex
+                              ) >= 0;
+                            const customMsg = !needWithdraw
+                              ? `Unstaking ${Number(
+                                  unstakeAmount
+                                )} ${getTokenName()} operation was successful.`
+                              : `Unstaking operation was successful. Withdraw function will be shown in the page later, please wait for the withdraw opening to get your unstaked ${getTokenName()}.`;
+
+                            cb && cb(result.status, needWithdraw, result);
+
+                            const txHash = result.transactionHash;
+                            dispatch(
+                              updateUnstakeLoadingParams({
+                                status: 'success',
+                                txHash: txHash,
+                                scanUrl: getEtherScanTxUrl(txHash),
+                                customMsg,
+                              })
+                            );
+                            const newNotice: LocalNotice = {
+                              id: noticeUuid || uuid(),
+                              type: 'Unstake',
+                              txDetail: {
+                                transactionHash: txHash,
+                                sender: metaMaskAccount,
+                              },
+                              data: {
+                                amount: Number(unstakeAmount) + '',
+                                willReceiveAmount:
+                                  Number(willReceiveAmount) + '',
+                                needWithdraw,
+                              },
+                              scanUrl: getEtherScanTxUrl(
+                                result.transactionHash
+                              ),
+                              status: 'Confirmed',
+                            };
+                            dispatch(addNotice(newNotice));
+                          } else {
+                            throw new Error(TRANSACTION_FAILED_MESSAGE);
+                          }
+                        }
+                      },
+                      onError: (error: any) => {
+                        throw new Error(TRANSACTION_FAILED_MESSAGE);
+                      },
+                    }
+                  );
+                }
+              }
+            },
+            onError: (error: any) => {
+              throw new Error(TRANSACTION_FAILED_MESSAGE);
+            },
+          }
+        );
       }
     } catch (err: any) {
       {
@@ -403,11 +490,11 @@ export const handleLsdEthUnstake =
  */
 export const handleEthWithdraw =
   (
+    writeContractAsync: Function,
     claimableWithdrawals: string[],
     withdrawAmount: string,
     willReceiveAmount: string,
     isReTry: boolean,
-    txHash: string,
     cb?: (success: boolean, result: any) => void
   ): AppThunk =>
   async (dispatch, getState) => {
@@ -421,68 +508,90 @@ export const handleEthWithdraw =
         throw new Error('Please connect MetaMask');
       }
 
-      // const web3 = createWeb3();
-      // const contract = new web3.eth.Contract(
-      //   getEthWithdrawContractAbi(),
-      //   getEthWithdrawContract(),
-      //   {
-      //     from: metaMaskAccount,
-      //   }
-      // );
+      const web3 = createWeb3();
+      const contract = new web3.eth.Contract(
+        getEthWithdrawContractAbi(),
+        getEthWithdrawContract(),
+        {
+          from: metaMaskAccount,
+        }
+      );
 
-      // dispatch(setWithdrawLoading(true));
-      // dispatch(
-      //   setWithdrawLoadingParams({
-      //     modalVisible: true,
-      //     status: 'loading',
-      //     tokenAmount: withdrawAmount,
-      //     customMsg: LOADING_MESSAGE_WITHDRAWING,
-      //   })
-      // );
+      dispatch(setWithdrawLoading(true));
+      dispatch(
+        setWithdrawLoadingParams({
+          modalVisible: true,
+          status: 'loading',
+          tokenAmount: withdrawAmount,
+          customMsg: LOADING_MESSAGE_WITHDRAWING,
+        })
+      );
 
-      // dispatch(
-      //   updateWithdrawLoadingParams({
-      //     customMsg: `Please confirm the ${formatNumber(
-      //       Number(withdrawAmount)
-      //     )} ${getTokenName()} withdraw transaction in your MetaMask wallet`,
-      //   })
-      // );
+      dispatch(
+        updateWithdrawLoadingParams({
+          customMsg: `Please confirm the ${formatNumber(
+            Number(withdrawAmount)
+          )} ${getTokenName()} withdraw transaction in your MetaMask wallet`,
+        })
+      );
 
-      // const result = await contract.methods
-      //   .withdraw(claimableWithdrawals)
-      //   .send();
-
-      cb && cb(true, txHash);
-      if (txHash) {
-        dispatch(
-          updateWithdrawLoadingParams(
-            {
-              status: 'success',
-              broadcastStatus: 'success',
-              packStatus: 'success',
-              finalizeStatus: 'success',
-              txHash: txHash,
-              scanUrl: getEtherScanTxUrl(txHash),
-              customMsg: undefined,
-            },
-            (newParams) => {
-              dispatch(
-                addNotice({
-                  id: noticeUuid || '',
-                  type: 'Withdraw',
-                  data: {
-                    tokenAmount: withdrawAmount,
-                  },
-                  status: 'Confirmed',
-                  scanUrl: getEtherScanTxUrl(txHash),
-                })
-              );
+      await writeContractAsync(
+        {
+          abi: getEthWithdrawContractAbi(),
+          address: getEthWithdrawContract() as `0x${string}`,
+          functionName: 'withdraw',
+          args: [claimableWithdrawals],
+        },
+        {
+          onSuccess: (data: any) => {
+            console.log('Transaction successful!', data);
+          },
+          onSettled: async (data: any, error: any) => {
+            if (error) {
+              console.error('Transaction settled with error:', error);
+            } else {
+              const result = await waitForTransactionReceipt(web3, data);
+              if (result.status) {
+                cb && cb(result.status, result);
+                if (result && result.status) {
+                  const txHash = result.transactionHash;
+                  dispatch(
+                    updateWithdrawLoadingParams(
+                      {
+                        status: 'success',
+                        broadcastStatus: 'success',
+                        packStatus: 'success',
+                        finalizeStatus: 'success',
+                        txHash: txHash,
+                        scanUrl: getEtherScanTxUrl(txHash),
+                        customMsg: undefined,
+                      },
+                      (newParams) => {
+                        dispatch(
+                          addNotice({
+                            id: noticeUuid || '',
+                            type: 'Withdraw',
+                            data: {
+                              tokenAmount: withdrawAmount,
+                            },
+                            status: 'Confirmed',
+                            scanUrl: getEtherScanTxUrl(txHash),
+                          })
+                        );
+                      }
+                    )
+                  );
+                } else {
+                  throw new Error(TRANSACTION_FAILED_MESSAGE);
+                }
+              }
             }
-          )
-        );
-      } else {
-        throw new Error(TRANSACTION_FAILED_MESSAGE);
-      }
+          },
+          onError: (error: any) => {
+            throw new Error(TRANSACTION_FAILED_MESSAGE);
+          },
+        }
+      );
     } catch (err: any) {
       let displayMsg = err.message || TRANSACTION_FAILED_MESSAGE;
       if (err.code === -32603) {

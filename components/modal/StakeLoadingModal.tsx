@@ -8,7 +8,6 @@ import successIcon from 'public/images/tx_success.png';
 import errorIcon from 'public/images/tx_error.png';
 import { useMemo } from 'react';
 import {
-  setStakeLoading,
   setStakeLoadingParams,
   updateStakeLoadingParams,
 } from 'redux/reducers/AppSlice';
@@ -18,12 +17,6 @@ import { formatNumber } from 'utils/numberUtils';
 import { roboto } from 'config/font';
 import { getLsdEthName, getTokenName } from 'utils/configUtils';
 import { useWriteContract } from 'wagmi';
-import { parseEther } from 'viem';
-import {
-  getEthDepositContract,
-  getEthDepositContractAbi,
-} from 'config/contract';
-import { uuid } from 'utils/commonUtils';
 
 export const StakeLoadingModal = () => {
   const dispatch = useAppDispatch();
@@ -78,40 +71,15 @@ export const StakeLoadingModal = () => {
     if (!stakeLoadingParams) {
       return;
     }
-    try {
-      dispatch(setStakeLoading(true));
-
-      const txHash = await writeContractAsync({
-        abi: getEthDepositContractAbi(),
-        address: getEthDepositContract() as `0x${string}`,
-        functionName: 'deposit',
-        args: [],
-        value: parseEther(stakeLoadingParams.amount + ''),
-      });
-      const noticeUuid = uuid();
-      dispatch(
-        handleEthStake(
-          Number(stakeLoadingParams.amount) + '',
-          stakeLoadingParams.willReceiveAmount + '',
-          stakeLoadingParams.newLsdTokenBalance + '',
-          false,
-          txHash,
-          noticeUuid
-        )
-      );
-    } catch (error) {
-      dispatch(setStakeLoading(false));
-      console.error(error);
-    }
-
-    // dispatch(
-    //   handleEthStake(
-    //     stakeLoadingParams.amount + "",
-    //     stakeLoadingParams.willReceiveAmount + "",
-    //     stakeLoadingParams.newLsdTokenBalance + "",
-    //     true
-    //   )
-    // );
+    dispatch(
+      handleEthStake(
+        writeContractAsync,
+        stakeLoadingParams.amount + '',
+        stakeLoadingParams.willReceiveAmount + '',
+        stakeLoadingParams.newLsdTokenBalance + '',
+        true
+      )
+    );
   };
 
   return (

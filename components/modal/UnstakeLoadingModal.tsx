@@ -2,26 +2,18 @@ import { Box, Modal } from '@mui/material';
 import classNames from 'classnames';
 import { PrimaryLoading } from 'components/common/PrimaryLoading';
 import { Icomoon } from 'components/icon/Icomoon';
-import {
-  getEthWithdrawContract,
-  getEthWithdrawContractAbi,
-  getLsdEthTokenContract,
-  getLsdEthTokenContractAbi,
-} from 'config/contract';
+
 import { roboto } from 'config/font';
-import { CANCELLED_MESSAGE, LOADING_MESSAGE_UNSTAKING } from 'constants/common';
 import { useAppDispatch, useAppSelector } from 'hooks/common';
 import Image from 'next/image';
 import errorIcon from 'public/images/tx_error.png';
 import successIcon from 'public/images/tx_success.png';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import {
-  setUnstakeLoading,
   setUnstakeLoadingParams,
   updateUnstakeLoadingParams,
 } from 'redux/reducers/AppSlice';
 import { handleLsdEthUnstake } from 'redux/reducers/EthSlice';
-import { updateLsdEthBalance } from 'redux/reducers/LsdEthSlice';
 import { RootState } from 'redux/store';
 import {
   getLsdEthName,
@@ -30,17 +22,11 @@ import {
 } from 'utils/configUtils';
 import { formatNumber } from 'utils/numberUtils';
 import snackbarUtil from 'utils/snackbarUtils';
-import { parseEther } from 'viem';
-import {
-  useAccount,
-  useReadContract,
-  useWaitForTransactionReceipt,
-  useWriteContract,
-} from 'wagmi';
+import { useWriteContract } from 'wagmi';
 
 export const UnstakeLoadingModal = () => {
   const dispatch = useAppDispatch();
-  const { chainId: metaMaskChainId, address: metaMaskAccount } = useAccount();
+  const { writeContractAsync } = useWriteContract();
   const { unstakeLoadingParams, darkMode } = useAppSelector(
     (state: RootState) => {
       return {
@@ -87,78 +73,6 @@ export const UnstakeLoadingModal = () => {
     }
   };
 
-  const { data: allowance } = useReadContract({
-    abi: getLsdEthTokenContractAbi(),
-    address: getLsdEthTokenContract() as `0x${string}`,
-    functionName: 'allowance',
-    args: [metaMaskAccount, getEthWithdrawContract()],
-  });
-
-  const [approvetxHash, setApprovetxHash] = useState<`0x${string}`>('0x');
-  const { isSuccess } = useWaitForTransactionReceipt({
-    hash: approvetxHash,
-  });
-
-  const { writeContractAsync } = useWriteContract({
-    mutation: {
-      onSuccess: async (data) => {
-        setApprovetxHash(data);
-      },
-      onError: (error) => {
-        dispatch(setUnstakeLoading(false));
-        snackbarUtil.error(CANCELLED_MESSAGE);
-        dispatch(setUnstakeLoadingParams(undefined));
-        return;
-      },
-    },
-  });
-
-  const [unstakeTxHash, setUnstakeTxHash] = useState<`0x${string}`>('0x');
-  const { isSuccess: unstakeSuccess } = useWaitForTransactionReceipt({
-    hash: unstakeTxHash,
-  });
-
-  useEffect(() => {
-    const maketx = async () => {
-      dispatch(
-        handleLsdEthUnstake(
-          unstakeLoadingParams?.amount + '',
-          unstakeLoadingParams?.willReceiveAmount + '',
-          unstakeLoadingParams?.newLsdTokenBalance + '',
-          true,
-          unstakeTxHash
-        )
-      );
-    };
-    if (unstakeSuccess && unstakeLoadingParams) {
-      maketx();
-    }
-  }, [unstakeSuccess, dispatch, unstakeLoadingParams, unstakeTxHash]);
-
-  const { writeContractAsync: writeUnstakeContractAsync } = useWriteContract({
-    mutation: {
-      onSettled(data, error) {
-        if (error) {
-          dispatch(setUnstakeLoading(false));
-          dispatch(
-            updateUnstakeLoadingParams({
-              customMsg: 'Unstake failed, please try again later',
-            })
-          );
-          return;
-        } else if (data) {
-          setUnstakeTxHash(data);
-        }
-      },
-      onError: (error) => {
-        dispatch(setUnstakeLoading(false));
-        snackbarUtil.error(CANCELLED_MESSAGE);
-        dispatch(setUnstakeLoadingParams(undefined));
-        return;
-      },
-    },
-  });
-
   const clickRetry = async () => {
     if (!unstakeLoadingParams) {
       return;
@@ -177,81 +91,16 @@ export const UnstakeLoadingModal = () => {
       return;
     }
 
-    try {
-      dispatch(setUnstakeLoading(true));
-      dispatch(
-        setUnstakeLoadingParams({
-          modalVisible: true,
-          status: 'loading',
-          targetAddress: metaMaskAccount,
-          amount: unstakeLoadingParams?.amount + '',
-          willReceiveAmount,
-          newLsdTokenBalance: unstakeLoadingParams?.newLsdTokenBalance + '',
-          customMsg: LOADING_MESSAGE_UNSTAKING,
-        })
-      );
-
-      if (
-        Number(allowance) <
-        Number(parseEther(unstakeLoadingParams?.amount + ''))
-      ) {
-        dispatch(
-          updateUnstakeLoadingParams({
-            customMsg:
-              'Please approve the fund allowance request in your wallet',
-          })
-        );
-        await writeContractAsync({
-          abi: getLsdEthTokenContractAbi(),
-          address: getLsdEthTokenContract() as `0x${string}`,
-          functionName: 'approve',
-          args: [getEthWithdrawContract(), parseEther('10000000')],
-        });
-      } else {
-        await writeUnstakeContractAsync({
-          abi: getEthWithdrawContractAbi(),
-          address: getEthWithdrawContract() as `0x${string}`,
-          functionName: 'unstake',
-          args: [parseEther(unstakeLoadingParams?.amount + '')],
-        });
-      }
-    } catch (error) {
-      dispatch(setUnstakeLoading(false));
-    }
+    dispatch(
+      handleLsdEthUnstake(
+        writeContractAsync,
+        unstakeLoadingParams.amount + '',
+        unstakeLoadingParams.willReceiveAmount + '',
+        unstakeLoadingParams.newLsdTokenBalance + '',
+        true
+      )
+    );
   };
-
-  useEffect(() => {
-    const maketx = async () => {
-      await writeUnstakeContractAsync({
-        abi: getEthWithdrawContractAbi(),
-        address: getEthWithdrawContract() as `0x${string}`,
-        functionName: 'unstake',
-        args: [parseEther(unstakeLoadingParams?.amount + '')],
-      });
-
-      dispatch(
-        handleLsdEthUnstake(
-          unstakeLoadingParams?.amount + '',
-          unstakeLoadingParams?.willReceiveAmount + '',
-          unstakeLoadingParams?.newLsdTokenBalance + '',
-          true,
-          unstakeTxHash
-        )
-      );
-    };
-    console.log(isSuccess);
-    if (isSuccess) {
-      maketx();
-    }
-  }, [
-    isSuccess,
-    dispatch,
-    unstakeLoadingParams?.amount,
-    unstakeLoadingParams?.newLsdTokenBalance,
-    unstakeLoadingParams?.willReceiveAmount,
-    unstakeTxHash,
-    writeUnstakeContractAsync,
-  ]);
 
   return (
     <Modal

@@ -25,27 +25,14 @@ import {
   useAccount,
   useConnect,
   useSwitchChain,
-  useWaitForTransactionReceipt,
   useWriteContract,
 } from 'wagmi';
-import { parseEther } from 'viem';
 import Web3 from 'web3';
 import { CustomButton } from '../common/CustomButton';
 import { CustomNumberInput } from '../common/CustomNumberInput';
 import { DataLoading } from '../common/DataLoading';
 import { useDepositEnabled } from 'hooks/useDepositEnabled';
 import { setMetaMaskDisconnected } from 'redux/reducers/WalletSlice';
-import {
-  getEthDepositContract,
-  getEthDepositContractAbi,
-} from 'config/contract';
-import {
-  setStakeLoading,
-  setStakeLoadingParams,
-} from 'redux/reducers/AppSlice';
-import { uuid } from 'utils/commonUtils';
-import { CANCELLED_MESSAGE } from 'constants/common';
-import snackbarUtil from 'utils/snackbarUtils';
 
 export const LsdTokenStake = () => {
   const dispatch = useAppDispatch();
@@ -64,7 +51,7 @@ export const LsdTokenStake = () => {
   const { depositEnabled } = useDepositEnabled();
 
   const { balance } = useBalance();
-
+  const { writeContractAsync } = useWriteContract();
   const { stakeLoading } = useAppSelector((state: RootState) => {
     return {
       stakeLoading: state.app.stakeLoading,
@@ -237,67 +224,6 @@ export const LsdTokenStake = () => {
     }
   };
 
-  const noticeUuid = uuid();
-  const [stakeTxHash, setStakeTxHash] = useState<`0x${string}`>('0x');
-  const { isSuccess } = useWaitForTransactionReceipt({
-    hash: stakeTxHash,
-  });
-
-  useEffect(() => {
-    const maketx = async () => {
-      dispatch(
-        handleEthStake(
-          Number(stakeAmount) + '',
-          willReceiveAmount,
-          newRTokenBalance,
-          false,
-          stakeTxHash || '',
-          noticeUuid,
-          (success) => {
-            dispatch(updateEthBalance());
-            if (success) {
-              setStakeAmount('');
-              dispatch(updateLsdEthBalance());
-            }
-          }
-        )
-      );
-    };
-
-    if (isSuccess) {
-      maketx();
-    }
-  }, [
-    isSuccess,
-    dispatch,
-    newRTokenBalance,
-    noticeUuid,
-    stakeAmount,
-    stakeTxHash,
-    willReceiveAmount,
-  ]);
-
-  const { writeContractAsync } = useWriteContract({
-    mutation: {
-      onSettled(data, error) {
-        if (error) {
-          dispatch(setStakeLoading(false));
-
-          return;
-        } else if (data) {
-          setStakeTxHash(data);
-        }
-      },
-
-      onError: () => {
-        dispatch(setStakeLoading(false));
-        snackbarUtil.error(CANCELLED_MESSAGE);
-        dispatch(setStakeLoadingParams(undefined));
-        return;
-      },
-    },
-  });
-
   const clickStake = async () => {
     // Connect Wallet
     if (walletNotConnected || isWrongMetaMaskNetwork) {
@@ -305,46 +231,22 @@ export const LsdTokenStake = () => {
       return;
     }
 
-    try {
-      dispatch(setStakeLoading(true));
-      dispatch(
-        setStakeLoadingParams({
-          modalVisible: true,
-          noticeUuid,
-          status: 'loading',
-          amount: Number(stakeAmount) + '',
-          willReceiveAmount,
-          newLsdTokenBalance: newRTokenBalance,
-        })
-      );
-
-      await writeContractAsync({
-        abi: getEthDepositContractAbi(),
-        address: getEthDepositContract() as `0x${string}`,
-        functionName: 'deposit',
-        args: [],
-        value: parseEther(stakeAmount),
-      });
-    } catch (error) {
-      dispatch(setStakeLoading(false));
-      console.error(error);
-    }
-
-    // dispatch(
-    //   handleEthStake(
-    //     Number(stakeAmount) + '',
-    //     willReceiveAmount,
-    //     newRTokenBalance,
-    //     false,
-    //     (success) => {
-    //       dispatch(updateEthBalance());
-    //       if (success) {
-    //         setStakeAmount('');
-    //         dispatch(updateLsdEthBalance());
-    //       }
-    //     }
-    //   )
-    // );
+    dispatch(
+      handleEthStake(
+        writeContractAsync,
+        Number(stakeAmount) + '',
+        willReceiveAmount,
+        newRTokenBalance,
+        false,
+        (success) => {
+          dispatch(updateEthBalance());
+          if (success) {
+            setStakeAmount('');
+            dispatch(updateLsdEthBalance());
+          }
+        }
+      )
+    );
   };
 
   const ratePopupState = usePopupState({

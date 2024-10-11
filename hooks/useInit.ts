@@ -39,8 +39,8 @@ export function useInit() {
   // const metaMaskAccount = useMetaMaskAccount();
   const { address: metaMaskAccount, chainId } = useAccount();
 
-  const { metaMaskAccount: walletMetaMaskAccount, metaMaskChainId } =
-    useWalletAccount();
+  // const { metaMaskAccount: walletMetaMaskAccount, metaMaskChainId } =
+  //   useWalletAccount();
 
   useEffect(() => {
     // Init local data.
@@ -108,7 +108,7 @@ export function useInit() {
   // Update wallet balances.
   useEffect(() => {
     dispatch(updateEthBalance());
-  }, [dispatch, walletMetaMaskAccount, metaMaskChainId, updateFlag]);
+  }, [dispatch, metaMaskAccount, chainId, updateFlag]);
 
   // Change body backgroundColor
   useEffect(() => {

@@ -3,8 +3,7 @@ import { CustomButton } from '../common/CustomButton';
 import { useAppDispatch, useAppSelector } from 'hooks/common';
 import { RootState } from 'redux/store';
 import { formatNumber } from 'utils/numberUtils';
-import { useEffect, useMemo, useState } from 'react';
-import { handleEthWithdraw } from 'redux/reducers/EthSlice';
+import { useMemo } from 'react';
 import { getTokenName } from 'utils/configUtils';
 import { useRouter } from 'next/router';
 import {
@@ -12,18 +11,13 @@ import {
   setWithdrawLoadingParams,
   updateWithdrawLoadingParams,
 } from 'redux/reducers/AppSlice';
-import {
-  CANCELLED_MESSAGE,
-  LOADING_MESSAGE_WITHDRAWING,
-} from 'constants/common';
-import { parseEther } from 'viem';
-import { uuid } from 'utils/commonUtils';
-import { useWaitForTransactionReceipt, useWriteContract } from 'wagmi';
-import snackbarUtil from 'utils/snackbarUtils';
+import { LOADING_MESSAGE_WITHDRAWING } from 'constants/common';
+import { useWriteContract } from 'wagmi';
 import {
   getEthWithdrawContract,
   getEthWithdrawContractAbi,
 } from 'config/contract';
+import { handleEthWithdraw } from 'redux/reducers/EthSlice';
 
 interface Props {
   overallAmount: string | undefined;
@@ -41,7 +35,7 @@ export const WithdrawUnstaked = (props: Props) => {
   } = props;
 
   const router = useRouter();
-
+  const { writeContractAsync } = useWriteContract();
   const dispatch = useAppDispatch();
   const { withdrawLoading } = useAppSelector((state: RootState) => {
     return { withdrawLoading: state.app.withdrawLoading };
@@ -59,126 +53,35 @@ export const WithdrawUnstaked = (props: Props) => {
     );
   }, [claimableWithdrawals, claimableAmount, withdrawLoading]);
 
-  const [withdrawTxHash, setWithdrawTxHash] = useState<`0x${string}`>('0x');
-  const { isSuccess } = useWaitForTransactionReceipt({
-    hash: withdrawTxHash,
-  });
-
-  useEffect(() => {
-    const maketx = async () => {
-      dispatch(
-        handleEthWithdraw(
-          claimableWithdrawals,
-          claimableAmount || '0',
-          willReceiveAmount,
-          false,
-          withdrawTxHash,
-          (success) => {
-            if (
-              !overallAmount ||
-              isNaN(Number(overallAmount)) ||
-              Number(overallAmount) === 0
-            ) {
-              router.replace({
-                pathname: router.pathname,
-                query: {
-                  ...router.query,
-                  tab: 'stake',
-                },
-              });
-            }
-          }
-        )
-      );
-    };
-
-    if (isSuccess) {
-      maketx();
-    }
-  }, [
-    isSuccess,
-    claimableAmount,
-    claimableWithdrawals,
-    dispatch,
-    overallAmount,
-    router,
-    willReceiveAmount,
-    withdrawTxHash,
-  ]);
-
-  const { writeContractAsync } = useWriteContract({
-    mutation: {
-      onSettled(data) {
-        if (data) {
-          setWithdrawTxHash(data);
-        }
-      },
-
-      onError: (error) => {
-        dispatch(setWithdrawLoading(false));
-        snackbarUtil.error(CANCELLED_MESSAGE);
-        dispatch(setWithdrawLoadingParams(undefined));
-        return;
-      },
-    },
-  });
-
   const clickWithdraw = async () => {
     if (withdrawDisabled) {
       return;
     }
-    try {
-      dispatch(setWithdrawLoading(true));
-      dispatch(
-        setWithdrawLoadingParams({
-          modalVisible: true,
-          status: 'loading',
-          tokenAmount: claimableAmount || '0',
-          customMsg: LOADING_MESSAGE_WITHDRAWING,
-        })
-      );
-      dispatch(
-        updateWithdrawLoadingParams({
-          customMsg: `Please confirm the ${formatNumber(
-            Number(claimableAmount || '0')
-          )} ${getTokenName()} withdraw transaction in your MetaMask wallet`,
-        })
-      );
 
-      await writeContractAsync({
-        abi: getEthWithdrawContractAbi(),
-        address: getEthWithdrawContract() as `0x${string}`,
-        functionName: 'withdraw',
-        args: [claimableWithdrawals],
-      });
-    } catch (error) {
-      dispatch(setWithdrawLoading(false));
-      dispatch(setWithdrawLoadingParams(undefined));
-      console.error(error);
-    }
-    // dispatch(
-    //   handleEthWithdraw(
-    //     claimableWithdrawals,
-    //     claimableAmount || "0",
-    //     willReceiveAmount,
-    //     false,
-    //     (success) => {
-    //       if (
-    //         !overallAmount ||
-    //         isNaN(Number(overallAmount)) ||
-    //         Number(overallAmount) === 0
-    //       ) {
-    //         router.replace({
-    //           pathname: router.pathname,
-    //           query: {
-    //             ...router.query,
-    //             tab: "stake",
-    //           },
-    //         });
-    //       }
-    //     }
-    //   )
-    // );
+    dispatch(
+      handleEthWithdraw(
+        writeContractAsync,
+        claimableWithdrawals,
+        claimableAmount || '0',
+        willReceiveAmount,
+        false,
+        (success) => {
+          if (
+            !overallAmount ||
+            isNaN(Number(overallAmount)) ||
+            Number(overallAmount) === 0
+          ) {
+            router.replace({
+              pathname: router.pathname,
+              query: {
+                ...router.query,
+                tab: 'stake',
+              },
+            });
+          }
+        }
+      )
+    );
   };
 
   return (
