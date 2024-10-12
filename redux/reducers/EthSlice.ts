@@ -300,6 +300,7 @@ export const handleLsdEthUnstake =
       }
 
       const web3 = getEthWeb3();
+      console.log(web3);
       const contract = new web3.eth.Contract(
         getEthWithdrawContractAbi(),
         getEthWithdrawContract(),
