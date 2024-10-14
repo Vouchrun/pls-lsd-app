@@ -300,7 +300,6 @@ export const handleLsdEthUnstake =
       }
 
       const web3 = getEthWeb3();
-      console.log(web3);
       const contract = new web3.eth.Contract(
         getEthWithdrawContractAbi(),
         getEthWithdrawContract(),
@@ -368,7 +367,7 @@ export const handleLsdEthUnstake =
                     updateUnstakeLoadingParams({
                       customMsg: `Please confirm the ${Number(
                         unstakeAmount
-                      )} ${getLsdEthName()} unstaking transaction in your MetaMask wallet`,
+                      )} ${getLsdEthName()} unstaking transaction in your wallet`,
                     })
                   );
 
@@ -469,7 +468,7 @@ export const handleLsdEthUnstake =
           updateUnstakeLoadingParams({
             customMsg: `Please confirm the ${Number(
               unstakeAmount
-            )} ${getLsdEthName()} unstaking transaction in your MetaMask wallet`,
+            )} ${getLsdEthName()} unstaking transaction in your wallet`,
           })
         );
 
@@ -616,7 +615,7 @@ export const handleEthWithdraw =
         updateWithdrawLoadingParams({
           customMsg: `Please confirm the ${formatNumber(
             Number(withdrawAmount)
-          )} ${getTokenName()} withdraw transaction in your MetaMask wallet`,
+          )} ${getTokenName()} withdraw transaction in your wallet`,
         })
       );
 
