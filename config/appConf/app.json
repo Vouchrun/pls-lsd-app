@@ -1,5 +1,5 @@
 {
-  "appTitle": "Pulse LSD App",
+  "appTitle": "Vouch LSD UserApp",
   "chainIcon": "/images/chain/pulse.png",
   "token": {
     "tokenName": "PLS",
@@ -47,8 +47,8 @@
         },
         {
           "type": "link",
-          "content": "https://docs.stafi.io/rtoken/#rtoken-exchange-rate\n",
-          "link": "https://docs.stafi.io/rtoken/#rtoken-exchange-rate"
+          "content": "https://vouch.run/docs/introduction/vPLS_Token.html\n",
+          "link": "https://vouch.run/docs/introduction/vPLS_Token.html"
         }
       ]
     },
@@ -74,8 +74,8 @@
         },
         {
           "type": "link",
-          "content": "https://docs.stafi.io/rtoken/#rtoken-exchange-rate\n",
-          "link": "https://docs.stafi.io/rtoken/#rtoken-exchange-rate"
+          "content": "https://vouch.run/docs/introduction/vPLS_Token.html\n",
+          "link": "https://vouch.run/docs/introduction/vPLS_Token.html"
         }
       ]
     }
@@ -83,19 +83,19 @@
   "externalLinkList": [
     {
       "name": "Docs",
-      "link": "https://app.vouch.run/"
+      "link": "https://vouch.run/docs/introduction/intro_to_LSD.html"
     },
     {
       "name": "Website",
-      "link": "https://app.vouch.run/"
+      "link": "https://vouch.run/"
     },
     {
       "name": "DAO Forum",
-      "link": "https://app.vouch.run/" 
+      "link": "https://vouch.run/" 
     },
     {
       "name": "Dune Dashboard",
-      "link": "https://app.vouch.run/" 
+      "link": "https://vouch.run/" 
     }
   ],
   "contactList": [
