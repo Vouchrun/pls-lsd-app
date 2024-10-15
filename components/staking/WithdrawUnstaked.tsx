@@ -1,12 +1,23 @@
-import { useEthWithdrawRemainingTime } from "hooks/useWithdrawRemainingTime";
-import { CustomButton } from "../common/CustomButton";
-import { useAppDispatch, useAppSelector } from "hooks/common";
-import { RootState } from "redux/store";
-import { formatNumber } from "utils/numberUtils";
-import { useMemo } from "react";
-import { handleEthWithdraw } from "redux/reducers/EthSlice";
-import { getTokenName } from "utils/configUtils";
-import { useRouter } from "next/router";
+import { useEthWithdrawRemainingTime } from 'hooks/useWithdrawRemainingTime';
+import { CustomButton } from '../common/CustomButton';
+import { useAppDispatch, useAppSelector } from 'hooks/common';
+import { RootState } from 'redux/store';
+import { formatNumber } from 'utils/numberUtils';
+import { useMemo } from 'react';
+import { getTokenName } from 'utils/configUtils';
+import { useRouter } from 'next/router';
+import {
+  setWithdrawLoading,
+  setWithdrawLoadingParams,
+  updateWithdrawLoadingParams,
+} from 'redux/reducers/AppSlice';
+import { LOADING_MESSAGE_WITHDRAWING } from 'constants/common';
+import { useWriteContract } from 'wagmi';
+import {
+  getEthWithdrawContract,
+  getEthWithdrawContractAbi,
+} from 'config/contract';
+import { handleEthWithdraw } from 'redux/reducers/EthSlice';
 
 interface Props {
   overallAmount: string | undefined;
@@ -24,7 +35,7 @@ export const WithdrawUnstaked = (props: Props) => {
   } = props;
 
   const router = useRouter();
-
+  const { writeContractAsync } = useWriteContract();
   const dispatch = useAppDispatch();
   const { withdrawLoading } = useAppSelector((state: RootState) => {
     return { withdrawLoading: state.app.withdrawLoading };
@@ -42,14 +53,16 @@ export const WithdrawUnstaked = (props: Props) => {
     );
   }, [claimableWithdrawals, claimableAmount, withdrawLoading]);
 
-  const clickWithdraw = () => {
+  const clickWithdraw = async () => {
     if (withdrawDisabled) {
       return;
     }
+
     dispatch(
       handleEthWithdraw(
+        writeContractAsync,
         claimableWithdrawals,
-        claimableAmount || "0",
+        claimableAmount || '0',
         willReceiveAmount,
         false,
         (success) => {
@@ -62,7 +75,7 @@ export const WithdrawUnstaked = (props: Props) => {
               pathname: router.pathname,
               query: {
                 ...router.query,
-                tab: "stake",
+                tab: 'stake',
               },
             });
           }
@@ -72,13 +85,13 @@ export const WithdrawUnstaked = (props: Props) => {
   };
 
   return (
-    <div className="mt-[.18rem] bg-color-bg2 rounded-[.3rem] py-[.18rem]">
-      <div className="mt-[.2rem] mx-[.24rem] flex items-center justify-between">
-        <div className="flex items-center">
-          <div className="text-[.14rem] text-color-text2 opacity-50 font-[500]">
+    <div className='mt-[.18rem] bg-color-bg2 rounded-[.3rem] py-[.18rem]'>
+      <div className='mt-[.2rem] mx-[.24rem] flex items-center justify-between'>
+        <div className='flex items-center'>
+          <div className='text-[.14rem] text-color-text2 opacity-50 font-[500]'>
             Overall Amount
           </div>
-          <div className="ml-[.12rem] text-[.16rem] text-color-text2 font-[500]">
+          <div className='ml-[.12rem] text-[.16rem] text-color-text2 font-[500]'>
             {formatNumber(overallAmount)} {getTokenName()}
           </div>
         </div>
@@ -93,21 +106,21 @@ export const WithdrawUnstaked = (props: Props) => {
         </div> */}
       </div>
 
-      <div className="h-[.77rem] mt-[.25rem] mx-[.24rem] px-[.24rem] bg-color-bgPage rounded-[.3rem] flex items-center justify-between">
-        <div className="text-[.14rem] text-color-text1 font-[500]">
+      <div className='h-[.77rem] mt-[.25rem] mx-[.24rem] px-[.24rem] bg-color-bgPage rounded-[.3rem] flex items-center justify-between'>
+        <div className='text-[.14rem] text-color-text1 font-[500]'>
           Withdrawable
         </div>
-        <div className="text-[.24rem] text-color-text1 font-[500]">
+        <div className='text-[.24rem] text-color-text1 font-[500]'>
           {formatNumber(claimableAmount)} {getTokenName()}
         </div>
-        <div className="text-[.14rem] text-color-text2 invisible">
+        <div className='text-[.14rem] text-color-text2 invisible'>
           Withdrawable
         </div>
       </div>
 
-      <div className="mt-[.2rem] mx-[.24rem]">
+      <div className='mt-[.2rem] mx-[.24rem]'>
         <CustomButton
-          height=".56rem"
+          height='.56rem'
           disabled={withdrawDisabled}
           onClick={clickWithdraw}
         >

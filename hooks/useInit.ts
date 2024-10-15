@@ -37,10 +37,10 @@ export function useInit() {
 
   // const { useAccount: useMetaMaskAccount } = hooks;
   // const metaMaskAccount = useMetaMaskAccount();
-  const { address: metaMaskAccount } = useAccount();
+  const { address: metaMaskAccount, chainId } = useAccount();
 
-  const { metaMaskAccount: walletMetaMaskAccount, metaMaskChainId } =
-    useWalletAccount();
+  // const { metaMaskAccount: walletMetaMaskAccount, metaMaskChainId } =
+  //   useWalletAccount();
 
   useEffect(() => {
     // Init local data.
@@ -66,40 +66,49 @@ export function useInit() {
 
   useInterval(() => {
     dispatch(setUpdateFlag(dayjs().unix()));
+  }, 30000); // 30s
+
+  useInterval(() => {
+    if (metaMaskAccount) {
+      dispatch(setUpdateFlag(dayjs().unix()));
+    }
   }, 6000); // 6s
 
   useEffect(() => {
-    if (!metaMaskAccount) {
-      metaMask.connectEagerly();
-    }
+    // if (!metaMaskAccount) {
+    //   metaMask.connectEagerly();
+    // }
     // dispatch(setMetaMaskAccount("0x7939869edf6dC94F668b8Ba726374C9501Ed5f35"));
     dispatch(setMetaMaskAccount(metaMaskAccount));
   }, [dispatch, metaMaskAccount]);
 
   useEffect(() => {
-    const listener = (chainId: any) => {
-      dispatch(setMetaMaskChainId(parseInt(chainId, 16) + ''));
-    };
-    if (window.ethereum && window.ethereum.isMetaMask) {
-      ethereum.request({ method: 'eth_chainId' }).then((chainId: string) => {
-        dispatch(setMetaMaskChainId(parseInt(chainId, 16) + ''));
-        // clearDefaultProviderWeb3();
-      });
+    // const listener = (chainId: any) => {
+    //   dispatch(setMetaMaskChainId(parseInt(chainId, 16) + ''));
+    // };
 
-      ethereum.on('chainChanged', listener);
-    }
+    // if (window.ethereum && window.ethereum.isMetaMask) {
+    //   ethereum.request({ method: 'eth_chainId' }).then((chainId: string) => {
+    //     dispatch(setMetaMaskChainId(parseInt(chainId, 16) + ''));
+    //     // clearDefaultProviderWeb3();
+    //   });
 
-    return () => {
-      if (window.ethereum) {
-        ethereum?.removeListener('chainChanged', listener);
-      }
-    };
-  }, [dispatch]);
+    //   ethereum.on('chainChanged', listener);
+    // }
+
+    // return () => {
+    //   if (window.ethereum) {
+    //     ethereum?.removeListener('chainChanged', listener);
+    //   }
+    // };
+    if (chainId)
+      dispatch(setMetaMaskChainId(parseInt(chainId?.toString(), 16) + ''));
+  }, [chainId]);
 
   // Update wallet balances.
   useEffect(() => {
     dispatch(updateEthBalance());
-  }, [dispatch, walletMetaMaskAccount, metaMaskChainId, updateFlag]);
+  }, [dispatch, metaMaskAccount, chainId, updateFlag]);
 
   // Change body backgroundColor
   useEffect(() => {
