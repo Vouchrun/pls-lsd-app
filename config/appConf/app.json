@@ -1,36 +1,31 @@
 {
-  "appTitle": "Pulse LSD App",
+  "appTitle": "Vouch LSD UserApp",
   "chainIcon": "/images/chain/pulse.png",
   "token": {
     "tokenName": "PLS",
     "lsdTokenName": "vPLS",
-    "supportChains": ["Testnet v4 Pulse"],
-    "lsdTokenIconUri": "https://cdn.stafi.io/rtoken/logo/rPLS.png",
+    "supportChains": ["PulseChain"],
+    "lsdTokenIconUri": "https://vouch.run/downloads/branding/vPLS_trans.svg",
     "tokenIcon": "/images/token/PLS.svg",
     "lsdTokenIcon": "/images/token/vPLS_trans.svg"
   },
   "unstake": {
-    "lockTipLink": "https://docs.stafi.io/stakingeth/unstake/",
+    "lockTipLink": "https://vouch.run/docs/architecture/vouch_lsd.html#user-unstake-flow",
     "duration": "1-5 days"
   },
   "apr": 8.1,
   "detailedInfo": {
     "audit": {
-      "nameList": ["Peckshield", "Blocksec"],
-      "link": "https://github.com/stafiprotocol/security/blob/main/audits/202304_BlockSec_StaFi-ETHWithdraw/blocksec_stafi_v1.0-signed.pdf"
+      "nameList": ["Credshields"],
+      "link": "https://vouch.run/downloads/Contract_Audit_Credshield.pdf"
     },
     "listedIns": []
   },
   "auditList": [
     {
-      "name": "PeckShield",
-      "icon": "/images/audit/peck_shield.svg",
-      "iconDark": "/images/audit/peck_shield_dark.svg"
-    },
-    {
-      "name": "BlockSec",
-      "icon": "/images/audit/block_sec.svg",
-      "iconDark": "/images/audit/block_sec_dark.svg"
+      "name": "Credshields",
+      "icon": "/images/audit/CS_Audited_Light_sml.svg",
+      "iconDark": "/images/audit/CS_Audited_Dark_sml.svg"
     }
   ],
  "faqList": [
@@ -47,8 +42,8 @@
         },
         {
           "type": "link",
-          "content": "https://docs.stafi.io/rtoken/#rtoken-exchange-rate\n",
-          "link": "https://docs.stafi.io/rtoken/#rtoken-exchange-rate"
+          "content": "https://vouch.run/docs/introduction/vPLS_Token.html\n",
+          "link": "https://vouch.run/docs/introduction/vPLS_Token.html"
         }
       ]
     },
@@ -74,8 +69,8 @@
         },
         {
           "type": "link",
-          "content": "https://docs.stafi.io/rtoken/#rtoken-exchange-rate\n",
-          "link": "https://docs.stafi.io/rtoken/#rtoken-exchange-rate"
+          "content": "https://vouch.run/docs/introduction/vPLS_Token.html\n",
+          "link": "https://vouch.run/docs/introduction/vPLS_Token.html"
         }
       ]
     }
@@ -83,19 +78,19 @@
   "externalLinkList": [
     {
       "name": "Docs",
-      "link": "https://app.vouch.run/"
+      "link": "https://vouch.run/docs/introduction/intro_to_LSD.html"
     },
     {
       "name": "Website",
-      "link": "https://app.vouch.run/"
+      "link": "https://vouch.run/"
     },
     {
-      "name": "DAO Forum",
-      "link": "https://app.vouch.run/" 
+      "name": "DAO Forum (soon)",
+      "link": "https://vouch.run/" 
     },
     {
-      "name": "Dune Dashboard",
-      "link": "https://app.vouch.run/" 
+      "name": "Validator App",
+      "link": "https://val.vouch.run/" 
     }
   ],
   "contactList": [
