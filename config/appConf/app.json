@@ -30,6 +30,19 @@
   ],
  "faqList": [
     {
+      "title": "What is the minimum staking amount?",
+      "contents": [
+        {
+          "type": "text",
+          "content": "The current minimum staking amount is 10,000 PLS.\n"
+        },
+        {
+          "type": "text",
+          "content": "In theory the Vouch protocol can allow deposits as low as fractions of a PLS, however in the interest of gas and protocol efficency a larger minimum has been set.\n"
+        }
+      ]
+    },
+    {
       "title": "What are the factors that affect the staking rewards?",
       "contents": [
         {
@@ -46,7 +59,7 @@
           "link": "https://vouch.run/docs/introduction/vPLS_Token.html"
         }
       ]
-    },
+    },    
     {
       "title": "How much time is needed for PLS withdrawals?",
       "contents": [
