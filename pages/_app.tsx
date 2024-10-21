@@ -11,10 +11,12 @@ import 'styles/globals.css';
 import { theme } from 'styles/material-ui-theme';
 import { SnackbarUtilsConfigurator } from 'utils/snackbarUtils';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { CaipNetwork, createAppKit } from '@reown/appkit/react';
+import { createAppKit } from '@reown/appkit/react';
 
 import { WagmiProvider } from 'wagmi';
 import { WagmiAdapter } from '@reown/appkit-adapter-wagmi';
+import { isDev } from 'config/env';
+import { pulsechain, pulsechainV4 } from 'viem/chains';
 
 export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
   getLayout?: (page: ReactElement) => ReactNode;
@@ -65,31 +67,17 @@ const metadata = {
   icons: ['https://val.vouch.run/_next/static/media/appIconDark.3c9ae27e.svg'],
 };
 
-const networks = [
-  {
-    id: 'eip155:943',
-    chainId: 943,
-    chainNamespace: 'eip155',
-    name: 'Pulsechain Testnet V4',
-    currency: 'tPLS',
-    explorerUrl: 'https://scan.v4.testnet.pulsechain.com',
-    rpcUrl: 'https://rpc.v4.testnet.pulsechain.com',
-    network: 'testnet',
-    imageUrl: 'https://avatars.githubusercontent.com/u/179229932',
-  } as CaipNetwork,
-];
-
 // 3. Create Wagmi Adapter
 const wagmiAdapter = new WagmiAdapter({
   ssr: true,
-  networks,
+  networks: [isDev() ? pulsechainV4 : pulsechain],
   projectId,
 });
 
 // 4. Create modal
 createAppKit({
   adapters: [wagmiAdapter],
-  networks: networks,
+  networks: [isDev() ? pulsechainV4 : pulsechain],
   metadata,
   projectId,
   featuredWalletIds: [

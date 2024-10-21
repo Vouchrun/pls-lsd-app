@@ -13,7 +13,7 @@
     "lockTipLink": "https://vouch.run/docs/architecture/vouch_lsd.html#user-unstake-flow",
     "duration": "1-5 days"
   },
-  "apr": 8.1,
+  "apr": 0,
   "detailedInfo": {
     "audit": {
       "nameList": ["Credshields"],
@@ -28,7 +28,7 @@
       "iconDark": "/images/audit/CS_Audited_Dark_sml.svg"
     }
   ],
- "faqList": [
+  "faqList": [
     {
       "title": "What is the minimum staking amount?",
       "contents": [
@@ -59,7 +59,7 @@
           "link": "https://vouch.run/docs/introduction/vPLS_Token.html"
         }
       ]
-    },    
+    },
     {
       "title": "How much time is needed for PLS withdrawals?",
       "contents": [
@@ -87,7 +87,7 @@
         }
       ]
     }
- ],
+  ],
   "externalLinkList": [
     {
       "name": "Docs",
@@ -99,11 +99,11 @@
     },
     {
       "name": "DAO Forum (soon)",
-      "link": "https://vouch.run/" 
+      "link": "https://vouch.run/"
     },
     {
       "name": "Validator App",
-      "link": "https://val.vouch.run/" 
+      "link": "https://val.vouch.run/"
     }
   ],
   "contactList": [
