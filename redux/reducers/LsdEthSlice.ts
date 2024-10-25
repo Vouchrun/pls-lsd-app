@@ -1,18 +1,18 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { AppThunk } from "redux/store";
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { AppThunk } from 'redux/store';
 import {
   decodeBalancesUpdatedLog,
   getErc20AssetBalance,
   getEthWeb3,
-} from "utils/web3Utils";
+} from 'utils/web3Utils';
 import {
   getLsdEthTokenContract,
   getLsdEthTokenContractAbi,
   getNetworkBalanceContract,
   getNetworkBalanceContractAbi,
-} from "config/contract";
-import { getDefaultApr } from "utils/configUtils";
-import { getBlockSeconds } from "config/env";
+} from 'config/contract';
+import { getDefaultApr } from 'utils/configUtils';
+import { getBlockSeconds } from 'config/env';
 
 export interface LsdEthState {
   balance: string | undefined; // balance of lsdETH
@@ -29,7 +29,7 @@ const initialState: LsdEthState = {
 };
 
 export const lsdEthSlice = createSlice({
-  name: "lsdEth",
+  name: 'lsdEth',
   initialState,
   reducers: {
     setBalance: (
@@ -85,7 +85,7 @@ export const updateLsdEthBalance =
  */
 export const updateLsdEthRate = (): AppThunk => async (dispatch, getState) => {
   try {
-    let newRate = "--";
+    let newRate = '--';
 
     const web3 = getEthWeb3();
     let contract = new web3.eth.Contract(
@@ -93,7 +93,7 @@ export const updateLsdEthRate = (): AppThunk => async (dispatch, getState) => {
       getLsdEthTokenContract()
     );
     const result = await contract.methods.getRate().call();
-    newRate = web3.utils.fromWei(result + "", "ether");
+    newRate = web3.utils.fromWei(result + '', 'ether');
 
     dispatch(setRate(newRate));
   } catch (err: unknown) {}
@@ -112,23 +112,12 @@ export const updateApr = (): AppThunk => async (dispatch, getState) => {
       getNetworkBalanceContract()
     );
 
-    const updateBalancesEpochs = await networkBalanceContract.methods
-      .updateBalancesEpochs()
-      .call()
-      .catch((err: any) => {
-        console.log({ err });
-      });
-
-    const eraSeconds = Number(updateBalancesEpochs) * (getBlockSeconds() * 32);
-
-    const eventLength = Math.round((7 * 24 * 3600) / eraSeconds);
-
     const topics = web3.utils.sha3(
-      "BalancesUpdated(uint256,uint256,uint256,uint256)"
+      'BalancesUpdated(uint256,uint256,uint256,uint256)'
     );
     const fromBlock =
-      currentBlock - Math.floor((1 / getBlockSeconds()) * 60 * 60 * 24 * 8);
-    const events = await networkBalanceContract.getPastEvents("allEvents", {
+      currentBlock - Math.floor((1 / getBlockSeconds()) * 60 * 60 * 24 * 7);
+    const events = await networkBalanceContract.getPastEvents('allEvents', {
       fromBlock: fromBlock,
       toBlock: currentBlock,
     });
@@ -136,9 +125,8 @@ export const updateApr = (): AppThunk => async (dispatch, getState) => {
     const balancesUpdatedEvents = events
       .filter((e) => e.raw.topics.length === 1 && e.raw.topics[0] === topics)
       .sort((a, b) => a.blockNumber - b.blockNumber);
-    if (balancesUpdatedEvents.length > eventLength) {
-      const beginEvent =
-        balancesUpdatedEvents[balancesUpdatedEvents.length - eventLength - 1];
+    if (balancesUpdatedEvents.length > 1) {
+      const beginEvent = balancesUpdatedEvents[0];
       const endEvent = balancesUpdatedEvents[balancesUpdatedEvents.length - 1];
       const beginValues: any = decodeBalancesUpdatedLog(
         beginEvent.raw.data,
