@@ -85,7 +85,7 @@ export function formatNumber(
   let numValue = parseFloat(num.toString());
   if (isNaN(numValue)) return '--';
 
-  return numValue.toLocaleString('en-US', {
+  return numValue.toLocaleString('en-IN', {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   });
