@@ -79,16 +79,30 @@ export function formatNumber(
   // }
 
   // return newNum;
+  let decimals = options.decimals === undefined ? 6 : options.decimals;
+  const roundMode = options.roundMode || 'floor';
+  const roundMethod =
+    roundMode === 'floor'
+      ? Math.floor
+      : roundMode === 'ceil'
+      ? Math.ceil
+      : Math.round;
+
+  const toReadable =
+    options.toReadable === undefined ? true : options.toReadable;
   if (num === undefined || num === '') {
     return '--';
   }
-  let numValue = parseFloat(num.toString());
+  let numValue =
+    roundMethod(Number(num) * Math.pow(10, decimals)) / Math.pow(10, decimals);
   if (isNaN(numValue)) return '--';
 
-  return numValue.toLocaleString('en-US', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  });
+  if (toReadable) {
+    return numValue.toLocaleString('en-US', {
+      maximumFractionDigits: decimals,
+    });
+  }
+  return (+numValue).toString();
 }
 
 export function formatLargeAmount(amount: string | number) {
