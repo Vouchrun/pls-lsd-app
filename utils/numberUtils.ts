@@ -79,6 +79,7 @@ export function formatNumber(
   // }
 
   // return newNum;
+
   let decimals = options.decimals === undefined ? 2 : options.decimals;
   const roundMode = options.roundMode || 'floor';
   const roundMethod =
