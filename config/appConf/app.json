@@ -109,19 +109,7 @@
   "contactList": [
     {
       "type": "Twitter",
-      "link": "https://twitter.com/"
-    },
-    {
-      "type": "Medium",
-      "link": "https://medium.com/"
-    },
-    {
-      "type": "Discord",
-      "link": "https://discord.com/"
-    },
-    {
-      "type": "Telegram",
-      "link": "https://t.me/vouchrun"
+      "link": "https://x.com/@VouchLSD"
     }
   ],
   "tokenPriceUrl": "https://api.coingecko.com/api/v3/simple/price?ids=pulsechain&vs_currencies=usd"
