@@ -473,7 +473,7 @@ const ETHPage = () => {
             >
               Terms of Use
             </a>{' '}
-            by clicking the "Accept" button below
+            by clicking the &quot;Accept&quot; button below
           </p>
           <br />
           <div className='flex items-center gap-[8px]'>
