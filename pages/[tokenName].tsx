@@ -57,6 +57,8 @@ const style = {
   position: 'absolute',
   top: '50%',
   left: '50%',
+  maxWidth: '600px',
+  width: 'calc(100% - 20px)',
   transform: 'translate(-50%, -50%)',
   bgcolor: 'background.paper',
   border: '2px solid #000',
@@ -462,9 +464,16 @@ const ETHPage = () => {
           </p>
           <br />
           <p id='modal-modal-description' className='d-subtitle'>
-            I accept these risks and acknowledge that the application operators
-            have no control over my funds or transactions and provide no
-            warranty or endorsement with respect to any tokens or outcomes.
+            I understand the risks associated with entering into using Vouch
+            protocol and agree with full{' '}
+            <a
+              href='https://vouch.run/docs/terms/terms.html'
+              target='_blank'
+              style={{ textDecoration: 'underline' }}
+            >
+              Terms of Use
+            </a>{' '}
+            by clicking the "Accept" button below
           </p>
           <br />
           <div className='flex items-center gap-[8px]'>
@@ -488,7 +497,7 @@ const ETHPage = () => {
             onClick={() => onConfirm()}
             border='none'
           >
-            <div className='flex items-center'>Confirm</div>
+            <div className='flex items-center'>Accept</div>
           </CustomButton>
         </Box>
       </Modal>
