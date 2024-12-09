@@ -1,4 +1,4 @@
-import appConfig from "config/appConf/app.json";
+import appConfig from 'config/appConf/app.json';
 
 export function getTokenName() {
   return appConfig.token.tokenName;
@@ -64,4 +64,8 @@ export function getContactList() {
 
 export function getExternalLinkList() {
   return appConfig.externalLinkList;
+}
+
+export function getThresholdAPR() {
+  return appConfig.APR_warning_threshold;
 }

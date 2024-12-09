@@ -147,4 +147,15 @@ body {
     line-height: 150%;
     text-align: left;
   }
+
+  .threshold-alert {
+    background-color: #c93939;
+    max-width: 400px;
+    margin: 10px auto 0 auto;
+    text-align: center;
+    padding: 5px;
+    font-size: 14px;
+    border-radius: 4px;
+    line-height: normal;
+  }
 }

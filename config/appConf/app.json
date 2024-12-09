@@ -112,5 +112,6 @@
       "link": "https://x.com/@VouchLSD"
     }
   ],
-  "tokenPriceUrl": "https://api.coingecko.com/api/v3/simple/price?ids=pulsechain&vs_currencies=usd"
+  "tokenPriceUrl": "https://api.coingecko.com/api/v3/simple/price?ids=pulsechain&vs_currencies=usd",
+  "APR_warning_threshold": 25
 }

@@ -61,11 +61,12 @@ const style = {
   width: 'calc(100% - 20px)',
   transform: 'translate(-50%, -50%)',
   bgcolor: 'background.paper',
-  border: '2px solid #000',
+  border: '1px solid #6C86AD80',
   boxShadow: 20,
   p: 4,
   background: '#455168',
   borderRadius: '0.3rem',
+  outline: 'none',
 };
 
 const ETHPage = () => {
