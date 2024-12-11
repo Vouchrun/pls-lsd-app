@@ -16,11 +16,13 @@ import Image from 'next/image';
 import { useRouter } from 'next/router';
 import auditIcon from 'public/images/audit.svg';
 import cooperationIcon from 'public/images/cooperation.svg';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { openLink } from 'utils/commonUtils';
 import { formatNumber } from 'utils/numberUtils';
 import { addLsdEthToMetaMask } from 'utils/web3Utils';
 import { getLsdTokenIcon } from 'utils/iconUtils';
+import Box from '@mui/material/Box';
+import Modal from '@mui/material/Modal';
 import {
   IFaqItem,
   getDetailInfoAudit,
@@ -37,6 +39,8 @@ import { useLsdEthRate } from 'hooks/useLsdEthRate';
 import { useWalletAccount } from 'hooks/useWalletAccount';
 import { useApr } from 'hooks/useApr';
 import { GetStaticProps } from 'next';
+import { Switch } from '@mui/material';
+import { CustomButton } from 'components/common/CustomButton';
 
 export async function getStaticPaths() {
   return {
@@ -49,9 +53,29 @@ export const getStaticProps: GetStaticProps = async (context) => {
   return { props: {} };
 };
 
+const style = {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  maxWidth: '600px',
+  width: 'calc(100% - 20px)',
+  transform: 'translate(-50%, -50%)',
+  bgcolor: 'background.paper',
+  border: '1px solid #6C86AD80',
+  boxShadow: 20,
+  p: 4,
+  background: '#455168',
+  borderRadius: '0.3rem',
+  outline: 'none',
+};
+
 const ETHPage = () => {
   const router = useRouter();
   const { apr } = useApr();
+
+  const [open, setOpen] = useState(false);
+  const [show, setShow] = useState(false);
+  const handleClose = () => setOpen(false);
 
   const {
     overallAmount,
@@ -71,6 +95,12 @@ const ETHPage = () => {
     }
     return Number(lsdBalance) * Number(rate);
   }, [lsdBalance, rate]);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      setOpen(window.localStorage.getItem('show') === 'false' ? false : true);
+    }
+  }, []);
 
   const selectedTab = useMemo(() => {
     const tabParam = router.query.tab;
@@ -153,6 +183,13 @@ const ETHPage = () => {
       renderedJSX.push(contentJSX);
     });
     return renderedJSX;
+  };
+
+  const onConfirm = async () => {
+    if (show) {
+      window.localStorage.setItem('show', 'false');
+    }
+    setOpen(false);
   };
 
   return (
@@ -409,6 +446,62 @@ const ETHPage = () => {
           </div>
         )}
       </div>
+
+      <Modal
+        open={open}
+        onClose={handleClose}
+        aria-labelledby='modal-modal-title'
+        aria-describedby='modal-modal-description'
+      >
+        <Box sx={style}>
+          <h4 className='d-title'>Disclaimer</h4>
+          <br />
+          <p id='modal-modal-description' className='d-subtitle'>
+            I acknowledge that all transactions executed through connected smart
+            contracts are irreversible and conducted solely on the applicable
+            blockchain networks. I understand that using smart contracts carries
+            risks, including errors, hacks, and unforeseen consequences, which
+            may result in loss of funds.
+          </p>
+          <br />
+          <p id='modal-modal-description' className='d-subtitle'>
+            I understand the risks associated with entering into using Vouch
+            protocol and agree with full{' '}
+            <a
+              href='https://vouch.run/docs/terms/terms.html'
+              target='_blank'
+              style={{ textDecoration: 'underline' }}
+            >
+              Terms of Use
+            </a>{' '}
+            by clicking the &quot;Accept&quot; button below
+          </p>
+          <br />
+          <div className='flex items-center gap-[8px]'>
+            <label className='sc-1ecf058b-1 ggnPRR'>
+              {' '}
+              <Switch
+                checked={show}
+                onChange={() => setShow(!show)}
+                name='loading'
+                color='warning'
+              />
+              <span className='sc-1ecf058b-0 dioEsS'></span>
+            </label>
+            <div style={{ color: 'white' }}>Do not show again</div>
+          </div>
+          <CustomButton
+            mt='.18rem'
+            className='mx-[.24rem]'
+            height='.56rem'
+            type='primary'
+            onClick={() => onConfirm()}
+            border='none'
+          >
+            <div className='flex items-center'>Accept</div>
+          </CustomButton>
+        </Box>
+      </Modal>
     </div>
   );
 };

@@ -18,7 +18,11 @@ import { useEffect, useMemo, useState } from 'react';
 import { handleEthStake, updateEthBalance } from 'redux/reducers/EthSlice';
 import { updateLsdEthBalance } from 'redux/reducers/LsdEthSlice';
 import { RootState } from 'redux/store';
-import { getLsdEthName, getTokenName } from 'utils/configUtils';
+import {
+  getLsdEthName,
+  getThresholdAPR,
+  getTokenName,
+} from 'utils/configUtils';
 import { getTokenIcon } from 'utils/iconUtils';
 import { formatLargeAmount, formatNumber } from 'utils/numberUtils';
 import {
@@ -33,6 +37,7 @@ import { CustomNumberInput } from '../common/CustomNumberInput';
 import { DataLoading } from '../common/DataLoading';
 import { useDepositEnabled } from 'hooks/useDepositEnabled';
 import { setMetaMaskDisconnected } from 'redux/reducers/WalletSlice';
+import { Alert } from '@mui/material';
 
 export const LsdTokenStake = () => {
   const dispatch = useAppDispatch();
@@ -52,6 +57,7 @@ export const LsdTokenStake = () => {
 
   const { balance } = useBalance();
   const { writeContractAsync } = useWriteContract();
+  const thresholdAPR = getThresholdAPR();
   const { stakeLoading } = useAppSelector((state: RootState) => {
     return {
       stakeLoading: state.app.stakeLoading,
@@ -314,6 +320,14 @@ export const LsdTokenStake = () => {
           </div>
         </div>
       </div>
+
+      {apr && apr > thresholdAPR && (
+        <div className='threshold-alert text-color-text1 font-[700]'>
+          Warning APR appears Abnormally High!
+          <br />
+          This could result in getting less vPLS than you expect.
+        </div>
+      )}
 
       {buttonText && (
         <CustomButton

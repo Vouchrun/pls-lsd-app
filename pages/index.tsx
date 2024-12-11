@@ -1,7 +1,7 @@
-import type { NextPage } from "next";
-import { useEffect } from "react";
-import { useRouter } from "next/router";
-import { getTokenName } from "utils/configUtils";
+import type { NextPage } from 'next';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
+import { getTokenName } from 'utils/configUtils';
 
 const Home: NextPage = () => {
   const router = useRouter();
