@@ -110,6 +110,10 @@
     {
       "type": "Twitter",
       "link": "https://x.com/@VouchLSD"
+    },
+    {
+      "type": "Telegram",
+      "link": "https://t.me/vouchrun"
     }
   ],
   "tokenPriceUrl": "https://api.coingecko.com/api/v3/simple/price?ids=pulsechain&vs_currencies=usd",
