@@ -75,7 +75,12 @@ const ETHPage = () => {
 
   const [open, setOpen] = useState(false);
   const [show, setShow] = useState(false);
-  const handleClose = () => setOpen(false);
+  const handleClose = (event: any, reason: string) => {
+    if (reason === 'backdropClick') {
+      return; // Ignore backdrop clicks
+    }
+    setOpen(false);
+  };
 
   const {
     overallAmount,
