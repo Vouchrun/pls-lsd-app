@@ -345,7 +345,7 @@ export const handleLsdEthUnstake =
             abi: getLsdEthTokenContractAbi(),
             address: getLsdEthTokenContract() as `0x${string}`,
             functionName: 'approve',
-            args: [getEthWithdrawContract(), parseEther('10000000')],
+            args: [getEthWithdrawContract(), parseEther(unstakeAmount)],
           },
           {
             onSuccess: (data: any) => {
