@@ -6,7 +6,7 @@ import {
   setUnreadNoticeFlag,
   setUpdateFlag,
 } from 'redux/reducers/AppSlice';
-import { updateApr } from 'redux/reducers/LsdEthSlice';
+import { updateApr, updateYearlyApr } from 'redux/reducers/LsdEthSlice';
 import {
   setMetaMaskAccount,
   setMetaMaskChainId,
@@ -61,6 +61,8 @@ export function useInit() {
       dispatch(updateEthLatestBlockTimestamp());
       // query apr
       dispatch(updateApr());
+      // query yearly apr
+      dispatch(updateYearlyApr());
     }
   }, [updateFlag, dispatch]);
 

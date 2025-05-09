@@ -19,5 +19,6 @@
     "networkBalanceContract": {
       "address": "0xC3116bB002F94d2E4bB8E4D83252ee021552dEB8"
     }
-  }
+  },
+  "networkBalanceContractDeploymentBlock": 21740533
 }
