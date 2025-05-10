@@ -1,11 +1,11 @@
-import appConfig from "./appConf/app.json";
-import appDevConfig from "./appConf/dev.json";
-import appProdConfig from "./appConf/prod.json";
-import { getLsdEthTokenContract } from "./contract";
+import appConfig from './appConf/app.json';
+import appDevConfig from './appConf/dev.json';
+import appProdConfig from './appConf/prod.json';
+import { getLsdEthTokenContract } from './contract';
 
 export function isDev() {
   // return false;
-  return process.env.NEXT_PUBLIC_ENV !== "production";
+  return process.env.NEXT_PUBLIC_ENV !== 'production';
 }
 
 export function getEthereumChainId() {
@@ -59,8 +59,8 @@ export function getWagmiChainConfig() {
     network: getEthereumChainName(),
     nativeCurrency: {
       decimals: 18,
-      name: "ETH",
-      symbol: "ETH",
+      name: 'ETH',
+      symbol: 'ETH',
     },
     rpcUrls: {
       default: {
@@ -72,15 +72,22 @@ export function getWagmiChainConfig() {
     },
     blockExplorers: {
       etherscan: {
-        name: "",
+        name: '',
         url: getExplorerUrl(),
       },
       default: {
-        name: "",
+        name: '',
         url: getExplorerUrl(),
       },
     },
     contracts: {},
     testnet: isDev(),
   };
+}
+
+export function getNetworkBalanceContractDeploymentBlock() {
+  if (isDev()) {
+    return appDevConfig.networkBalanceContractDeploymentBlock;
+  }
+  return appProdConfig.networkBalanceContractDeploymentBlock;
 }

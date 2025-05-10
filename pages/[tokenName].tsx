@@ -71,7 +71,7 @@ const style = {
 
 const ETHPage = () => {
   const router = useRouter();
-  const { apr } = useApr();
+  const { apr, yearlyApr } = useApr();
 
   const [open, setOpen] = useState(false);
   const [show, setShow] = useState(false);
@@ -210,28 +210,24 @@ const ETHPage = () => {
                 {getLsdEthName()}
               </div>
 
-              <div className='ml-[.16rem]'>
+              {/* <div className='ml-[.16rem]'>
                 <CustomTag type='stroke'>
                   <div className='text-[.16rem] scale-75 origin-center'>
                     PRC20
                   </div>
                 </CustomTag>
-              </div>
+              </div> */}
 
               <div className='ml-[.06rem]'>
                 <CustomTag>
-                  <div className='text-[.16rem] scale-75 origin-center flex items-center'>
-                    {apr === 0 ? (
-                      <span className='ml-[.02rem]'>APR Pending Update</span>
-                    ) : (
-                      <>
-                        {' '}
-                        <span className='font-[700]'>
-                          {formatNumber(apr, { decimals: 2 })}%
-                        </span>
-                        <span className='ml-[.02rem]'>APR liquid Stake</span>
-                      </>
-                    )}
+                  <div className='px-1'>
+                    <span className='font-bold mr-1'>Staking APR:</span>
+                    <span className='mr-1'>
+                      7 Days Avg: {formatNumber(apr, { decimals: 2 })}%
+                    </span>
+                    <span>
+                      1 Year Avg: {formatNumber(yearlyApr, { decimals: 2 })}%
+                    </span>
                   </div>
                 </CustomTag>
               </div>
