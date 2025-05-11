@@ -10,7 +10,7 @@
     "lsdTokenIcon": "/images/token/vPLS_trans.svg"
   },
   "unstake": {
-    "lockTipLink": "https://vouch.run/docs/architecture/vouch_lsd.html#user-unstake-flow",
+    "lockTipLink": "https://vouch.run/docs/user_guide/user_staking_intro.html",
     "duration": "1-5 days"
   },
   "apr": 0,
