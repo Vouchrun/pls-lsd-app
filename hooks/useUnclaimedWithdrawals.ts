@@ -1,15 +1,15 @@
 import {
   getEthWithdrawContract,
   getEthWithdrawContractAbi,
-} from "config/contract";
-import { useEffect, useMemo, useState } from "react";
-import { RootState } from "redux/store";
-import { getEthWeb3 } from "utils/web3Utils";
-import Web3 from "web3";
-import { useAppSelector } from "./common";
-import { useAppSlice } from "./selector";
-import { useWalletAccount } from "./useWalletAccount";
-import { formatScientificNumber } from "utils/numberUtils";
+} from 'config/contract';
+import { useEffect, useMemo, useState } from 'react';
+import { RootState } from 'redux/store';
+import { getEthWeb3 } from 'utils/web3Utils';
+import Web3 from 'web3';
+import { useAppSelector } from './common';
+import { useAppSlice } from './selector';
+import { useWalletAccount } from './useWalletAccount';
+import { formatScientificNumber } from 'utils/numberUtils';
 
 export function useEthUnclaimedWithdrawls() {
   const { updateFlag } = useAppSlice();
@@ -27,9 +27,9 @@ export function useEthUnclaimedWithdrawls() {
 
   const willReceiveAmount = useMemo(() => {
     if (!rate || isNaN(Number(rate))) {
-      return "--";
+      return '--';
     }
-    return Number(rate) * Number(claimableAmount) + "";
+    return Number(rate) * Number(claimableAmount) + '';
   }, [rate, claimableAmount]);
 
   useEffect(() => {
@@ -56,8 +56,8 @@ export function useEthUnclaimedWithdrawls() {
           !unclaimedWithdrawsOfUser ||
           unclaimedWithdrawsOfUser.length === 0
         ) {
-          setOverallAmount("0");
-          setClaimableAmount("0");
+          setOverallAmount('0');
+          setClaimableAmount('0');
           return;
         }
 
@@ -111,8 +111,8 @@ export function useEthUnclaimedWithdrawls() {
   }, [metaMaskAccount, updateFlag]);
 
   return {
-    overallAmount,
-    claimableAmount,
+    overallAmount: overallAmount?.replace(',', '.'),
+    claimableAmount: claimableAmount?.replace(',', '.'),
     willReceiveAmount,
     claimableWithdrawals,
   };
