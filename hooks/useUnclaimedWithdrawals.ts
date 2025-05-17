@@ -110,6 +110,8 @@ export function useEthUnclaimedWithdrawls() {
     })();
   }, [metaMaskAccount, updateFlag]);
 
+  console.log('overallAmount', overallAmount);
+  console.log('claimableAmount', claimableAmount);
   return {
     overallAmount,
     claimableAmount,
