@@ -15,8 +15,8 @@ export function useEthUnclaimedWithdrawls() {
   const { updateFlag } = useAppSlice();
   const { metaMaskAccount } = useWalletAccount();
 
-  const [overallAmount, setOverallAmount] = useState<string>();
-  const [claimableAmount, setClaimableAmount] = useState<string>();
+  const [overallAmount, setOverallAmount] = useState<number>(0);
+  const [claimableAmount, setClaimableAmount] = useState<number>(0);
   const [claimableWithdrawals, setClaimableWithdrawals] = useState<string[]>(
     []
   );
@@ -50,15 +50,14 @@ export function useEthUnclaimedWithdrawls() {
         const unclaimedWithdrawsOfUser = await contract.methods
           .getUnclaimedWithdrawalsOfUser(metaMaskAccount)
           .call();
-        console.log('res', unclaimedWithdrawsOfUser);
+        // console.log("res", unclaimedWithdrawsOfUser);
 
         if (
           !unclaimedWithdrawsOfUser ||
           unclaimedWithdrawsOfUser.length === 0
         ) {
-          console.log('no unclaimed withdrawals');
-          setOverallAmount('0');
-          setClaimableAmount('0');
+          setOverallAmount(0);
+          setClaimableAmount(0);
           return;
         }
 
@@ -68,7 +67,7 @@ export function useEthUnclaimedWithdrawls() {
               const withdrawal = await contract.methods
                 .withdrawalAtIndex(index)
                 .call();
-              console.log('withdrawal', withdrawal);
+              // console.log("withdrawal", withdrawal);
 
               return withdrawal;
             } catch (err: any) {}
@@ -76,7 +75,7 @@ export function useEthUnclaimedWithdrawls() {
         });
 
         const withdrawalList = await Promise.all(requestList);
-        console.log('withdrawalList', withdrawalList);
+
         const maxClaimableWithdrawIndex = await contract.methods
           .maxClaimableWithdrawIndex()
           .call();
@@ -102,9 +101,8 @@ export function useEthUnclaimedWithdrawls() {
           }
         );
 
-        console.log('overallAmount222', overallAmount);
-        setOverallAmount(formatScientificNumber(overallAmount));
-        setClaimableAmount(formatScientificNumber(claimableAmount));
+        setOverallAmount(+formatScientificNumber(overallAmount));
+        setClaimableAmount(+formatScientificNumber(claimableAmount));
         setClaimableWithdrawals(claimableWithdrawals);
       } catch (err: any) {
         console.log(err);
@@ -112,7 +110,6 @@ export function useEthUnclaimedWithdrawls() {
     })();
   }, [metaMaskAccount, updateFlag]);
 
-  console.log('overallAmount333', overallAmount);
   return {
     overallAmount,
     claimableAmount,
