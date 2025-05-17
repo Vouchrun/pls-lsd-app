@@ -1,15 +1,15 @@
 import {
   getEthWithdrawContract,
   getEthWithdrawContractAbi,
-} from "config/contract";
-import { useEffect, useMemo, useState } from "react";
-import { RootState } from "redux/store";
-import { getEthWeb3 } from "utils/web3Utils";
-import Web3 from "web3";
-import { useAppSelector } from "./common";
-import { useAppSlice } from "./selector";
-import { useWalletAccount } from "./useWalletAccount";
-import { formatScientificNumber } from "utils/numberUtils";
+} from 'config/contract';
+import { useEffect, useMemo, useState } from 'react';
+import { RootState } from 'redux/store';
+import { getEthWeb3 } from 'utils/web3Utils';
+import Web3 from 'web3';
+import { useAppSelector } from './common';
+import { useAppSlice } from './selector';
+import { useWalletAccount } from './useWalletAccount';
+import { formatScientificNumber } from 'utils/numberUtils';
 
 export function useEthUnclaimedWithdrawls() {
   const { updateFlag } = useAppSlice();
@@ -27,9 +27,9 @@ export function useEthUnclaimedWithdrawls() {
 
   const willReceiveAmount = useMemo(() => {
     if (!rate || isNaN(Number(rate))) {
-      return "--";
+      return '--';
     }
-    return Number(rate) * Number(claimableAmount) + "";
+    return Number(rate) * Number(claimableAmount) + '';
   }, [rate, claimableAmount]);
 
   useEffect(() => {
@@ -50,14 +50,15 @@ export function useEthUnclaimedWithdrawls() {
         const unclaimedWithdrawsOfUser = await contract.methods
           .getUnclaimedWithdrawalsOfUser(metaMaskAccount)
           .call();
-        // console.log("res", unclaimedWithdrawsOfUser);
+        console.log('res', unclaimedWithdrawsOfUser);
 
         if (
           !unclaimedWithdrawsOfUser ||
           unclaimedWithdrawsOfUser.length === 0
         ) {
-          setOverallAmount("0");
-          setClaimableAmount("0");
+          console.log('no unclaimed withdrawals');
+          setOverallAmount('0');
+          setClaimableAmount('0');
           return;
         }
 
@@ -67,7 +68,7 @@ export function useEthUnclaimedWithdrawls() {
               const withdrawal = await contract.methods
                 .withdrawalAtIndex(index)
                 .call();
-              // console.log("withdrawal", withdrawal);
+              console.log('withdrawal', withdrawal);
 
               return withdrawal;
             } catch (err: any) {}
@@ -75,7 +76,7 @@ export function useEthUnclaimedWithdrawls() {
         });
 
         const withdrawalList = await Promise.all(requestList);
-
+        console.log('withdrawalList', withdrawalList);
         const maxClaimableWithdrawIndex = await contract.methods
           .maxClaimableWithdrawIndex()
           .call();
@@ -101,6 +102,7 @@ export function useEthUnclaimedWithdrawls() {
           }
         );
 
+        console.log('overallAmount222', overallAmount);
         setOverallAmount(formatScientificNumber(overallAmount));
         setClaimableAmount(formatScientificNumber(claimableAmount));
         setClaimableWithdrawals(claimableWithdrawals);
@@ -110,6 +112,7 @@ export function useEthUnclaimedWithdrawls() {
     })();
   }, [metaMaskAccount, updateFlag]);
 
+  console.log('overallAmount333', overallAmount);
   return {
     overallAmount,
     claimableAmount,
