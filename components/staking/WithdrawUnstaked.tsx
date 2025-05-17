@@ -20,8 +20,8 @@ import {
 import { handleEthWithdraw } from 'redux/reducers/EthSlice';
 
 interface Props {
-  overallAmount: number;
-  claimableAmount: number;
+  overallAmount: string | undefined;
+  claimableAmount: string | undefined;
   willReceiveAmount: string;
   claimableWithdrawals: string[];
 }
@@ -62,7 +62,7 @@ export const WithdrawUnstaked = (props: Props) => {
       handleEthWithdraw(
         writeContractAsync,
         claimableWithdrawals,
-        claimableAmount.toString(),
+        claimableAmount || '0',
         willReceiveAmount,
         false,
         (success) => {

@@ -15,8 +15,8 @@ export function useEthUnclaimedWithdrawls() {
   const { updateFlag } = useAppSlice();
   const { metaMaskAccount } = useWalletAccount();
 
-  const [overallAmount, setOverallAmount] = useState<number>(0);
-  const [claimableAmount, setClaimableAmount] = useState<number>(0);
+  const [overallAmount, setOverallAmount] = useState<string>();
+  const [claimableAmount, setClaimableAmount] = useState<string>();
   const [claimableWithdrawals, setClaimableWithdrawals] = useState<string[]>(
     []
   );
@@ -56,8 +56,8 @@ export function useEthUnclaimedWithdrawls() {
           !unclaimedWithdrawsOfUser ||
           unclaimedWithdrawsOfUser.length === 0
         ) {
-          setOverallAmount(0);
-          setClaimableAmount(0);
+          setOverallAmount('0');
+          setClaimableAmount('0');
           return;
         }
 
@@ -101,8 +101,8 @@ export function useEthUnclaimedWithdrawls() {
           }
         );
 
-        setOverallAmount(+formatScientificNumber(overallAmount));
-        setClaimableAmount(+formatScientificNumber(claimableAmount));
+        setOverallAmount(formatScientificNumber(overallAmount));
+        setClaimableAmount(formatScientificNumber(claimableAmount));
         setClaimableWithdrawals(claimableWithdrawals);
       } catch (err: any) {
         console.log(err);
@@ -112,6 +112,7 @@ export function useEthUnclaimedWithdrawls() {
 
   console.log('overallAmount', overallAmount);
   console.log('claimableAmount', claimableAmount);
+
   return {
     overallAmount,
     claimableAmount,
