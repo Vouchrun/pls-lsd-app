@@ -123,9 +123,6 @@ const ETHPage = () => {
   }, [router.query]);
 
   const showWithdrawTab = useMemo(() => {
-    console.log('overallAmount', overallAmount);
-    console.log('isNaN(Number(overallAmount))', isNaN(Number(overallAmount)));
-    console.log('Number(overallAmount) > 0', Number(overallAmount) > 0);
     return (
       !!overallAmount &&
       !isNaN(Number(overallAmount)) &&
