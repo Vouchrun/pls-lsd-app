@@ -114,8 +114,8 @@ export function useEthUnclaimedWithdrawls() {
   console.log('claimableAmount', claimableAmount);
 
   return {
-    overallAmount,
-    claimableAmount,
+    overallAmount: overallAmount?.replace(',', '.'),
+    claimableAmount: claimableAmount?.replace(',', '.'),
     willReceiveAmount,
     claimableWithdrawals,
   };
