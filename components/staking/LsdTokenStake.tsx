@@ -262,7 +262,7 @@ export const LsdTokenStake = () => {
 
   return (
     <div>
-      <div className="h-[1.07rem] mt-[.18rem] pt-[.24rem] mx-[.24rem] bg-color-bgPage rounded-[.3rem]">
+      <div className="h-[1.07rem] mt-[.18rem] pt-[.24rem] mx-[.24rem] bg-[#edece3] dark:bg-[#111111] rounded-[.3rem]">
         <div className="mx-[.12rem] flex items-start">
           <div className="h-[.42rem] bg-color-bg2 rounded-[.3rem] flex items-center cursor-pointer">
             <div className="ml-[.08rem] flex items-center">
