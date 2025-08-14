@@ -271,7 +271,7 @@ export const LsdTokenUnstake = () => {
   return (
     <div>
       <div
-        className='cursor-pointer h-[.56rem] mt-[.18rem] mx-[.24rem] bg-[#6C86AD14] dark:bg-[#6C86AD50] rounded-[.16rem] flex items-center justify-between pl-[.12rem] pr-[.18rem]'
+        className='cursor-pointer h-[.56rem] mt-[.18rem] mx-[.24rem] bg-[#E2E0D0] dark:bg-[#333333] rounded-[.16rem] flex items-center justify-between pl-[.12rem] pr-[.18rem]'
         onClick={() => {
           openLink(getUnstakeTipLink());
         }}
@@ -321,7 +321,7 @@ export const LsdTokenUnstake = () => {
                   width='.63rem'
                   height='.36rem'
                   fontSize='.16rem'
-                  className='bg-color-bg1 border-color-border1'
+                  className='bg-color-bgPage border-color-border1'
                   onClick={clickMax}
                   border={`0.01rem solid ${darkMode ? '#6C86AD80' : '#ffffff'}`}
                 >
@@ -448,10 +448,10 @@ export const LsdTokenUnstake = () => {
         sx={{
           marginTop: '.15rem',
           '& .MuiPopover-paper': {
-            background: darkMode ? '#6C86AD4D' : '#ffffff80',
+            background: darkMode ? '#333333' : '#E2E0D0',
             border: darkMode
-              ? '0.01rem solid #6C86AD80'
-              : '0.01rem solid #FFFFFF',
+              ? '0.01rem solid #333333'
+              : '0.01rem solid #E2E0D0',
             backdropFilter: 'blur(.4rem)',
             borderRadius: '.3rem',
           },
@@ -469,8 +469,8 @@ export const LsdTokenUnstake = () => {
             darkMode ? 'dark' : ''
           )}
         >
-          <div className='text-center leading-[150%]'>Exchange Rate</div>
-          <div className='text-center mt-[.08rem] leading-[150%]'>
+          <div className='text-center leading-[150%] text-color-text2'>Exchange Rate</div>
+          <div className='text-center mt-[.08rem] leading-[150%] text-color-text2'>
             1:{formatNumber(lsdEthRate, { decimals: 6 })}
           </div>
         </div>

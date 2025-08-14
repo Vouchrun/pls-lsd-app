@@ -35,8 +35,8 @@ export const SettingsDrawer = (props: Props) => {
       onClose={() => onChangeOpen(false)}
       sx={{
         '& .MuiPaper-root': {
-          background: darkMode ? '#1B1B1F' : '#E8EFFD',
-          width: '4.85rem',
+          background: darkMode ? '#1a1a1a' : '#f3f3ec',
+          width: '300px',
           paddingTop: '1rem',
         },
       }}
@@ -45,7 +45,7 @@ export const SettingsDrawer = (props: Props) => {
         <div>
           <div className='px-[.36rem]'>
             <div className='ml-[.24rem] mt-[.56rem] flex items-center'>
-              <div className='text-[.16rem] text-color-text2 mr-[.16rem]'>
+              <div className='text-[.16rem] mr-[.16rem]' style={{ color: darkMode ? "#fff" : "#1b1b1f" }}>
                 Dark Mode
               </div>
 

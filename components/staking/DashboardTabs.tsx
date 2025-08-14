@@ -1,6 +1,9 @@
 import classNames from "classnames";
 import { useRouter } from "next/router";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
+import Image from "next/image";
+import menuIcon from "public/images/burger-menu.svg";
+import Link from "next/link";
 
 interface Props {
   selectedTab: "stake" | "unstake" | "withdraw";
@@ -15,44 +18,78 @@ export const DashboardTabs = (props: Props) => {
   const showWithdraw = useMemo(() => {
     return showWithdrawTab || router.query.tab === "withdraw";
   }, [router.query, showWithdrawTab]);
+  const [isActive, setIsActive] = useState(false);
+  const handleClick = () => {
+    setIsActive((prev) => !prev); // Toggle state
+  };
 
   return (
-    <div
-      className={classNames(
-        "p-[.04rem] h-[.42rem] grid items-stretch bg-color-bg2 rounded-[.3rem] w-[2.2rem]"
-      )}
-      style={{
-        gridTemplateColumns: "40% 60%",
-      }}
-    >
+    <>
+      <Image
+        src={menuIcon}
+        alt="stafi"
+        height="30"
+        width="30"
+        className="cursor-pointer block xl:hidden ml-[60px]"
+        onClick={handleClick}
+      />
       <div
-        className={classNames(
-          "cursor-pointer flex items-center justify-center text-[.16rem] rounded-[.3rem]",
-          props.selectedTab === "stake" || props.selectedTab === "unstake"
-            ? "text-color-highlight bg-color-highlight"
-            : "text-color-text1"
-        )}
-        onClick={() => props.onChangeTab("stake")}
+        className={`ml-[15px] w-[280px] sm:w-[280px] xl:w-[420px] h-auto p-[20px] lg:p-[.04rem] items-stretch bg-[#edece3] dark:bg-[#111111] rounded-[15px] lg:rounded-[.6rem] xl:grid absolute xl:relative top-[40px] xl:top-0 gap-0
+  ${isActive ? "flex flex-col" : "hidden"}`}
+        style={{
+          gridTemplateColumns: "33.33% 33.33% 33.33%",
+        }}
       >
-        Stake
-      </div>
+        <Link
+          className={classNames(
+            "cursor-pointer flex items-center justify-center text-[.16rem] rounded-[.3rem]",
+            (props.selectedTab === "stake" ||
+              props.selectedTab === "unstake" ||
+              router.pathname.startsWith("/PLS/")) &&
+              !router.pathname.startsWith("/dashboard")
+              ? "text-color-highlight bg-color-highlight"
+              : "text-color-text1"
+          )}
+          href={`/PLS/?tab=stake`}
+          // onClick={() => props.onChangeTab("stake")}
+        >
+          Stake
+        </Link>
 
-      {showWithdraw && (
+        {showWithdraw && (
+          <div className="flex items-stretch">
+            <div className="ml-[.1rem] w-[0.01rem] h-[.22rem] bg-[#DEE6F7] dark:bg-bg1Dark self-center" />
+            <Link
+              className={classNames(
+                "flex-1 ml-[.1rem] cursor-pointer flex items-center justify-center text-[.16rem] rounded-[.3rem]",
+                props.selectedTab === "withdraw" &&
+                  !router.pathname.startsWith("/dashboard")
+                  ? "text-color-highlight bg-color-highlight"
+                  : "text-color-text1"
+              )}
+              href={`/PLS/?tab=withdraw`}
+              // onClick={() => props.onChangeTab("withdraw")}
+            >
+              Withdraw
+            </Link>
+          </div>
+        )}
         <div className="flex items-stretch">
-          <div className="ml-[.1rem] w-[0.01rem] h-[.22rem] bg-[#DEE6F7] dark:bg-bg1Dark self-center" />
-          <div
+          <div className="ml-[.1rem] mr-[.1rem] w-[0.01rem] h-[.22rem] bg-[#DEE6F7] dark:bg-bg1Dark self-center" />
+          <Link
+            href={"/dashboard"}
             className={classNames(
               "flex-1 ml-[.1rem] cursor-pointer flex items-center justify-center text-[.16rem] rounded-[.3rem]",
-              props.selectedTab === "withdraw"
+
+              router.pathname.startsWith("/dashboard")
                 ? "text-color-highlight bg-color-highlight"
                 : "text-color-text1"
             )}
-            onClick={() => props.onChangeTab("withdraw")}
           >
-            Withdraw
-          </div>
+            Dashboard
+          </Link>
         </div>
-      )}
-    </div>
+      </div>
+    </>
   );
 };
