@@ -4,10 +4,12 @@ import { CustomButton } from 'components/common/CustomButton';
 import { NoticeDrawer } from 'components/drawer/NoticeDrawer';
 import { SettingsDrawer } from 'components/drawer/SettingsDrawer';
 import { Icomoon } from 'components/icon/Icomoon';
+import { DashboardTabs } from 'components/staking/DashboardTabs';
 import { getEthereumChainId, getEthereumChainName } from 'config/env';
 import { useAppDispatch, useAppSelector } from 'hooks/common';
 import { useAppSlice } from 'hooks/selector';
 import { useWalletAccount } from 'hooks/useWalletAccount';
+import { useRouter } from 'next/router';
 import {
   bindPopover,
   bindTrigger,
@@ -16,6 +18,7 @@ import {
 import Image from 'next/image';
 import appLogo from 'public/images/appIconDark.svg';
 import appLogoLight from 'public/images/appIconLight.svg';
+
 import defaultAvatar from 'public/images/default_avatar.png';
 import noticeIcon from 'public/images/notice.png';
 import { useEffect, useMemo, useState } from 'react';
@@ -31,11 +34,13 @@ import { getShortAddress } from 'utils/stringUtils';
 import { useAccount } from 'wagmi';
 
 const Navbar = () => {
-  const { unreadNoticeFlag } = useAppSlice();
+  const router = useRouter();
+  const { darkMode, unreadNoticeFlag } = useAppSlice();
   const dispatch = useAppDispatch();
   const [noticeDrawerOpen, setNoticeDrawerOpen] = useState(false);
   const [settingsDrawerOpen, setSettingsDrawerOpen] = useState(false);
   const [auditExpand, setAuditExpand] = useState(false);
+  const showWithdrawTab = true;
   const [pageWidth, setPageWidth] = useState(
     document.documentElement.clientWidth
   );
@@ -67,6 +72,30 @@ const Navbar = () => {
       window.removeEventListener('resize', resizeListener);
     };
   }, []);
+  
+  const selectedTab = useMemo(() => {
+    const tabParam = router.query.tab;
+    if (tabParam) {
+      switch (tabParam) {
+        case 'stake':
+        case 'unstake':
+        case 'withdraw':
+          return tabParam;
+        default:
+          return 'stake';
+      }
+    }
+    return 'stake';
+  }, [router.query]);
+  const updateTab = (tab: string) => {
+    router.replace({
+      pathname: router.pathname,
+      query: {
+        ...router.query,
+        tab,
+      },
+    });
+  };
 
   return (
     <div className='bg-color-bgPage py-[.36rem] flex items-center justify-center'>
@@ -80,10 +109,19 @@ const Navbar = () => {
             expand={auditExpand}
             onExpandChange={setAuditExpand}
           />
+         
+          {showWithdrawTab && (
+            <DashboardTabs
+              selectedTab={selectedTab}
+              onChangeTab={updateTab}
+              showWithdrawTab={showWithdrawTab}
+            />
+          )}
+
         </div>
 
         <div className={classNames('flex items-center')}>
-          <div className={classNames('ml-[.16rem]')}>
+          <div className={classNames('ml-[.16rem] rounded-[80px]', darkMode ? "bg-[#333333]" : "bg-[#d7d4be]")}>
             {/* {metaMaskAccount ? (
               <UserInfo auditExpand={auditExpand} />
             ) : (

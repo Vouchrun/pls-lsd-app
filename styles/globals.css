@@ -130,7 +130,6 @@ body {
   }
 
   .d-title {
-    color: rgb(255, 255, 255);
     font-size: 24px;
     font-style: normal;
     font-weight: 700;
@@ -140,7 +139,6 @@ body {
   }
 
   .d-subtitle {
-    color: rgb(255, 255, 255);
     font-size: 16px;
     font-style: normal;
     font-weight: 500;
@@ -159,3 +157,4 @@ body {
     line-height: normal;
   }
 }
+.tab-active div {color: #000 !important;}

@@ -29,7 +29,7 @@ export const FaqItem = (props: Props) => {
   }, [collapseOpenId, props.id, dispatch]);
 
   return (
-    <div className="bg-color-bg3 rounded-[.12rem]" id={id}>
+    <div className="bg-color-bg2 rounded-[.12rem]" id={id}>
       <div
         className="py-[.24rem] flex items-start justify-between px-[.24rem] cursor-pointer"
         style={{
