@@ -35,7 +35,17 @@ export const DashboardTabs = (props: Props) => {
       />
       <div
         className={`w-[280px] sm:w-[280px] xl:w-[420px] h-auto p-[20px] lg:p-[.04rem] items-stretch bg-[#edece3] dark:bg-[#111111] rounded-[15px] lg:rounded-[.6rem] xl:grid absolute xl:relative top-[40px] xl:top-0 gap-0
-  ${isActive ? "flex flex-col" : "hidden"}`}
+  ${isActive ? "flex flex-col" : "hidden"}
+  [&>*:not(:last-child):after]:content-['|'] 
+  [&>*:not(:last-child):after]:absolute 
+  [&>*:not(:last-child):after]:right-[-1px] 
+  [&>*:not(:last-child):after]:top-1/2 
+  [&>*:not(:last-child):after]:-translate-y-1/2 
+  [&>*:not(:last-child):after]:text-color-text1 
+  [&>*:not(:last-child):after]:opacity-30
+  [&>*]:relative
+  [&>*.tab-active:after]:hidden
+  [&>*:has(+_.tab-active):after]:hidden`}
         style={{
           gridTemplateColumns: "33.33% 33.33% 33.33%",
         }}
@@ -58,7 +68,7 @@ export const DashboardTabs = (props: Props) => {
 
         {showWithdraw && (
           <div className="flex items-stretch">
-            <div className="ml-[.1rem] w-[0.01rem] h-[.22rem] bg-[#DEE6F7] dark:bg-bg1Dark self-center" />
+            {/* <div className="ml-[.1rem] w-[0.01rem] h-[.22rem] bg-[#DEE6F7] dark:bg-bg1Dark self-center" /> */}
             <Link
               className={classNames(
                 "h-[35px] flex-1 ml-[.1rem] cursor-pointer flex items-center justify-center text-[.16rem] rounded-[.3rem]",
@@ -75,7 +85,7 @@ export const DashboardTabs = (props: Props) => {
           </div>
         )}
         <div className="flex items-stretch">
-          <div className="ml-[.1rem] mr-[.1rem] w-[0.01rem] h-[.22rem] bg-[#DEE6F7] dark:bg-bg1Dark self-center" />
+          {/* <div className="ml-[.1rem] mr-[.1rem] w-[0.01rem] h-[.22rem] bg-[#DEE6F7] dark:bg-bg1Dark self-center" /> */}
           <Link
             href={"/dashboard"}
             className={classNames(

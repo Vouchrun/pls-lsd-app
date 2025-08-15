@@ -100,32 +100,34 @@ const Navbar = () => {
   return (
     <div className="bg-color-bgPage py-[10px] lg:py-[25px] flex items-center justify-center">
       <div className="w-smallContentW xl:w-contentW 2xl:w-largeContentW mx-auto flex items-center justify-between relative">
-        <div
+        <div className="flex items-center relative">
+          <AuditComponent
+            expand={auditExpand}
+            onExpandChange={setAuditExpand}
+          />
+          <div
+            className={classNames(
+              "flex items-center relative"
+              // pageWidth >= 1600 ? "" : "pl-[1.06rem]"
+            )}
+          >
+            {showWithdrawTab && (
+              <DashboardTabs
+                selectedTab={selectedTab}
+                onChangeTab={updateTab}
+                showWithdrawTab={showWithdrawTab}
+              />
+            )}
+          </div>
+        </div>
+        {/* <div
           className={classNames(
             "absolute top-[.11rem] w-[82px] h-[20px] left-[-1.06rem]",
             pageWidth >= 1600 ? "left-[-1.06rem]" : "left-0"
           )}
         >
-          <AuditComponent
-            expand={auditExpand}
-            onExpandChange={setAuditExpand}
-          />
-        </div>
-
-        <div
-          className={classNames(
-            "flex items-center relative",
-            pageWidth >= 1600 ? "" : "pl-[1.06rem]"
-          )}
-        >
-          {showWithdrawTab && (
-            <DashboardTabs
-              selectedTab={selectedTab}
-              onChangeTab={updateTab}
-              showWithdrawTab={showWithdrawTab}
-            />
-          )}
-        </div>
+          
+        </div> */}
 
         <div className={classNames("flex items-center")}>
           <div
@@ -408,12 +410,11 @@ const AuditComponent = (props: AuditComponentProps) => {
   return (
     <div
       className={classNames(
-        "h-[.42rem] rounded-[.3rem] border-[#6C86AD]/20 flex items-center ",
+        "cursor-pointer ml-[.04rem] w-[1.54rem] h-[.40rem] relative rounded-full mr-[10px]",
         expand ? "border-[0.01rem]" : ""
       )}
     >
       <div
-        className="w-[82px] h-[20px]"
         onClick={() => {
           onExpandChange(!expand);
         }}
@@ -421,7 +422,7 @@ const AuditComponent = (props: AuditComponentProps) => {
         <Image
           src={darkMode ? appLogo : appLogoLight}
           alt="stafi"
-          layout="fill"
+          className="relative h-auto w-auto"
         />
       </div>
 
