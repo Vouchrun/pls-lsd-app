@@ -106,7 +106,7 @@ export const WithdrawUnstaked = (props: Props) => {
         </div> */}
       </div>
 
-      <div className='h-[.77rem] mt-[.25rem] mx-[.24rem] px-[.24rem] bg-color-bgPage rounded-[.3rem] flex items-center justify-between'>
+      <div className='h-[.77rem] mt-[.25rem] mx-[.24rem] px-[.24rem] bg-[#edece3] dark:bg-[#111111] rounded-[.3rem] flex items-center justify-between'>
         <div className='text-[.14rem] text-color-text1 font-[500]'>
           Withdrawable
         </div>
