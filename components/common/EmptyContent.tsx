@@ -1,5 +1,6 @@
 import Image from "next/image";
 import empty from "public/images/empty_bird.svg";
+import { useAppSlice } from 'hooks/selector';
 
 interface EmptyContentProps {
   hideText?: boolean;
@@ -8,6 +9,7 @@ interface EmptyContentProps {
 }
 
 export const EmptyContent = (props: EmptyContentProps) => {
+  const { darkMode, unreadNoticeFlag } = useAppSlice();
   return (
     <div
       className="flex justify-center"
@@ -26,7 +28,7 @@ export const EmptyContent = (props: EmptyContentProps) => {
           <Image src={empty} alt="empty" layout="fill" />
         </div>
         {!props.hideText && (
-          <div className="mt-[.16rem] text-[.14rem] text-color-text2">
+          <div className="mt-[.16rem] text-[.14rem]" style={{ color: darkMode ? '#fff' : '#1b1b1f' }}>
             There is Nothing Here
           </div>
         )}

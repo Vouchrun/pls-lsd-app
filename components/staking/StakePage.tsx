@@ -46,9 +46,9 @@ export const StakePage = () => {
             className={classNames(
               "cursor-pointer flex items-center justify-center rounded-tl-[.3rem] text-[.16rem] text-color-text1 border-[0.01rem]",
               selectedTab === "stake"
-                ? "font-[700] border-color-borderActive"
+                ? "font-[700] border-[#ff4400]/30"
                 : "border-color-border1",
-              selectedTab === "stake" ? styles["selected-bg"] : "bg-color-bg2"
+              selectedTab === "stake" ? styles["selected-bg"] : "bg-[#E2E0D0] dark:bg-[#333333]"
             )}
             style={{
               // background:
@@ -72,9 +72,9 @@ export const StakePage = () => {
             className={classNames(
               "cursor-pointer flex items-center justify-center rounded-tr-[.3rem] text-[.16rem] text-color-text1 border-[0.01rem]",
               selectedTab === "unstake"
-                ? "font-[700] border-color-borderActive"
+                ? "font-[700] border-[#ff4400]/30"
                 : "border-color-border1",
-              selectedTab === "unstake" ? styles["selected-bg"] : "bg-color-bg2"
+              selectedTab === "unstake" ? styles["selected-bg"] : "bg-[#E2E0D0] dark:bg-[#333333]"
             )}
             style={{
               // background:

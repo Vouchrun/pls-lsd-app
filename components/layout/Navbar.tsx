@@ -1,41 +1,46 @@
-import { Popover } from '@mui/material';
-import classNames from 'classnames';
-import { CustomButton } from 'components/common/CustomButton';
-import { NoticeDrawer } from 'components/drawer/NoticeDrawer';
-import { SettingsDrawer } from 'components/drawer/SettingsDrawer';
-import { Icomoon } from 'components/icon/Icomoon';
-import { getEthereumChainId, getEthereumChainName } from 'config/env';
-import { useAppDispatch, useAppSelector } from 'hooks/common';
-import { useAppSlice } from 'hooks/selector';
-import { useWalletAccount } from 'hooks/useWalletAccount';
+import { Popover } from "@mui/material";
+import classNames from "classnames";
+import { CustomButton } from "components/common/CustomButton";
+import { NoticeDrawer } from "components/drawer/NoticeDrawer";
+import { SettingsDrawer } from "components/drawer/SettingsDrawer";
+import { Icomoon } from "components/icon/Icomoon";
+import { DashboardTabs } from "components/staking/DashboardTabs";
+import { getEthereumChainId, getEthereumChainName } from "config/env";
+import { useAppDispatch, useAppSelector } from "hooks/common";
+import { useAppSlice } from "hooks/selector";
+import { useWalletAccount } from "hooks/useWalletAccount";
+import { useRouter } from "next/router";
 import {
   bindPopover,
   bindTrigger,
   usePopupState,
-} from 'material-ui-popup-state/hooks';
-import Image from 'next/image';
-import appLogo from 'public/images/appIconDark.svg';
-import appLogoLight from 'public/images/appIconLight.svg';
-import defaultAvatar from 'public/images/default_avatar.png';
-import noticeIcon from 'public/images/notice.png';
-import { useEffect, useMemo, useState } from 'react';
+} from "material-ui-popup-state/hooks";
+import Image from "next/image";
+import appLogo from "public/images/appIconDark.svg";
+import appLogoLight from "public/images/appIconLight.svg";
+
+import defaultAvatar from "public/images/default_avatar.png";
+import noticeIcon from "public/images/notice.png";
+import { useEffect, useMemo, useState } from "react";
 import {
   disconnectWallet,
   setMetaMaskAccount,
   setMetaMaskDisconnected,
-} from 'redux/reducers/WalletSlice';
-import { RootState } from 'redux/store';
-import { getAuditList } from 'utils/configUtils';
-import { getChainIcon } from 'utils/iconUtils';
-import { getShortAddress } from 'utils/stringUtils';
-import { useAccount } from 'wagmi';
+} from "redux/reducers/WalletSlice";
+import { RootState } from "redux/store";
+import { getAuditList } from "utils/configUtils";
+import { getChainIcon } from "utils/iconUtils";
+import { getShortAddress } from "utils/stringUtils";
+import { useAccount } from "wagmi";
 
 const Navbar = () => {
-  const { unreadNoticeFlag } = useAppSlice();
+  const router = useRouter();
+  const { darkMode, unreadNoticeFlag } = useAppSlice();
   const dispatch = useAppDispatch();
   const [noticeDrawerOpen, setNoticeDrawerOpen] = useState(false);
   const [settingsDrawerOpen, setSettingsDrawerOpen] = useState(false);
   const [auditExpand, setAuditExpand] = useState(false);
+  const showWithdrawTab = true;
   const [pageWidth, setPageWidth] = useState(
     document.documentElement.clientWidth
   );
@@ -60,30 +65,77 @@ const Navbar = () => {
   };
 
   useEffect(() => {
-    window.addEventListener('resize', resizeListener);
+    window.addEventListener("resize", resizeListener);
     resizeListener();
 
     return () => {
-      window.removeEventListener('resize', resizeListener);
+      window.removeEventListener("resize", resizeListener);
     };
   }, []);
 
-  return (
-    <div className='bg-color-bgPage py-[.36rem] flex items-center justify-center'>
-      <div className='w-smallContentW xl:w-contentW 2xl:w-largeContentW mx-auto flex items-center justify-between relative'>
-        <div
-          className={classNames('absolute top-[.11rem] w-[.82rem] h-[.2rem]')}
-        ></div>
+  const selectedTab = useMemo(() => {
+    const tabParam = router.query.tab;
+    if (tabParam) {
+      switch (tabParam) {
+        case "stake":
+        case "unstake":
+        case "withdraw":
+          return tabParam;
+        default:
+          return "stake";
+      }
+    }
+    return "stake";
+  }, [router.query]);
+  const updateTab = (tab: string) => {
+    router.replace({
+      pathname: router.pathname,
+      query: {
+        ...router.query,
+        tab,
+      },
+    });
+  };
 
-        <div className={classNames('flex items-center relative')}>
+  return (
+    <div className="bg-color-bgPage py-[10px] lg:py-[25px] flex items-center justify-center">
+      <div className="w-smallContentW xl:w-contentW 2xl:w-largeContentW mx-auto flex items-center justify-between relative">
+        <div className="flex items-center relative">
           <AuditComponent
             expand={auditExpand}
             onExpandChange={setAuditExpand}
           />
+          <div
+            className={classNames(
+              "flex items-center relative"
+              // pageWidth >= 1600 ? "" : "pl-[1.06rem]"
+            )}
+          >
+            {showWithdrawTab && (
+              <DashboardTabs
+                selectedTab={selectedTab}
+                onChangeTab={updateTab}
+                showWithdrawTab={showWithdrawTab}
+              />
+            )}
+          </div>
         </div>
+        {/* <div
+          className={classNames(
+            "absolute top-[.11rem] w-[82px] h-[20px] left-[-1.06rem]",
+            pageWidth >= 1600 ? "left-[-1.06rem]" : "left-0"
+          )}
+        >
+          
+        </div> */}
 
-        <div className={classNames('flex items-center')}>
-          <div className={classNames('ml-[.16rem]')}>
+        <div className={classNames("flex items-center")}>
+          <div
+            className={classNames(
+              "ml-[.16rem] rounded-[80px]",
+              darkMode ? "bg-[#333333]" : "bg-[#d7d4be]"
+            )}
+          >
             {/* {metaMaskAccount ? (
               <UserInfo auditExpand={auditExpand} />
             ) : (
@@ -94,34 +146,34 @@ const Navbar = () => {
 
           <div
             className={classNames(
-              'cursor-pointer ml-[.3rem] w-[.42rem] h-[.42rem] flex items-center justify-center rounded-[.12rem] relative',
-              noticeDrawerOpen ? 'bg-color-selected' : ''
+              "cursor-pointer ml-[.3rem] w-[.42rem] h-[.42rem] flex items-center justify-center rounded-[.12rem] relative",
+              noticeDrawerOpen ? "bg-color-selected" : ""
             )}
             onClick={() => {
               setSettingsDrawerOpen(false);
               setNoticeDrawerOpen(!noticeDrawerOpen);
             }}
           >
-            <div className='h-[.25rem] w-[.22rem] relative'>
-              <Image src={noticeIcon} layout='fill' alt='notice' />
+            <div className="h-[.25rem] w-[.22rem] relative">
+              <Image src={noticeIcon} layout="fill" alt="notice" />
             </div>
 
             {unreadNoticeFlag && (
-              <div className='bg-error rounded-full w-[.06rem] h-[.06rem] absolute right-[0.08rem] top-[0.08rem]'></div>
+              <div className="bg-error rounded-full w-[.06rem] h-[.06rem] absolute right-[0.08rem] top-[0.08rem]"></div>
             )}
           </div>
 
           <div
             className={classNames(
-              'cursor-pointer ml-[.3rem] w-[.42rem] h-[.42rem] flex items-center justify-center rounded-[.12rem]',
-              settingsDrawerOpen ? 'bg-color-selected' : ''
+              "cursor-pointer ml-[.3rem] w-[.42rem] h-[.42rem] flex items-center justify-center rounded-[.12rem]",
+              settingsDrawerOpen ? "bg-color-selected" : ""
             )}
             onClick={() => {
               setNoticeDrawerOpen(false);
               setSettingsDrawerOpen(!settingsDrawerOpen);
             }}
           >
-            <Icomoon icon='more' size='.2rem' color='#6C86AD' />
+            <Icomoon icon="more" size=".2rem" color="#6C86AD" />
           </div>
         </div>
 
@@ -358,33 +410,30 @@ const AuditComponent = (props: AuditComponentProps) => {
   return (
     <div
       className={classNames(
-        'h-[.42rem] rounded-[.3rem] border-[#6C86AD]/20 flex items-center ',
-        expand ? 'border-[0.01rem]' : ''
+        "cursor-pointer ml-[.04rem] w-[1.54rem] h-[.40rem] relative rounded-full mr-[10px]",
+        expand ? "border-[0.01rem]" : ""
       )}
     >
       <div
-        className='cursor-pointer ml-[.04rem] w-[1.54rem] h-[.34rem] p-[.06rem] relative rounded-full'
         onClick={() => {
           onExpandChange(!expand);
         }}
       >
-        <div className='w-full h-full relative flex items-center justify-center'>
-          <Image
-            src={darkMode ? appLogo : appLogoLight}
-            alt='audit'
-            className='relative h-auto w-auto'
-          />
-        </div>
+        <Image
+          src={darkMode ? appLogo : appLogoLight}
+          alt="stafi"
+          className="relative h-auto w-auto"
+        />
       </div>
 
       <div
         className={classNames(
-          'items-center origin-left',
-          expand ? 'animate-expand flex' : 'animate-collapse hidden'
+          "items-center origin-left",
+          expand ? "animate-expand flex" : "animate-collapse hidden"
         )}
       >
         <div
-          className='text-color-text2 ml-[.06rem] text-[.14rem] w-[.8rem] min-w-[.8rem] break-normal'
+          className="text-color-text2 ml-[.06rem] text-[.14rem] w-[.8rem] min-w-[.8rem] break-normal"
           style={
             {
               // maxLines: 1,
@@ -403,25 +452,25 @@ const AuditComponent = (props: AuditComponentProps) => {
         {getAuditList().map(
           (item: { name: string; icon: string; iconDark: string }) => (
             <div
-              className='ml-[.1rem] w-[.8rem] h-[.17rem] relative'
+              className="ml-[.1rem] w-[.8rem] h-[.17rem] relative"
               key={item.name}
             >
               <Image
                 src={darkMode ? item.iconDark : item.icon}
-                alt='audit'
-                layout='fill'
+                alt="audit"
+                layout="fill"
               />
             </div>
           )
         )}
 
         <div
-          className='mx-[.12rem] cursor-pointer'
+          className="mx-[.12rem] cursor-pointer"
           onClick={() => {
             onExpandChange(false);
           }}
         >
-          <Icomoon icon='collapse' size='.12rem' />
+          <Icomoon icon="collapse" size=".12rem" />
         </div>
       </div>
     </div>
