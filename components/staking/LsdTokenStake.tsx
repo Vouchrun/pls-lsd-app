@@ -323,9 +323,11 @@ export const LsdTokenStake = () => {
 
       {apr && apr > thresholdAPR ? (
         <div className="threshold-alert text-color-text1 font-[700]">
-          Warning APR appears Abnormally High!
+          Warning APR appears to be high (this may be normal).
           <br />
-          This could result in getting less vPLS than you expect.
+          Exercise caution if this seems excessive compared to recent APRs.
+          <br />
+          If APR is unrealistically high you will get less vPLS when staking PLS.
         </div>
       ) : (
         ""
