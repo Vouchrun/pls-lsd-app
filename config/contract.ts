@@ -1,11 +1,12 @@
-import { isDev } from "./env";
-import appDevConfig from "./appConf/dev.json";
-import appProdConfig from "./appConf/prod.json";
-import lsdTokenContractAbi from "./abi/lsdToken.json";
-import networkBalanceContractAbi from "./abi/networkBalance.json";
-import networkWithdrawContractAbi from "./abi/networkWithdraw.json";
-import depositContractAbi from "./abi/deposit.json";
-import { AbiItem } from "web3-utils";
+import { isDev } from './env';
+import appDevConfig from './appConf/dev.json';
+import appProdConfig from './appConf/prod.json';
+import lsdTokenContractAbi from './abi/lsdToken.json';
+import networkBalanceContractAbi from './abi/networkBalance.json';
+import networkWithdrawContractAbi from './abi/networkWithdraw.json';
+import depositContractAbi from './abi/deposit.json';
+import vouchStakingContractAbi from './abi/vouchStaking.json';
+import { AbiItem } from 'web3-utils';
 
 /**
  * get lsdETH token contract address.
@@ -73,4 +74,40 @@ export function getEthWithdrawContractAbi() {
  */
 export function getNetworkBalanceContractAbi() {
   return networkBalanceContractAbi as AbiItem[];
+}
+
+/**
+ * get VouchStaking contract address
+ */
+export function getVouchStakingContract() {
+  // Using the provided contract address
+  return '0x0f264CCEda9e21c3Cd474F0c849f8B37ead9BFE8';
+}
+
+/**
+ * get VouchStaking contract ABI
+ */
+export function getVouchStakingContractAbi() {
+  return vouchStakingContractAbi as AbiItem[];
+}
+
+/**
+ * get HolderRewardsVault contract address
+ */
+export function getHolderRewardsVaultContract() {
+  return '0xD16361E50357A553e337b323709fEE962E0cE6aB';
+}
+
+/**
+ * get LPRewardPool contract address
+ */
+export function getLPRewardPoolContract() {
+  return '0xe1506f212536EC56eef420aEbE6Fe1BC924D450F';
+}
+
+/**
+ * get StakingRewardPool contract address
+ */
+export function getStakingRewardPoolContract() {
+  return '0xA8413B248558223f015b01fc563eCF577968311d';
 }
