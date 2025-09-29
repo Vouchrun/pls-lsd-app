@@ -125,7 +125,7 @@ export const updateApr = (): AppThunk => async (dispatch, getState) => {
       'BalancesUpdated(uint256,uint256,uint256,uint256)'
     );
     const fromBlock =
-      currentBlock - Math.floor((1 / getBlockSeconds()) * 60 * 60 * 24 * 3);
+      currentBlock - Math.floor((1 / getBlockSeconds()) * 60 * 60 * 24 * 7);
     const events = await networkBalanceContract.getPastEvents('allEvents', {
       fromBlock: fromBlock,
       toBlock: currentBlock,
@@ -153,7 +153,7 @@ export const updateApr = (): AppThunk => async (dispatch, getState) => {
         endRate !== 1 &&
         beginRate !== 1
       ) {
-        apr = ((endRate - beginRate) / 7) * 365.25 * 100;
+        apr = ((endRate - beginRate) / 3) * 365.25 * 100;
       }
     }
     dispatch(setApr(apr));
