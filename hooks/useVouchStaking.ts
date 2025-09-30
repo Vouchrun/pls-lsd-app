@@ -1,12 +1,18 @@
 import { useCallback, useEffect, useState } from 'react';
 import Web3 from 'web3';
-import { getEthWeb3 } from 'utils/web3Utils';
+import { getEthWeb3, getEthWeb3ForTransactions } from 'utils/web3Utils';
 import {
   getVouchStakingContract,
   getVouchStakingContractAbi,
 } from 'config/contract';
+import {
+  getLPRewardPoolContract,
+  getStakingRewardPoolContract,
+} from 'config/contract';
 import { useWalletAccount } from './useWalletAccount';
 import { useAppSlice } from './selector';
+import { TOKEN_ADDRESSES } from './useVouchTokens';
+import { AbiItem } from 'web3-utils';
 
 export interface PendingRewards {
   standardTotal: string;
@@ -83,11 +89,15 @@ export function useVouchStaking() {
   const [totalLiquidityAllocPoint, setTotalLiquidityAllocPoint] =
     useState<string>('0');
   const [userTotalVouchStaked, setUserTotalVouchStaked] = useState<string>('0');
+  const [userTotalVplsStaked, setUserTotalVplsStaked] = useState<string>('0');
+  const [totalVouchUnlocking, setTotalVouchUnlocking] = useState<string>('0');
+  const [vouchUnlockPeriod, setVouchUnlockPeriod] = useState<number>(0);
+  const [vplsUnlockPeriod, setVplsUnlockPeriod] = useState<number>(0);
 
   // Loading states
   const [loading, setLoading] = useState(false);
 
-  // Get contract instance
+  // Get contract instance for read operations
   const getContract = useCallback(() => {
     const web3 = getEthWeb3();
     return new web3.eth.Contract(
@@ -95,6 +105,52 @@ export function useVouchStaking() {
       getVouchStakingContract()
     );
   }, []);
+
+  // Get contract instance for transactions
+  const getContractForTransactions = useCallback(() => {
+    const web3 = getEthWeb3ForTransactions();
+    return new web3.eth.Contract(
+      getVouchStakingContractAbi(),
+      getVouchStakingContract()
+    );
+  }, []);
+
+  // Minimal ERC20 ABI for allowance/approve
+  const ERC20_MINI_ABI: AbiItem[] = [
+    {
+      constant: true,
+      inputs: [
+        { name: '_owner', type: 'address' },
+        { name: '_spender', type: 'address' },
+      ],
+      name: 'allowance',
+      outputs: [{ name: '', type: 'uint256' }],
+      type: 'function',
+    },
+    {
+      constant: false,
+      inputs: [
+        { name: '_spender', type: 'address' },
+        { name: '_value', type: 'uint256' },
+      ],
+      name: 'approve',
+      outputs: [{ name: '', type: 'bool' }],
+      type: 'function',
+    },
+  ];
+
+  const getErc20Contract = useCallback((tokenAddress: string) => {
+    const web3 = getEthWeb3();
+    return new web3.eth.Contract(ERC20_MINI_ABI, tokenAddress);
+  }, []);
+
+  const getErc20ContractForTransactions = useCallback(
+    (tokenAddress: string) => {
+      const web3 = getEthWeb3ForTransactions();
+      return new web3.eth.Contract(ERC20_MINI_ABI, tokenAddress);
+    },
+    []
+  );
 
   // Fetch pending rewards for user
   const fetchPendingRewards = useCallback(async () => {
@@ -172,16 +228,20 @@ export function useVouchStaking() {
       const totalPoolsResult = await contract.methods.totalPools().call();
       setTotalPools(Number(totalPoolsResult));
 
-      // Get allocation points
-      const standardAllocResult = await contract.methods
-        .totalStandardAllocPoint()
+      // Get allocation points via reward pool rates (ABI exposes totalAllocPoint_ on this return)
+      const stakingRewardPool = getStakingRewardPoolContract();
+      const lpRewardPool = getLPRewardPoolContract();
+
+      const stakingRates = await contract.methods
+        .getRewardPoolRates(stakingRewardPool)
         .call();
-      const liquidityAllocResult = await contract.methods
-        .totalLiquidityAllocPoint()
+      const lpRates = await contract.methods
+        .getRewardPoolRates(lpRewardPool)
         .call();
 
-      setTotalStandardAllocPoint(standardAllocResult.toString());
-      setTotalLiquidityAllocPoint(liquidityAllocResult.toString());
+      // stakingRates.totalAllocPoint_ and lpRates.totalAllocPoint_ are BigNumber-like strings
+      setTotalStandardAllocPoint(stakingRates.totalAllocPoint_.toString());
+      setTotalLiquidityAllocPoint(lpRates.totalAllocPoint_.toString());
 
       // Get user total vouch staked if user is connected
       if (metaMaskAccount) {
@@ -191,11 +251,80 @@ export function useVouchStaking() {
         setUserTotalVouchStaked(
           Web3.utils.fromWei(userStakedResult || '0', 'ether')
         );
+
+        // Get user total vpls staked (assuming there's a similar method for vPLS)
+        try {
+          const userVplsStakedResult = await contract.methods
+            .getUserTotalVplsStaked(metaMaskAccount)
+            .call();
+          setUserTotalVplsStaked(
+            Web3.utils.fromWei(userVplsStakedResult || '0', 'ether')
+          );
+        } catch (error) {
+          // If the method doesn't exist, set to 0
+          setUserTotalVplsStaked('0');
+        }
       }
     } catch (error) {
       console.error('Error fetching pool info:', error);
     }
   }, [metaMaskAccount, getContract]);
+
+  // Fetch vouch unlock period
+  const fetchVouchUnlockPeriod = useCallback(async () => {
+    try {
+      const contract = getContract();
+      const unlockPeriodResult = await contract.methods
+        .vouchUnlockPeriod()
+        .call();
+      // Convert from seconds to days
+      const unlockPeriodDays = Math.ceil(
+        Number(unlockPeriodResult) / (24 * 60 * 60)
+      );
+      setVouchUnlockPeriod(unlockPeriodDays);
+    } catch (error) {
+      console.error('Error fetching vouch unlock period:', error);
+      // Fallback to a default value if fetch fails
+      setVouchUnlockPeriod(7); // Default to 7 days
+    }
+  }, [getContract]);
+
+  // Fetch vpls unlock period
+  const fetchVplsUnlockPeriod = useCallback(async () => {
+    try {
+      const contract = getContract();
+      // For now, using the same vouchUnlockPeriod as there doesn't seem to be a separate vPLS unlock period
+      // If a separate vplsUnlockPeriod method exists in the contract, update this line
+      const unlockPeriodResult = await contract.methods
+        .vouchUnlockPeriod()
+        .call();
+      // Convert from seconds to days
+      const unlockPeriodDays = Math.ceil(
+        Number(unlockPeriodResult) / (24 * 60 * 60)
+      );
+      setVplsUnlockPeriod(unlockPeriodDays);
+    } catch (error) {
+      console.error('Error fetching vpls unlock period:', error);
+      // Fallback to a default value if fetch fails
+      setVplsUnlockPeriod(7); // Default to 7 days
+    }
+  }, [getContract]);
+
+  // Fetch total VOUCH unlocking
+  const fetchTotalVouchUnlocking = useCallback(async () => {
+    try {
+      const contract = getContract();
+      const totalUnlockingResult = await contract.methods
+        .totalVouchUnlocking()
+        .call();
+      setTotalVouchUnlocking(
+        Web3.utils.fromWei(totalUnlockingResult || '0', 'ether')
+      );
+    } catch (error) {
+      console.error('Error fetching total VOUCH unlocking:', error);
+      setTotalVouchUnlocking('0');
+    }
+  }, [getContract]);
 
   // Stake tokens
   const stake = useCallback(
@@ -204,22 +333,46 @@ export function useVouchStaking() {
 
       setLoading(true);
       try {
-        const web3 = getEthWeb3();
-        const contract = getContract();
         const amountWei = Web3.utils.toWei(amount, 'ether');
 
-        const gasEstimate = await contract.methods
+        // 1) Ensure allowance of VOUCH for staking contract
+        const vouchToken = TOKEN_ADDRESSES.VOUCH;
+        const spender = getVouchStakingContract();
+        const erc20 = getErc20Contract(vouchToken);
+        const erc20ForTx = getErc20ContractForTransactions(vouchToken);
+
+        const currentAllowanceWei: string = await erc20.methods
+          .allowance(metaMaskAccount, spender)
+          .call();
+
+        console.log(currentAllowanceWei, amountWei);
+        const isAllowanceEnough = Web3.utils
+          .toBN(currentAllowanceWei)
+          .gte(Web3.utils.toBN(amountWei));
+
+        if (!isAllowanceEnough) {
+          console.log('approve');
+          const approveGas = await erc20ForTx.methods
+            .approve(spender, amountWei)
+            .estimateGas({ from: metaMaskAccount });
+          console.log('approveGas', approveGas);
+
+          await erc20ForTx.methods
+            .approve(spender, amountWei)
+            .send({ from: metaMaskAccount, gas: Math.floor(approveGas * 1.2) });
+        }
+
+        // 2) Perform stake
+        const stakingContractForTx = getContractForTransactions();
+        const gasEstimate = await stakingContractForTx.methods
           .stake(pid, amountWei)
-          .estimateGas({
-            from: metaMaskAccount,
-          });
+          .estimateGas({ from: metaMaskAccount });
 
-        const result = await contract.methods.stake(pid, amountWei).send({
-          from: metaMaskAccount,
-          gas: Math.floor(gasEstimate * 1.2), // Add 20% buffer
-        });
+        const receipt = await stakingContractForTx.methods
+          .stake(pid, amountWei)
+          .send({ from: metaMaskAccount, gas: Math.floor(gasEstimate * 1.2) });
 
-        return result;
+        return receipt;
       } catch (error) {
         console.error('Error staking:', error);
         throw error;
@@ -227,7 +380,13 @@ export function useVouchStaking() {
         setLoading(false);
       }
     },
-    [metaMaskAccount, getContract]
+    [
+      metaMaskAccount,
+      getContract,
+      getErc20Contract,
+      getContractForTransactions,
+      getErc20ContractForTransactions,
+    ]
   );
 
   // Unstake tokens
@@ -237,7 +396,7 @@ export function useVouchStaking() {
 
       setLoading(true);
       try {
-        const contract = getContract();
+        const contract = getContractForTransactions();
         const amountWei = Web3.utils.toWei(amount, 'ether');
 
         const gasEstimate = await contract.methods
@@ -259,7 +418,7 @@ export function useVouchStaking() {
         setLoading(false);
       }
     },
-    [metaMaskAccount, getContract]
+    [metaMaskAccount, getContractForTransactions]
   );
 
   // Claim rewards from specific pool
@@ -269,7 +428,7 @@ export function useVouchStaking() {
 
       setLoading(true);
       try {
-        const contract = getContract();
+        const contract = getContractForTransactions();
 
         const gasEstimate = await contract.methods.claim(pid).estimateGas({
           from: metaMaskAccount,
@@ -288,7 +447,7 @@ export function useVouchStaking() {
         setLoading(false);
       }
     },
-    [metaMaskAccount, getContract]
+    [metaMaskAccount, getContractForTransactions]
   );
 
   // Claim all rewards
@@ -297,7 +456,7 @@ export function useVouchStaking() {
 
     setLoading(true);
     try {
-      const contract = getContract();
+      const contract = getContractForTransactions();
 
       const gasEstimate = await contract.methods.claimAll().estimateGas({
         from: metaMaskAccount,
@@ -315,7 +474,7 @@ export function useVouchStaking() {
     } finally {
       setLoading(false);
     }
-  }, [metaMaskAccount, getContract]);
+  }, [metaMaskAccount, getContractForTransactions]);
 
   // Claim all holder rewards
   const claimAllHolderRewards = useCallback(async () => {
@@ -323,7 +482,7 @@ export function useVouchStaking() {
 
     setLoading(true);
     try {
-      const contract = getContract();
+      const contract = getContractForTransactions();
 
       const gasEstimate = await contract.methods
         .claimAllHolderRewards()
@@ -343,7 +502,7 @@ export function useVouchStaking() {
     } finally {
       setLoading(false);
     }
-  }, [metaMaskAccount, getContract]);
+  }, [metaMaskAccount, getContractForTransactions]);
 
   // Exit from pool (unstake all and claim)
   const exit = useCallback(
@@ -352,7 +511,7 @@ export function useVouchStaking() {
 
       setLoading(true);
       try {
-        const contract = getContract();
+        const contract = getContractForTransactions();
 
         const gasEstimate = await contract.methods.exit(pid).estimateGas({
           from: metaMaskAccount,
@@ -371,7 +530,7 @@ export function useVouchStaking() {
         setLoading(false);
       }
     },
-    [metaMaskAccount, getContract]
+    [metaMaskAccount, getContractForTransactions]
   );
 
   // Refresh all data
@@ -381,12 +540,18 @@ export function useVouchStaking() {
       fetchHolderRewardInfo(),
       fetchDripRedeemed(),
       fetchPoolInfo(),
+      fetchVouchUnlockPeriod(),
+      fetchVplsUnlockPeriod(),
+      fetchTotalVouchUnlocking(),
     ]);
   }, [
     fetchPendingRewards,
     fetchHolderRewardInfo,
     fetchDripRedeemed,
     fetchPoolInfo,
+    fetchVouchUnlockPeriod,
+    fetchVplsUnlockPeriod,
+    fetchTotalVouchUnlocking,
   ]);
 
   // Effect to fetch data when component mounts or dependencies change
@@ -403,6 +568,10 @@ export function useVouchStaking() {
     totalStandardAllocPoint,
     totalLiquidityAllocPoint,
     userTotalVouchStaked,
+    userTotalVplsStaked,
+    totalVouchUnlocking,
+    vouchUnlockPeriod,
+    vplsUnlockPeriod,
     loading,
 
     // Actions
@@ -416,5 +585,6 @@ export function useVouchStaking() {
 
     // Utilities
     getContract,
+    getContractForTransactions,
   };
 }

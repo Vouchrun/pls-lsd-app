@@ -24,6 +24,7 @@ export const VplsStaking: React.FC<VplsStakingProps> = ({
     loading,
     userTotalVouchStaked,
     pendingRewards,
+    vplsUnlockPeriod,
     refreshData,
   } = useVouchStaking();
 
@@ -33,7 +34,7 @@ export const VplsStaking: React.FC<VplsStakingProps> = ({
   const [isProcessing, setIsProcessing] = useState(false);
 
   // vPLS staking uses pool ID 0 (assuming vPLS is the first pool)
-  const VPLS_POOL_ID = 0;
+  const VPLS_POOL_ID = 1;
 
   const maxAmount = useMemo(() => {
     if (selectedTab === 'stake') {
@@ -154,6 +155,25 @@ export const VplsStaking: React.FC<VplsStakingProps> = ({
         </div>
       </div>
 
+      {/* Cooldown Message for Unstake Tab */}
+      {selectedTab === 'unstake' && vplsUnlockPeriod > 0 && (
+        <div className='mx-[.24rem] mt-[.16rem] p-[.12rem] bg-[#f0f0f0] dark:bg-[#2a2a2a] border border-[#d0d0d0] dark:border-[#444444] rounded-[.12rem] flex items-center'>
+          <div className='mr-[.08rem] text-[#6c86ad] dark:text-[#8fa4c7]'>
+            <svg width='16' height='16' viewBox='0 0 16 16' fill='currentColor'>
+              <path d='M8 0C3.584 0 0 3.584 0 8s3.584 8 8 8 8-3.584 8-8S12.416 0 8 0zm1 12H7V7h2v5zm0-6H7V4h2v2z' />
+            </svg>
+          </div>
+          <div className='text-[.12rem] text-[#666666] dark:text-[#aaaaaa] leading-[1.4]'>
+            Staked tokens have a{' '}
+            <span className='font-semibold'>
+              {vplsUnlockPeriod} day{vplsUnlockPeriod !== 1 ? 's' : ''}
+            </span>{' '}
+            cool down period to unstake. During this period unstaked tokens will
+            not accrue staking rewards.
+          </div>
+        </div>
+      )}
+
       {/* Content */}
       <div className='mt-[.18rem] pt-[.24rem] mx-[.24rem] bg-[#edece3] dark:bg-[#111111] rounded-[.3rem]'>
         <div className='mx-[.12rem] flex items-start'>
@@ -182,11 +202,15 @@ export const VplsStaking: React.FC<VplsStakingProps> = ({
             </div>
 
             {/* Balance Info */}
-            <div className='mt-[.1rem] flex items-center justify-between text-[.14rem]'>
-              <div className='text-color-text2'>
-                Balance: {formatNumber(maxAmount, { decimals: 4 })}{' '}
-                {selectedTab === 'stake' ? 'vPLS' : 'vPLS (Staked)'}
+            <div className='mt-[.1rem] text-[.14rem]'>
+              <div className='grid grid-cols-2 gap-0'>
+                <div></div>
+                <div className='text-color-text2 align-middle mt-[7px] mb-[14px]'>
+                  Balance: {formatNumber(maxAmount, { decimals: 4 })}{' '}
+                  {selectedTab === 'stake' ? 'vPLS' : 'vPLS (Staked)'}
+                </div>
               </div>
+
             </div>
           </div>
         </div>

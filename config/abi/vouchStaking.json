@@ -46,18 +46,18 @@
     "inputs": [
       {
         "indexed": true,
-        "internalType": "uint256",
-        "name": "_pid",
-        "type": "uint256"
+        "internalType": "address",
+        "name": "rewardsPool",
+        "type": "address"
       },
       {
-        "indexed": true,
+        "indexed": false,
         "internalType": "uint256",
         "name": "updateInterval",
         "type": "uint256"
       },
       {
-        "indexed": true,
+        "indexed": false,
         "internalType": "uint256",
         "name": "updateRatio",
         "type": "uint256"
@@ -243,37 +243,6 @@
     "anonymous": false,
     "inputs": [
       {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "updateInterval",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "updateRatio",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "updateThreshold",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "bool",
-        "name": "autoUpdate",
-        "type": "bool"
-      }
-    ],
-    "name": "LiquidityUpdateSettingsUpdated",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
         "indexed": true,
         "internalType": "uint256",
         "name": "pid",
@@ -332,6 +301,74 @@
       {
         "indexed": true,
         "internalType": "address",
+        "name": "rewardsPool",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "baseVouchPerYear",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "baseVplsPerYear",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "baseWplsPerYear",
+        "type": "uint256"
+      }
+    ],
+    "name": "RewardPoolRatesAutoUpdated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "rewardsPool",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "updateInterval",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "updateRatio",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "updateThreshold",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "autoUpdate",
+        "type": "bool"
+      }
+    ],
+    "name": "RewardPoolUpdateSettingsUpdated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
         "name": "user",
         "type": "address"
       },
@@ -349,37 +386,6 @@
       }
     ],
     "name": "Stake",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "uint256",
-        "name": "pid",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "vouchPerYear",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "vplsPerYear",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "wplsPerYear",
-        "type": "uint256"
-      }
-    ],
-    "name": "StandardEmissionsUpdated",
     "type": "event"
   },
   {
@@ -406,6 +412,119 @@
     ],
     "name": "Unstake",
     "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "user",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "pid",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "VouchUnlockCanceled",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "user",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "pid",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "VouchUnlockFinalized",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "oldPeriod",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "newPeriod",
+        "type": "uint256"
+      }
+    ],
+    "name": "VouchUnlockPeriodUpdated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "user",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "pid",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "unlockAt",
+        "type": "uint256"
+      }
+    ],
+    "name": "VouchUnlockRequested",
+    "type": "event"
+  },
+  {
+    "inputs": [],
+    "name": "MAX_VOUCH_UNLOCK_PERIOD",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
   },
   {
     "inputs": [],
@@ -461,11 +580,6 @@
       {
         "internalType": "address",
         "name": "_rewardPool",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "",
         "type": "address"
       },
       {
@@ -526,19 +640,13 @@
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "",
+        "name": "_pid",
         "type": "uint256"
       }
     ],
-    "name": "autoUpdate",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "view",
+    "name": "cancelVouchUnlock",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -603,6 +711,56 @@
       }
     ],
     "name": "exit",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256[]",
+        "name": "_pids",
+        "type": "uint256[]"
+      }
+    ],
+    "name": "finalizeAllMaturedVouchUnlocks",
+    "outputs": [
+      {
+        "internalType": "uint256[]",
+        "name": "finalizedPids",
+        "type": "uint256[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "amounts",
+        "type": "uint256[]"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_pid",
+        "type": "uint256"
+      }
+    ],
+    "name": "finalizeVouchUnlock",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_rewardPool",
+        "type": "address"
+      }
+    ],
+    "name": "forceUpdateRewardPool",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -718,6 +876,40 @@
     "inputs": [
       {
         "internalType": "address",
+        "name": "_rewardPool",
+        "type": "address"
+      }
+    ],
+    "name": "getRewardPoolRates",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "vouchPerYear",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "vplsPerYear",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "wplsPerYear",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "totalAllocPoint_",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
         "name": "_user",
         "type": "address"
       }
@@ -734,13 +926,44 @@
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "holderRewardsVault",
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_pid",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "_user",
+        "type": "address"
+      }
+    ],
+    "name": "getVouchUnlock",
     "outputs": [
       {
-        "internalType": "contract HolderRewardsVault",
-        "name": "",
-        "type": "address"
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "startTime_",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "unlockAt",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "secondsRemaining",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bool",
+        "name": "ready",
+        "type": "bool"
       }
     ],
     "stateMutability": "view",
@@ -749,56 +972,42 @@
   {
     "inputs": [
       {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
+        "internalType": "address",
+        "name": "_user",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "_pids",
+        "type": "uint256[]"
       }
     ],
-    "name": "lastUpdateTime",
+    "name": "getVouchUnlocks",
     "outputs": [
       {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "liqAutoUpdate",
-    "outputs": [
+        "internalType": "uint256[]",
+        "name": "amounts",
+        "type": "uint256[]"
+      },
       {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "liqLastUpdateTime",
-    "outputs": [
+        "internalType": "uint256[]",
+        "name": "startTimes",
+        "type": "uint256[]"
+      },
       {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "liqUpdateInterval",
-    "outputs": [
+        "internalType": "uint256[]",
+        "name": "unlockAts",
+        "type": "uint256[]"
+      },
       {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
+        "internalType": "uint256[]",
+        "name": "secondsRemainings",
+        "type": "uint256[]"
+      },
+      {
+        "internalType": "bool[]",
+        "name": "readies",
+        "type": "bool[]"
       }
     ],
     "stateMutability": "view",
@@ -806,64 +1015,12 @@
   },
   {
     "inputs": [],
-    "name": "liqUpdateRatio",
+    "name": "holderRewardsVault",
     "outputs": [
       {
-        "internalType": "uint256",
+        "internalType": "contract HolderRewardsVault",
         "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "liqUpdateThreshold",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "liqVouchAllocPerYear",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "liqVplsAllocPerYear",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "liqWplsAllocPerYear",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
+        "type": "address"
       }
     ],
     "stateMutability": "view",
@@ -1080,6 +1237,11 @@
   {
     "inputs": [
       {
+        "internalType": "address",
+        "name": "_rewardPool",
+        "type": "address"
+      },
+      {
         "internalType": "uint256",
         "name": "_vouchPerYear",
         "type": "uint256"
@@ -1095,13 +1257,18 @@
         "type": "uint256"
       }
     ],
-    "name": "setLiquidityEmissions",
+    "name": "setRewardPoolEmissions",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   },
   {
     "inputs": [
+      {
+        "internalType": "address",
+        "name": "_rewardPool",
+        "type": "address"
+      },
       {
         "internalType": "uint256",
         "name": "_updateInterval",
@@ -1123,7 +1290,7 @@
         "type": "bool"
       }
     ],
-    "name": "setLiquidityUpdateSettings",
+    "name": "setRewardPoolUpdateSettings",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -1131,37 +1298,9 @@
   {
     "inputs": [
       {
-        "internalType": "uint256",
-        "name": "_pid",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_vouchPerYear",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_vplsPerYear",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_wplsPerYear",
-        "type": "uint256"
-      }
-    ],
-    "name": "setStandardEmissions",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "_pid",
-        "type": "uint256"
+        "internalType": "address",
+        "name": "_rewardPool",
+        "type": "address"
       },
       {
         "internalType": "uint256",
@@ -1193,6 +1332,19 @@
     "inputs": [
       {
         "internalType": "uint256",
+        "name": "_seconds",
+        "type": "uint256"
+      }
+    ],
+    "name": "setVouchUnlockPeriod",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
         "name": "_pid",
         "type": "uint256"
       },
@@ -1208,16 +1360,21 @@
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "totalLiquidityAllocPoint",
-    "outputs": [
+    "inputs": [
       {
         "internalType": "uint256",
-        "name": "",
+        "name": "_pid",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_amount",
         "type": "uint256"
       }
     ],
-    "stateMutability": "view",
+    "name": "startVouchUnlock",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -1235,7 +1392,7 @@
   },
   {
     "inputs": [],
-    "name": "totalStandardAllocPoint",
+    "name": "totalVouchUnlocking",
     "outputs": [
       {
         "internalType": "uint256",
@@ -1265,52 +1422,8 @@
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "name": "updateInterval",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "name": "updateRatio",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "name": "updateThreshold",
+    "inputs": [],
+    "name": "vouchUnlockPeriod",
     "outputs": [
       {
         "internalType": "uint256",

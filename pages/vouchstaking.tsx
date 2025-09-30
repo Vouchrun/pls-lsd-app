@@ -13,6 +13,8 @@ export default function vouchstaking() {
     holderRewardInfo,
     dripRedeemed,
     userTotalVouchStaked,
+    userTotalVplsStaked,
+    totalVouchUnlocking,
     loading,
     claimAllHolderRewards,
     refreshData,
@@ -34,6 +36,32 @@ export default function vouchstaking() {
   const [vouchTab, setVouchTab] = useState<'stake' | 'unstake'>('stake');
   const { apr, yearlyApr } = useApr();
 
+  // Calculate bar chart percentages for VPLS
+  const vplsUnstakingAmount = Number(totalVouchUnlocking) || 0;
+  const vplsStakedAmount = Number(userTotalVplsStaked) || 0;
+  const vplsTotalSupply = Number(vplsInfo.totalSupply) || 1;
+  const vplsRemainingSupply = Math.max(
+    0,
+    vplsTotalSupply - vplsStakedAmount - vplsUnstakingAmount
+  );
+
+  const vplsUnstakingPercent = (vplsUnstakingAmount / vplsTotalSupply) * 100;
+  const vplsStakedPercent = (vplsStakedAmount / vplsTotalSupply) * 100;
+  const vplsRemainingPercent = (vplsRemainingSupply / vplsTotalSupply) * 100;
+
+  // Calculate bar chart percentages for VOUCH
+  const vouchUnstakingAmount = Number(totalVouchUnlocking) || 0;
+  const vouchStakedAmount = Number(userTotalVouchStaked) || 0;
+  const vouchTotalSupply = Number(vouchInfo.totalSupply) || 1;
+  const vouchRemainingSupply = Math.max(
+    0,
+    vouchTotalSupply - vouchStakedAmount - vouchUnstakingAmount
+  );
+
+  const vouchUnstakingPercent = (vouchUnstakingAmount / vouchTotalSupply) * 100;
+  const vouchStakedPercent = (vouchStakedAmount / vouchTotalSupply) * 100;
+  const vouchRemainingPercent = (vouchRemainingSupply / vouchTotalSupply) * 100;
+
   const handleClaimHolderRewards = async () => {
     try {
       setIsClaimingHolderRewards(true);
@@ -54,10 +82,10 @@ export default function vouchstaking() {
             My Vouch Holdings
           </p>
         </div>
-        <div className='grid grid-flow-col grid-rows-1 max-lg:grid-rows-2 gap-4 px-[35px] max-sm:px-[21px] relative'>
-          <div className='bg-[#333] h-[1000px] w-[1px] absolute left-[50%] max-lg:bg-transparent'></div>
-          <div className='bg-[#333] h-[6px] w-[6px] absolute left-[49.8%] origin-center rotate-45 max-lg:bg-transparent'></div>
-          <div className='bg-[#333] h-[6px] w-[6px] absolute left-[49.8%] bottom-[-24px] origin-center rotate-45 max-lg:bg-transparent'></div>
+        <div className='grid grid-cols-1 lg:grid-cols-2 gap-4 px-[35px] max-sm:px-[21px] relative'>
+          <div className='bg-[#FE8A3C] h-[1000px] w-[1px] absolute left-[50%] max-lg:bg-transparent'></div>
+          {/* <div className='bg-[#333] h-[6px] w-[6px] absolute left-[49.8%] origin-center rotate-45 max-lg:bg-transparent'></div> */}
+          {/* <div className='bg-[#333] h-[6px] w-[6px] absolute left-[49.8%] bottom-[-24px] origin-center rotate-45 max-lg:bg-transparent'></div> */}
           <div className=' '>
             <div className='flex items-center mb-[37px]'>
               <div className='w-[66px] h-[66px] mr-[16px]'>
@@ -97,20 +125,44 @@ export default function vouchstaking() {
               </button>
             </div>
             <div className='border-color-border1 border rounded-[8px] my-[37px] relative p-l[8px]'>
-              <p className='text-[14px] font-medium text-[#8E9397] mb-[7px] mt-[18px] text-center'>
-                Staked <Icomoon icon='tip' size='.12rem' color='#333333' />
-              </p>
-              <p className='text-[16px] font-normal text-[#A6A6A6] mb-[7px] text-center'>
-                <span className='text-[#FFFBFA] mr-[3px]'>
-                  {loading
-                    ? '...'
-                    : formatNumber(userTotalVouchStaked, { decimals: 4 })}
-                </span>
-                vPLS
-              </p>
-              <p className='text-[13px] font-medium text-[#A6A6A6] mb-[7px] text-center'>
-                $0.00
-              </p>
+              <div className='grid grid-cols-2 gap-4 py-[18px]'>
+                {/* Staked Column */}
+                <div className='flex flex-col items-center'>
+                  <p className='text-[14px] font-medium text-[#8E9397] mb-[7px] text-center'>
+                    Staked <Icomoon icon='tip' size='.12rem' color='#333333' />
+                  </p>
+                  <p className='text-[16px] font-normal text-[#A6A6A6] mb-[7px] text-center'>
+                    <span className='text-[#FFFBFA] mr-[3px]'>
+                      {loading
+                        ? '...'
+                        : formatNumber(userTotalVplsStaked, { decimals: 4 })}
+                    </span>
+                    vPLS
+                  </p>
+                  <p className='text-[13px] font-medium text-[#A6A6A6] mb-[7px] text-center'>
+                    $0.00
+                  </p>
+                </div>
+
+                {/* Unstaking Column */}
+                <div className='flex flex-col items-center'>
+                  <p className='text-[14px] font-medium text-[#8E9397] mb-[7px] text-center'>
+                    Unstaking{' '}
+                    <Icomoon icon='tip' size='.12rem' color='#333333' />
+                  </p>
+                  <p className='text-[16px] font-normal text-[#A6A6A6] mb-[7px] text-center'>
+                    <span className='text-[#FFFBFA] mr-[3px]'>
+                      {loading
+                        ? '...'
+                        : formatNumber(totalVouchUnlocking, { decimals: 4 })}
+                    </span>
+                    vPLS
+                  </p>
+                  <p className='text-[13px] font-medium text-[#A6A6A6] mb-[7px] text-center'>
+                    $0.00
+                  </p>
+                </div>
+              </div>
               <div className='grid grid-flow-col grid-rows-1 max-sm:grid-rows-2 gap-4 max-sm:gap-1 mt-[20px]'>
                 <div>
                   <p className='text-[14px] font-medium text-[#8E9397] mb-[13px] text-center relative z-[1]'>
@@ -186,57 +238,99 @@ export default function vouchstaking() {
             <div>
               <VplsStaking selectedTab={vplsTab} onTabChange={setVplsTab} />
             </div>
-            <div className='mt-[37px] flex justify-between mb-[20px]'>
-              <div>
-                <p className='text-[13px] font-normal text-[#A6A6A6] mb-[8px]'>
-                  VPLS Price
-                </p>
-                <p className='text-[23px] font-normal text-[#FFFBFA]'>
-                  ${tokensLoading ? '...' : vplsInfo.price}
-                  <span className='text-[#FC8181] text-[18px]'>-1.50%</span>
-                </p>
-                <p className='text-[#A6A6A6] text-[13px] mt-[3px]'>
-                  VPLS Token Supply:{' '}
-                  {tokensLoading
-                    ? '...'
-                    : formatNumber(vplsInfo.totalSupply, { decimals: 2 })}
-                </p>
-              </div>
-              <div>
-                <p className='text-[13px] font-normal text-[#A6A6A6]'>
-                  Market Cap
-                </p>
-                <p className='text-[23px] font-normal text-[#FFFBFA] mt-[9px]'>
-                  ${tokensLoading ? '...' : vplsInfo.marketCap}
-                </p>
-              </div>
-            </div>
-            <div className='border-color-border1 border rounded-[8px] p-[3px] flex'>
-              <div className='bg-[#333] h-[36px] w-[30%] rounded-l-[6px]'></div>
-              <div className='bg-gradient-to-r from-[#ff8533] via-[#ffa162] to-[#ff8c3e] w-[70%]  rounded-r-[6px]'></div>
-            </div>
-
-            <div className='mt-[37px] flex justify-between mb-[20px]'>
-              <div>
-                <p className='text-[13px] font-medium text-[#A6A6A6] mb-[8px]'>
-                  Staked
-                </p>
-                <div className='flex items-center mt-[10px]'>
-                  <div className='h-[11px] w-[11px] rounded-[2px] mr-[6px] bg-[#333]'></div>
+            <div className='px-[30px]'>
+              <div className='mt-[37px] flex justify-between mb-[20px]'>
+                <div>
+                  <p className='text-[13px] font-normal text-[#A6A6A6] mb-[8px]'>
+                    VPLS Price
+                  </p>
+                  <p className='text-[23px] font-normal text-[#FFFBFA]'>
+                    ${tokensLoading ? '...' : vplsInfo.price}
+                  </p>
+                  <p className='text-[#A6A6A6] text-[13px] mt-[3px]'>
+                    VPLS Token Supply:{' '}
+                    {tokensLoading
+                      ? '...'
+                      : formatNumber(vplsInfo.totalSupply, { decimals: 2 })}
+                  </p>
+                </div>
+                <div>
                   <p className='text-[13px] font-normal text-[#A6A6A6]'>
-                    4.76M{' '}
+                    Market Cap
+                  </p>
+                  <p className='text-[23px] font-normal text-[#FFFBFA] mt-[9px]'>
+                    ${tokensLoading ? '...' : vplsInfo.marketCap}
                   </p>
                 </div>
               </div>
-              <div>
-                <p className='text-[13px] font-medium text-[#A6A6A6]'>
-                  Total. Supply
-                </p>
-                <div className='flex items-center mt-[10px]'>
-                  <div className='h-[11px] w-[11px] rounded-[2px] mr-[6px] bg-[#B0CED1]'></div>
-                  <p className='text-[13px] font-normal text-[#A6A6A6]'>
-                    35.86M{' '}
+              <div className='border-color-border1 border rounded-[8px] p-[3px] flex'>
+                <div
+                  className='h-[36px] rounded-l-[6px]'
+                  style={{
+                    width: `${vplsUnstakingPercent}%`,
+                    backgroundColor: '#4F8CEF',
+                  }}
+                ></div>
+                <div
+                  className='bg-gradient-to-r from-[#ff8533] via-[#ffa162] to-[#ff8c3e] h-[36px]'
+                  style={{ width: `${vplsStakedPercent}%` }}
+                ></div>
+                <div
+                  className='h-[36px] rounded-r-[6px]'
+                  style={{
+                    width: `${vplsRemainingPercent}%`,
+                    backgroundColor: '#333333',
+                  }}
+                ></div>
+              </div>
+
+              <div className='mt-[37px] flex justify-between mb-[20px]'>
+                <div>
+                  <p className='text-[13px] font-medium text-[#A6A6A6] mb-[8px]'>
+                    Unstaking
                   </p>
+                  <div className='flex items-center mt-[10px]'>
+                    <div
+                      className='h-[11px] w-[11px] rounded-[2px] mr-[6px]'
+                      style={{ backgroundColor: '#4F8CEF' }}
+                    ></div>
+                    <p className='text-[13px] font-normal text-[#A6A6A6]'>
+                      {loading
+                        ? '...'
+                        : formatNumber(totalVouchUnlocking, { decimals: 2 })}{' '}
+                    </p>
+                  </div>
+                </div>
+                <div>
+                  <p className='text-[13px] font-medium text-[#A6A6A6] mb-[8px]'>
+                    Staked
+                  </p>
+                  <div className='flex items-center mt-[10px]'>
+                    <div className='h-[11px] w-[11px] rounded-[2px] mr-[6px] bg-gradient-to-r from-[#ff8533] to-[#ffa162]'></div>
+                    <p className='text-[13px] font-normal text-[#A6A6A6]'>
+                      {loading
+                        ? '...'
+                        : formatNumber(userTotalVplsStaked, { decimals: 2 })}{' '}
+                    </p>
+                  </div>
+                </div>
+                <div>
+                  <p className='text-[13px] font-medium text-[#A6A6A6]'>
+                    Total Supply
+                  </p>
+                  <div className='flex items-center mt-[10px]'>
+                    <div
+                      className='h-[11px] w-[11px] rounded-[2px] mr-[6px]'
+                      style={{ backgroundColor: '#333333' }}
+                    ></div>
+                    <p className='text-[13px] font-normal text-[#A6A6A6]'>
+                      {tokensLoading
+                        ? '...'
+                        : formatNumber(vplsInfo.totalSupply, {
+                            decimals: 2,
+                          })}{' '}
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -286,20 +380,45 @@ export default function vouchstaking() {
               </button>
             </div>
             <div className='border-color-border1 border rounded-[8px] my-[37px] relative p-l[8px]'>
-              <p className='text-[14px] font-medium text-[#8E9397] mb-[7px] mt-[18px] text-center'>
-                Staked <Icomoon icon='tip' size='.12rem' color='#333333' />
-              </p>
-              <p className='text-[16px] font-normal text-[#A6A6A6] mb-[7px] text-center'>
-                <span className='text-[#FFFBFA] mr-[3px]'>
-                  {loading
-                    ? '...'
-                    : formatNumber(userTotalVouchStaked, { decimals: 4 })}
-                </span>
-                VOUCH
-              </p>
-              <p className='text-[13px] font-medium text-[#A6A6A6] mb-[7px] text-center'>
-                $0.00
-              </p>
+              <div className='grid grid-cols-2 gap-4 py-[18px]'>
+                {/* Staked Column */}
+                <div className='flex flex-col items-center'>
+                  <p className='text-[14px] font-medium text-[#8E9397] mb-[7px] text-center'>
+                    Staked <Icomoon icon='tip' size='.12rem' color='#333333' />
+                  </p>
+                  <p className='text-[16px] font-normal text-[#A6A6A6] mb-[7px] text-center'>
+                    <span className='text-[#FFFBFA] mr-[3px]'>
+                      {loading
+                        ? '...'
+                        : formatNumber(userTotalVouchStaked, { decimals: 4 })}
+                    </span>
+                    VOUCH
+                  </p>
+                  <p className='text-[13px] font-medium text-[#A6A6A6] mb-[7px] text-center'>
+                    $0.00
+                  </p>
+                </div>
+
+                {/* Unstaking Column */}
+                <div className='flex flex-col items-center'>
+                  <p className='text-[14px] font-medium text-[#8E9397] mb-[7px] text-center'>
+                    Unstaking{' '}
+                    <Icomoon icon='tip' size='.12rem' color='#333333' />
+                  </p>
+                  <p className='text-[16px] font-normal text-[#A6A6A6] mb-[7px] text-center'>
+                    <span className='text-[#FFFBFA] mr-[3px]'>
+                      {loading
+                        ? '...'
+                        : formatNumber(totalVouchUnlocking, { decimals: 4 })}
+                    </span>
+                    VOUCH
+                  </p>
+                  <p className='text-[13px] font-medium text-[#A6A6A6] mb-[7px] text-center'>
+                    $0.00
+                  </p>
+                </div>
+              </div>
+
               <div className='grid grid-flow-col grid-rows-1 max-sm:grid-rows-2 gap-4 max-sm:gap-2 mt-[20px]'>
                 <div>
                   <p className='text-[14px] font-medium text-[#8E9397] mb-[13px] text-center relative z-[1]'>
@@ -409,60 +528,106 @@ export default function vouchstaking() {
             <div>
               <VouchStaking selectedTab={vouchTab} onTabChange={setVouchTab} />
             </div>
-            <div className='mt-[37px] flex justify-between mb-[20px]'>
-              <div>
-                <p className='text-[13px] font-normal text-[#A6A6A6] mb-[8px]'>
-                  VOUCH Price
-                </p>
-                <p className='text-[23px] font-normal text-[#FFFBFA]'>
-                  ${tokensLoading ? '...' : vouchInfo.price}
-                  <span className='text-[#FC8181] text-[18px]'>-1.50%</span>
-                </p>
-                <p className='text-[#A6A6A6] text-[13px] mt-[3px]'>
-                  VOUCH Token Supply:{' '}
-                  {tokensLoading
-                    ? '...'
-                    : formatNumber(vouchInfo.totalSupply, { decimals: 2 })}
-                </p>
-              </div>
-              <div>
-                <p className='text-[13px] font-normal text-[#A6A6A6]'>
-                  Market Cap
-                </p>
-                <p className='text-[23px] font-normal text-[#FFFBFA] mt-[9px]'>
-                  ${tokensLoading ? '...' : vouchInfo.marketCap}
-                </p>
-              </div>
-            </div>
-            <div className='border-color-border1 border rounded-[8px] p-[3px] flex'>
-              <div className='bg-[#333] h-[36px] w-[30%] rounded-l-[6px]'></div>
-              <div className='bg-gradient-to-r from-[#ff8533] via-[#ffa162] to-[#ff8c3e] w-[70%]  rounded-r-[6px]'></div>
-            </div>
+            <div>
 
-            <div className='mt-[37px] flex justify-between mb-[20px]'>
-              <div>
-                <p className='text-[13px] font-medium text-[#A6A6A6] mb-[8px]'>
-                  Staked
-                </p>
-                <div className='flex items-center mt-[10px]'>
-                  <div className='h-[11px] w-[11px] rounded-[2px] mr-[6px] bg-[#333]'></div>
-                  <p className='text-[13px] font-normal text-[#A6A6A6]'>
-                    4.76M{' '}
-                  </p>
-                </div>
-              </div>
-              <div>
-                <p className='text-[13px] font-medium text-[#A6A6A6]'>
-                  Total. Supply
-                </p>
-                <div className='flex items-center mt-[10px]'>
-                  <div className='h-[11px] w-[11px] rounded-[2px] mr-[6px] bg-[#B0CED1]'></div>
-                  <p className='text-[13px] font-normal text-[#A6A6A6]'>
-                    35.86M{' '}
-                  </p>
-                </div>
-              </div>
             </div>
+            <div className='px-[30px]'>
+              <div className='mt-[37px] flex justify-between mb-[20px]'>
+                <div>
+                  <p className='text-[13px] font-normal text-[#A6A6A6] mb-[8px]'>
+                    VOUCH Price
+                  </p>
+                  <p className='text-[23px] font-normal text-[#FFFBFA]'>
+                    ${tokensLoading ? '...' : vouchInfo.price}
+                  </p>
+                  <p className='text-[#A6A6A6] text-[13px] mt-[3px]'>
+                    VOUCH Token Supply:{' '}
+                    {tokensLoading
+                      ? '...'
+                      : formatNumber(vouchInfo.totalSupply, { decimals: 2 })}
+                  </p>
+                </div>
+                <div>
+                  <p className='text-[13px] font-normal text-[#A6A6A6]'>
+                    Market Cap
+                  </p>
+                  <p className='text-[23px] font-normal text-[#FFFBFA] mt-[9px]'>
+                    ${tokensLoading ? '...' : vouchInfo.marketCap}
+                  </p>
+                </div>
+              </div>
+              <div className='border-color-border1 border rounded-[8px] p-[3px] flex'>
+                <div
+                  className='h-[36px] rounded-l-[6px]'
+                  style={{
+                    width: `${vouchUnstakingPercent}%`,
+                    backgroundColor: '#4F8CEF',
+                  }}
+                ></div>
+                <div
+                  className='bg-gradient-to-r from-[#ff8533] via-[#ffa162] to-[#ff8c3e] h-[36px]'
+                  style={{ width: `${vouchStakedPercent}%` }}
+                ></div>
+                <div
+                  className='h-[36px] rounded-r-[6px]'
+                  style={{
+                    width: `${vouchRemainingPercent}%`,
+                    backgroundColor: '#333333',
+                  }}
+                ></div>
+              </div>
+              <div className='mt-[37px] flex justify-between mb-[20px]'>
+                <div>
+                  <p className='text-[13px] font-medium text-[#A6A6A6] mb-[8px]'>
+                    Unstaking
+                  </p>
+                  <div className='flex items-center mt-[10px]'>
+                    <div
+                      className='h-[11px] w-[11px] rounded-[2px] mr-[6px]'
+                      style={{ backgroundColor: '#4F8CEF' }}
+                    ></div>
+                    <p className='text-[13px] font-normal text-[#A6A6A6]'>
+                      {loading
+                        ? '...'
+                        : formatNumber(totalVouchUnlocking, { decimals: 2 })}{' '}
+                    </p>
+                  </div>
+                </div>
+                <div>
+                  <p className='text-[13px] font-medium text-[#A6A6A6] mb-[8px]'>
+                    Staked
+                  </p>
+                  <div className='flex items-center mt-[10px]'>
+                    <div className='h-[11px] w-[11px] rounded-[2px] mr-[6px] bg-gradient-to-r from-[#ff8533] to-[#ffa162]'></div>
+                    <p className='text-[13px] font-normal text-[#A6A6A6]'>
+                      {loading
+                        ? '...'
+                        : formatNumber(userTotalVouchStaked, {
+                            decimals: 2,
+                          })}{' '}
+                    </p>
+                  </div>
+                </div>
+                <div>
+                  <p className='text-[13px] font-medium text-[#A6A6A6]'>
+                    Total Supply
+                  </p>
+                  <div className='flex items-center mt-[10px]'>
+                    <div
+                      className='h-[11px] w-[11px] rounded-[2px] mr-[6px]'
+                      style={{ backgroundColor: '#333333' }}
+                    ></div>
+                    <p className='text-[13px] font-normal text-[#A6A6A6]'>
+                      {tokensLoading
+                        ? '...'
+                        : formatNumber(vouchInfo.totalSupply, {
+                            decimals: 2,
+                          })}{' '}
+                    </p>
+                  </div>
+                </div>
+              </div>
+              </div>
           </div>
         </div>
       </div>

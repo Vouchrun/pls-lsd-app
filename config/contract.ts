@@ -49,6 +49,46 @@ export function getNetworkBalanceContract() {
 }
 
 /**
+ * get vouchStaking contract address
+ */
+export function getVouchStakingContract() {
+  if (isDev()) {
+    return appDevConfig.contracts.vouchStakingContract.address;
+  }
+  return appProdConfig.contracts.vouchStakingContract.address;
+}
+
+/**
+ * get holderRewardsVault contract address
+ */
+export function getHolderRewardsVaultContract() {
+  if (isDev()) {
+    return appDevConfig.contracts.holderRewardsVaultContract.address;
+  }
+  return appProdConfig.contracts.holderRewardsVaultContract.address;
+}
+
+/**
+ * get stakingRewardPool contract address
+ */
+export function getLPRewardPoolContract() {
+  if (isDev()) {
+    return appDevConfig.contracts.lpRewardPoolContract.address;
+  }
+  return appProdConfig.contracts.lpRewardPoolContract.address;
+}
+
+/**
+ * get stakingRewardPool contract address
+ */
+export function getStakingRewardPoolContract() {
+  if (isDev()) {
+    return appDevConfig.contracts.stakingRewardPoolContract.address;
+  }
+  return appProdConfig.contracts.stakingRewardPoolContract.address;
+}
+
+/**
  * get lsdETH token contract ABI
  */
 export function getLsdEthTokenContractAbi() {
@@ -77,37 +117,8 @@ export function getNetworkBalanceContractAbi() {
 }
 
 /**
- * get VouchStaking contract address
- */
-export function getVouchStakingContract() {
-  // Using the provided contract address
-  return '0x0f264CCEda9e21c3Cd474F0c849f8B37ead9BFE8';
-}
-
-/**
  * get VouchStaking contract ABI
  */
 export function getVouchStakingContractAbi() {
   return vouchStakingContractAbi as AbiItem[];
-}
-
-/**
- * get HolderRewardsVault contract address
- */
-export function getHolderRewardsVaultContract() {
-  return '0xD16361E50357A553e337b323709fEE962E0cE6aB';
-}
-
-/**
- * get LPRewardPool contract address
- */
-export function getLPRewardPoolContract() {
-  return '0xe1506f212536EC56eef420aEbE6Fe1BC924D450F';
-}
-
-/**
- * get StakingRewardPool contract address
- */
-export function getStakingRewardPoolContract() {
-  return '0xA8413B248558223f015b01fc563eCF577968311d';
 }

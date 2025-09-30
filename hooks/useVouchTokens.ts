@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useState } from 'react';
 import Web3 from 'web3';
-import { getEthWeb3 } from 'utils/web3Utils';
+import { getEthWeb3, getEthWeb3ForTransactions } from 'utils/web3Utils';
 import { useWalletAccount } from './useWalletAccount';
 import { useAppSlice } from './selector';
+import { useVplsPrice } from './useVplsPrice';
+import { useVouchPrice } from './useVouchPrice';
 import { AbiItem } from 'web3-utils';
 
 // Standard ERC20 ABI for balance and basic info
@@ -65,7 +67,7 @@ const ERC20_ABI: AbiItem[] = [
 ];
 
 // Token addresses (you may need to update these)
-const TOKEN_ADDRESSES = {
+export const TOKEN_ADDRESSES = {
   VOUCH: '0xD34f5ADC24d8Cc55C1e832Bdf65fFfDF80D1314f', // Need actual VOUCH token address
   VPLS: '0x40EB49C971bCedA8Ea9998256aa7375f6bf05e90', // Need actual VPLS token address
   PLS: '0xA1077a294dDE1B09bB078844df40758a5D0f9a27', // Need actual PLS token address
@@ -92,6 +94,8 @@ export interface TokenInfo {
 export function useVouchTokens() {
   const { metaMaskAccount } = useWalletAccount();
   const { updateFlag } = useAppSlice();
+  const { vplsPrice, isLoading: vplsPriceLoading } = useVplsPrice();
+  const { vouchPrice, isLoading: vouchPriceLoading } = useVouchPrice();
 
   // Token balances
   const [vouchBalance, setVouchBalance] = useState<TokenBalance>({
@@ -122,8 +126,8 @@ export function useVouchTokens() {
   const [vouchInfo, setVouchInfo] = useState<TokenInfo>({
     totalSupply: '0',
     totalSupplyWei: '0',
-    price: '2.62', // Mock price, replace with real price feed
-    marketCap: '94.02M', // Mock market cap
+    price: '0', // Will be updated with real price
+    marketCap: '0', // Will be calculated from price * supply
     symbol: 'VOUCH',
     name: 'Vouch',
     decimals: 18,
@@ -132,8 +136,8 @@ export function useVouchTokens() {
   const [vplsInfo, setVplsInfo] = useState<TokenInfo>({
     totalSupply: '0',
     totalSupplyWei: '0',
-    price: '2.62', // Mock price
-    marketCap: '94.02M', // Mock market cap
+    price: '0', // Will be updated with real price
+    marketCap: '0', // Will be calculated from price * supply
     symbol: 'vPLS',
     name: 'Vouch PLS',
     decimals: 18,
@@ -145,11 +149,40 @@ export function useVouchTokens() {
   // Loading state
   const [loading, setLoading] = useState(false);
 
-  // Get token contract instance
+  // Utility function to format market cap
+  const formatMarketCap = useCallback(
+    (price: number, totalSupply: string): string => {
+      if (price === 0 || totalSupply === '0') return '0';
+
+      const marketCapValue = price * parseFloat(totalSupply);
+
+      if (marketCapValue >= 1e9) {
+        return `${(marketCapValue / 1e9).toFixed(2)}B`;
+      } else if (marketCapValue >= 1e6) {
+        return `${(marketCapValue / 1e6).toFixed(2)}M`;
+      } else if (marketCapValue >= 1e3) {
+        return `${(marketCapValue / 1e3).toFixed(2)}K`;
+      } else {
+        return marketCapValue.toFixed(2);
+      }
+    },
+    []
+  );
+
+  // Get token contract instance for read operations
   const getTokenContract = useCallback((tokenAddress: string) => {
     const web3 = getEthWeb3();
     return new web3.eth.Contract(ERC20_ABI, tokenAddress);
   }, []);
+
+  // Get token contract instance for transactions
+  const getTokenContractForTransactions = useCallback(
+    (tokenAddress: string) => {
+      const web3 = getEthWeb3ForTransactions();
+      return new web3.eth.Contract(ERC20_ABI, tokenAddress);
+    },
+    []
+  );
 
   // Fetch token balance
   const fetchTokenBalance = useCallback(
@@ -200,7 +233,10 @@ export function useVouchTokens() {
 
   // Fetch token info
   const fetchTokenInfo = useCallback(
-    async (tokenAddress: string): Promise<TokenInfo> => {
+    async (
+      tokenAddress: string,
+      tokenType: 'vpls' | 'vouch' | 'other' = 'other'
+    ): Promise<TokenInfo> => {
       try {
         const contract = getTokenContract(tokenAddress);
 
@@ -217,11 +253,26 @@ export function useVouchTokens() {
           decimalsNum === 18 ? 'ether' : 'wei'
         );
 
+        // Use real price for VPLS and VOUCH, mock price for other tokens
+        let price: string;
+        let marketCap: string;
+
+        if (tokenType === 'vpls') {
+          price = vplsPrice.toString();
+          marketCap = formatMarketCap(vplsPrice, totalSupplyFormatted);
+        } else if (tokenType === 'vouch') {
+          price = vouchPrice.toString();
+          marketCap = formatMarketCap(vouchPrice, totalSupplyFormatted);
+        } else {
+          price = '2.62';
+          marketCap = '94.02M';
+        }
+
         return {
           totalSupply: totalSupplyFormatted,
           totalSupplyWei: totalSupply,
-          price: '2.62', // Mock price - integrate with price oracle
-          marketCap: '94.02M', // Mock market cap - calculate from price * supply
+          price,
+          marketCap,
           symbol,
           name,
           decimals: decimalsNum,
@@ -239,7 +290,7 @@ export function useVouchTokens() {
         };
       }
     },
-    [getTokenContract]
+    [getTokenContract, vplsPrice, vouchPrice, formatMarketCap]
   );
 
   // Fetch PLS balance
@@ -261,7 +312,7 @@ export function useVouchTokens() {
 
       setLoading(true);
       try {
-        const contract = getTokenContract(tokenAddress);
+        const contract = getTokenContractForTransactions(tokenAddress);
         const amountWei = Web3.utils.toWei(amount, 'ether');
 
         const gasEstimate = await contract.methods
@@ -285,7 +336,7 @@ export function useVouchTokens() {
         setLoading(false);
       }
     },
-    [metaMaskAccount, getTokenContract]
+    [metaMaskAccount, getTokenContractForTransactions]
   );
 
   // Check token allowance
@@ -323,7 +374,10 @@ export function useVouchTokens() {
         );
         setVouchBalance(vouchBalanceData);
 
-        const vouchInfoData = await fetchTokenInfo(TOKEN_ADDRESSES.VOUCH);
+        const vouchInfoData = await fetchTokenInfo(
+          TOKEN_ADDRESSES.VOUCH,
+          'vouch'
+        );
         setVouchInfo(vouchInfoData);
       }
 
@@ -334,7 +388,7 @@ export function useVouchTokens() {
         );
         setVplsBalance(vplsBalanceData);
 
-        const vplsInfoData = await fetchTokenInfo(TOKEN_ADDRESSES.VPLS);
+        const vplsInfoData = await fetchTokenInfo(TOKEN_ADDRESSES.VPLS, 'vpls');
         setVplsInfo(vplsInfoData);
       }
 
@@ -361,6 +415,28 @@ export function useVouchTokens() {
     refreshTokenData();
   }, [metaMaskAccount]);
 
+  // Effect to update VPLS info when price changes
+  useEffect(() => {
+    if (vplsInfo.totalSupply !== '0' && vplsPrice > 0) {
+      setVplsInfo((prev) => ({
+        ...prev,
+        price: vplsPrice.toString(),
+        marketCap: formatMarketCap(vplsPrice, prev.totalSupply),
+      }));
+    }
+  }, [vplsPrice, vplsInfo.totalSupply, formatMarketCap]);
+
+  // Effect to update VOUCH info when price changes
+  useEffect(() => {
+    if (vouchInfo.totalSupply !== '0' && vouchPrice > 0) {
+      setVouchInfo((prev) => ({
+        ...prev,
+        price: vouchPrice.toString(),
+        marketCap: formatMarketCap(vouchPrice, prev.totalSupply),
+      }));
+    }
+  }, [vouchPrice, vouchInfo.totalSupply, formatMarketCap]);
+
   return {
     // Balances
     vouchBalance,
@@ -374,6 +450,7 @@ export function useVouchTokens() {
 
     // Loading state
     loading,
+    tokensLoading: loading || vplsPriceLoading || vouchPriceLoading,
 
     // Actions
     approveToken,
@@ -382,6 +459,7 @@ export function useVouchTokens() {
 
     // Utilities
     getTokenContract,
+    getTokenContractForTransactions,
     TOKEN_ADDRESSES,
   };
 }
