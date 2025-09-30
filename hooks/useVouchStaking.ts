@@ -330,13 +330,13 @@ export function useVouchStaking() {
   const stake = useCallback(
     async (pid: number, amount: string) => {
       if (!metaMaskAccount) throw new Error('Wallet not connected');
-
       setLoading(true);
       try {
         const amountWei = Web3.utils.toWei(amount, 'ether');
 
         // 1) Ensure allowance of VOUCH for staking contract
-        const vouchToken = TOKEN_ADDRESSES.VOUCH;
+        const vouchToken =
+          pid === 0 ? TOKEN_ADDRESSES.VOUCH : TOKEN_ADDRESSES.VPLS;
         const spender = getVouchStakingContract();
         const erc20 = getErc20Contract(vouchToken);
         const erc20ForTx = getErc20ContractForTransactions(vouchToken);
@@ -363,14 +363,15 @@ export function useVouchStaking() {
         }
 
         // 2) Perform stake
+        console.log('stake', pid, amountWei);
         const stakingContractForTx = getContractForTransactions();
-        const gasEstimate = await stakingContractForTx.methods
-          .stake(pid, amountWei)
-          .estimateGas({ from: metaMaskAccount });
+        // const gasEstimate = await stakingContractForTx.methods
+        //   .stake(pid, amountWei)
+        //   .estimateGas({ from: metaMaskAccount });
 
         const receipt = await stakingContractForTx.methods
           .stake(pid, amountWei)
-          .send({ from: metaMaskAccount, gas: Math.floor(gasEstimate * 1.2) });
+          .send({ from: metaMaskAccount });
 
         return receipt;
       } catch (error) {

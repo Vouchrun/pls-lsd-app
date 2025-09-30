@@ -69,7 +69,7 @@ const ERC20_ABI: AbiItem[] = [
 // Token addresses (you may need to update these)
 export const TOKEN_ADDRESSES = {
   VOUCH: '0xD34f5ADC24d8Cc55C1e832Bdf65fFfDF80D1314f', // Need actual VOUCH token address
-  VPLS: '0x40EB49C971bCedA8Ea9998256aa7375f6bf05e90', // Need actual VPLS token address
+  VPLS: '0x79bb3a0ee435f957ce4f54ee8c3cfadc7278da0c', // Need actual VPLS token address
   PLS: '0xA1077a294dDE1B09bB078844df40758a5D0f9a27', // Need actual PLS token address
 };
 

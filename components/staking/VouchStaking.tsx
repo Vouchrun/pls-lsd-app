@@ -35,7 +35,7 @@ export const VouchStaking: React.FC<VouchStakingProps> = ({
   const [isProcessing, setIsProcessing] = useState(false);
 
   // VOUCH staking uses pool ID 1 (assuming VOUCH is the second pool)
-  const VOUCH_POOL_ID = 1;
+  const VOUCH_POOL_ID = 0;
 
   const maxAmount = useMemo(() => {
     if (selectedTab === 'stake') {
@@ -211,7 +211,6 @@ export const VouchStaking: React.FC<VouchStakingProps> = ({
                   {selectedTab === 'stake' ? 'VOUCH' : 'VOUCH (Staked)'}
                 </div>
               </div>
-
             </div>
           </div>
         </div>
