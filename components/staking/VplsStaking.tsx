@@ -22,7 +22,7 @@ export const VplsStaking: React.FC<VplsStakingProps> = ({
     unstake,
     claim,
     loading,
-    userTotalVouchStaked,
+    userTotalVplsStaked,
     pendingRewards,
     vplsUnlockPeriod,
     refreshData,
@@ -34,15 +34,15 @@ export const VplsStaking: React.FC<VplsStakingProps> = ({
   const [isProcessing, setIsProcessing] = useState(false);
 
   // vPLS staking uses pool ID 0 (assuming vPLS is the first pool)
-  const VPLS_POOL_ID = 1;
+  const VPLS_POOL_ID = 2;
 
   const maxAmount = useMemo(() => {
     if (selectedTab === 'stake') {
       return vplsBalance.balance || '0';
     } else {
-      return userTotalVouchStaked || '0';
+      return userTotalVplsStaked || '0';
     }
-  }, [selectedTab, vplsBalance.balance, userTotalVouchStaked]);
+  }, [selectedTab, vplsBalance.balance, userTotalVplsStaked]);
 
   const isValidAmount = useMemo(() => {
     if (!amount || isNaN(Number(amount)) || Number(amount) <= 0) {
@@ -210,7 +210,6 @@ export const VplsStaking: React.FC<VplsStakingProps> = ({
                   {selectedTab === 'stake' ? 'vPLS' : 'vPLS (Staked)'}
                 </div>
               </div>
-
             </div>
           </div>
         </div>

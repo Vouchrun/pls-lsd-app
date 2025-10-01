@@ -515,19 +515,6 @@
   },
   {
     "inputs": [],
-    "name": "MAX_VOUCH_UNLOCK_PERIOD",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
     "name": "accPlsHolderRewardsPerShare",
     "outputs": [
       {
@@ -875,6 +862,90 @@
   {
     "inputs": [
       {
+        "internalType": "uint256",
+        "name": "_pid",
+        "type": "uint256"
+      }
+    ],
+    "name": "getPoolInfo",
+    "outputs": [
+      {
+        "internalType": "enum VouchStaking.PoolType",
+        "name": "poolType",
+        "type": "uint8"
+      },
+      {
+        "internalType": "address",
+        "name": "stakingToken",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "rewardsPool",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "allocPoint",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bool",
+        "name": "active",
+        "type": "bool"
+      },
+      {
+        "internalType": "uint256",
+        "name": "totalStaked",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "stdAccVouchPerShare",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "stdAccVplsPerShare",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "stdAccWplsPerShare",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "stdLastCalcTime",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "liqAccVouchPerShare",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "liqAccVplsPerShare",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "liqAccWplsPerShare",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "liqLastCalcTime",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "address",
         "name": "_rewardPool",
         "type": "address"
@@ -1201,6 +1272,89 @@
   {
     "inputs": [
       {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "principalStakedToken",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "rewardPoolConfig",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "initialized",
+        "type": "bool"
+      },
+      {
+        "internalType": "bool",
+        "name": "autoUpdate",
+        "type": "bool"
+      },
+      {
+        "internalType": "uint256",
+        "name": "updateInterval",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "updateRatio",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "updateThreshold",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "lastUpdateTime",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "baseVouchPerYear",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "baseVplsPerYear",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "baseWplsPerYear",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "totalAllocPoint",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "uint256",
         "name": "_pid",
         "type": "uint256"
@@ -1419,6 +1573,60 @@
     "name": "unstake",
     "outputs": [],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "userInfo",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "liqLastAccVouchPerShare",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "liqLastAccVplsPerShare",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "liqLastAccWplsPerShare",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "stdLastAccVouchPerShare",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "stdLastAccVplsPerShare",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "stdLastAccWplsPerShare",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {

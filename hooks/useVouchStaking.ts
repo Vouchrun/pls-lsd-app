@@ -91,8 +91,29 @@ export function useVouchStaking() {
   const [userTotalVouchStaked, setUserTotalVouchStaked] = useState<string>('0');
   const [userTotalVplsStaked, setUserTotalVplsStaked] = useState<string>('0');
   const [totalVouchUnlocking, setTotalVouchUnlocking] = useState<string>('0');
+  const [totalVplsUnlocking, setTotalVplsUnlocking] = useState<string>('0');
   const [vouchUnlockPeriod, setVouchUnlockPeriod] = useState<number>(0);
   const [vplsUnlockPeriod, setVplsUnlockPeriod] = useState<number>(0);
+  const [vplsPoolInfo, setVplsPoolInfo] = useState<PoolInfo>({
+    stakingToken: '',
+    allocPoint: '',
+    lastRewardBlock: '',
+    accVouchPerShare: '',
+    accVplsPerShare: '',
+    accWplsPerShare: '',
+    totalStaked: '',
+    active: false,
+  });
+  const [vouchPoolInfo, setVouchPoolInfo] = useState<PoolInfo>({
+    stakingToken: '',
+    allocPoint: '',
+    lastRewardBlock: '',
+    accVouchPerShare: '',
+    accVplsPerShare: '',
+    accWplsPerShare: '',
+    totalStaked: '',
+    active: false,
+  });
 
   // Loading states
   const [loading, setLoading] = useState(false);
@@ -255,16 +276,24 @@ export function useVouchStaking() {
         // Get user total vpls staked (assuming there's a similar method for vPLS)
         try {
           const userVplsStakedResult = await contract.methods
-            .getUserTotalVplsStaked(metaMaskAccount)
+            .userInfo(2, metaMaskAccount)
             .call();
+
           setUserTotalVplsStaked(
-            Web3.utils.fromWei(userVplsStakedResult || '0', 'ether')
+            Web3.utils.fromWei(userVplsStakedResult[0] || '0', 'ether')
           );
         } catch (error) {
           // If the method doesn't exist, set to 0
           setUserTotalVplsStaked('0');
         }
       }
+
+      // Get pool info
+      const vplsPoolInfoResult = await contract.methods.getPoolInfo(2).call();
+      setVplsPoolInfo(vplsPoolInfoResult);
+
+      const vouchPoolInfoResult = await contract.methods.getPoolInfo(1).call();
+      setVouchPoolInfo(vouchPoolInfoResult);
     } catch (error) {
       console.error('Error fetching pool info:', error);
     }
@@ -315,14 +344,30 @@ export function useVouchStaking() {
     try {
       const contract = getContract();
       const totalUnlockingResult = await contract.methods
-        .totalVouchUnlocking()
+        .getVouchUnlock(1, metaMaskAccount)
         .call();
       setTotalVouchUnlocking(
-        Web3.utils.fromWei(totalUnlockingResult || '0', 'ether')
+        Web3.utils.fromWei(totalUnlockingResult[0] || '0', 'ether')
       );
     } catch (error) {
       console.error('Error fetching total VOUCH unlocking:', error);
       setTotalVouchUnlocking('0');
+    }
+  }, [getContract]);
+
+  // Fetch total VPLS unlocking
+  const fetchTotalVplsUnlocking = useCallback(async () => {
+    try {
+      const contract = getContract();
+      const totalUnlockingResult = await contract.methods
+        .getVouchUnlock(2, metaMaskAccount)
+        .call();
+      setTotalVplsUnlocking(
+        Web3.utils.fromWei(totalUnlockingResult[0] || '0', 'ether')
+      );
+    } catch (error) {
+      console.error('Error fetching total VPLS unlocking:', error);
+      setTotalVplsUnlocking('0');
     }
   }, [getContract]);
 
@@ -336,7 +381,7 @@ export function useVouchStaking() {
 
         // 1) Ensure allowance of VOUCH for staking contract
         const vouchToken =
-          pid === 0 ? TOKEN_ADDRESSES.VOUCH : TOKEN_ADDRESSES.VPLS;
+          pid === 1 ? TOKEN_ADDRESSES.VOUCH : TOKEN_ADDRESSES.VPLS;
         const spender = getVouchStakingContract();
         const erc20 = getErc20Contract(vouchToken);
         const erc20ForTx = getErc20ContractForTransactions(vouchToken);
@@ -544,6 +589,7 @@ export function useVouchStaking() {
       fetchVouchUnlockPeriod(),
       fetchVplsUnlockPeriod(),
       fetchTotalVouchUnlocking(),
+      fetchTotalVplsUnlocking(),
     ]);
   }, [
     fetchPendingRewards,
@@ -553,6 +599,7 @@ export function useVouchStaking() {
     fetchVouchUnlockPeriod,
     fetchVplsUnlockPeriod,
     fetchTotalVouchUnlocking,
+    fetchTotalVplsUnlocking,
   ]);
 
   // Effect to fetch data when component mounts or dependencies change
@@ -571,9 +618,12 @@ export function useVouchStaking() {
     userTotalVouchStaked,
     userTotalVplsStaked,
     totalVouchUnlocking,
+    totalVplsUnlocking,
     vouchUnlockPeriod,
     vplsUnlockPeriod,
     loading,
+    vplsPoolInfo,
+    vouchPoolInfo,
 
     // Actions
     stake,
