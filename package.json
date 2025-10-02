@@ -2,7 +2,7 @@
   "name": "eth-lsd-app",
   "version": "0.1.0",
   "scripts": {
-    "dev": "NEXT_PUBLIC_ENV=dev next dev -p 5009",
+    "dev": "NEXT_PUBLIC_ENV=production next dev -p 5009",
     "build:dev": "NEXT_PUBLIC_ENV=dev next build",
     "build": "NEXT_PUBLIC_ENV=production next build",
     "start": "next start -p 5009"

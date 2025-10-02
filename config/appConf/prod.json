@@ -18,6 +18,18 @@
     },
     "networkBalanceContract": {
       "address": "0xC3116bB002F94d2E4bB8E4D83252ee021552dEB8"
+    },
+    "vouchStakingContract": {
+      "address": "0x3e0aF9086A83783d961d9E46D9807E4bEd1BA36a"
+    },
+    "holderRewardsVaultContract": {
+      "address": "0x21fad1816688d6376593a0899cDb42FF33527D8c"
+    },
+    "stakingRewardPoolContract": {
+      "address": "0x11BdA7E3e80dA68875C34a334699e677171b71E2"
+    },
+    "lpRewardPoolContract": {
+      "address": "0xFd0Efd75DAe63063B8a95F1DDB2441B5066F0A89"
     }
   },
   "networkBalanceContractDeploymentBlock": 21740533

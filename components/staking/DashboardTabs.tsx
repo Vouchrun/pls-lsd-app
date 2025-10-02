@@ -6,8 +6,8 @@ import menuIcon from "public/images/burger-menu.svg";
 import Link from "next/link";
 
 interface Props {
-  selectedTab: "stake" | "unstake" | "withdraw";
-  onChangeTab: (tab: "stake" | "unstake" | "withdraw") => void;
+  selectedTab: "stake" | "unstake" | "withdraw" | "vouchstaking";
+  onChangeTab: (tab: "stake" | "unstake" | "withdraw" | "vouchstaking") => void;
   showWithdrawTab?: boolean;
 }
 
@@ -34,7 +34,7 @@ export const DashboardTabs = (props: Props) => {
         onClick={handleClick}
       />
       <div
-        className={`w-[280px] sm:w-[280px] xl:w-[420px] h-auto p-[20px] lg:p-[.04rem] items-stretch bg-[#edece3] dark:bg-[#111111] rounded-[15px] lg:rounded-[.6rem] xl:grid absolute xl:relative top-[40px] xl:top-0 gap-0
+        className={`w-[280px] sm:w-[280px] xl:w-[580px] h-auto p-[20px] lg:p-[.04rem] items-stretch bg-[#edece3] dark:bg-[#111111] rounded-[15px] lg:rounded-[.6rem] xl:grid absolute xl:relative top-[40px] xl:top-0 gap-0
   ${isActive ? "flex flex-col" : "hidden"}
   [&>*:not(:last-child):after]:content-['|'] 
   [&>*:not(:last-child):after]:absolute 
@@ -47,7 +47,7 @@ export const DashboardTabs = (props: Props) => {
   [&>*.tab-active:after]:hidden
   [&>*:has(+_.tab-active):after]:hidden`}
         style={{
-          gridTemplateColumns: "33.33% 33.33% 33.33%",
+          gridTemplateColumns: "25% 25% 25% 25%",
         }}
       >
         <Link
@@ -56,7 +56,8 @@ export const DashboardTabs = (props: Props) => {
             (props.selectedTab === "stake" ||
               props.selectedTab === "unstake" ||
               router.pathname.startsWith("/PLS/")) &&
-              !router.pathname.startsWith("/dashboard")
+              !router.pathname.startsWith("/dashboard") &&
+              !router.pathname.startsWith("/vouchstaking")
               ? "text-color-highlight bg-color-highlight"
               : "text-color-text1"
           )}
@@ -97,6 +98,22 @@ export const DashboardTabs = (props: Props) => {
             )}
           >
             Dashboard
+          </Link>
+        </div>
+
+        <div className="flex items-stretch">
+          {/* <div className="ml-[.1rem] w-[0.01rem] h-[.22rem] bg-[#DEE6F7] dark:bg-bg1Dark self-center" /> */}
+          <Link
+            className={classNames(
+              "h-[35px] flex-1 ml-[.1rem] cursor-pointer flex items-center justify-center text-[.16rem] rounded-[.3rem] whitespace-nowrap",
+              router.pathname.startsWith("/vouchstaking")
+                ? "text-color-highlight bg-color-highlight"
+                : "text-color-text1"
+            )}
+            href="/vouchstaking"
+            // onClick={() => props.onChangeTab("withdraw")}
+          >
+            Vouch Staking
           </Link>
         </div>
       </div>

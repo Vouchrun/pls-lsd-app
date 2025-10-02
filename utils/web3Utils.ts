@@ -10,9 +10,10 @@ export function createWeb3(provider?: any) {
 }
 
 let ethWeb3: Web3 | undefined = undefined;
+let ethWeb3ForTransactions: Web3 | undefined = undefined;
 
 /**
- * get Ethereum web3 instance singleton
+ * get Ethereum web3 instance singleton (for read operations)
  */
 export function getEthWeb3() {
   const rpcLink = getEthereumRpc();
@@ -25,6 +26,16 @@ export function getEthWeb3() {
     );
   }
   return ethWeb3;
+}
+
+/**
+ * get Ethereum web3 instance for transactions (uses MetaMask provider)
+ */
+export function getEthWeb3ForTransactions() {
+  if (!ethWeb3ForTransactions) {
+    ethWeb3ForTransactions = createWeb3(window.ethereum);
+  }
+  return ethWeb3ForTransactions;
 }
 
 export async function getErc20AssetBalance(
