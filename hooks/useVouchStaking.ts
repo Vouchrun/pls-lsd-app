@@ -39,6 +39,16 @@ export interface DripRedeemed {
   plsClaimed: string;
 }
 
+export interface PendingTripleByPidItem {
+  vouchPending: string;
+  vplsPending: string;
+  wplsPending: string;
+}
+
+export interface PendingTripleByPid {
+  [pid: number]: PendingTripleByPidItem;
+}
+
 export interface PoolInfo {
   stakingToken: string;
   allocPoint: string;
@@ -81,6 +91,10 @@ export function useVouchStaking() {
     vplsClaimed: '0',
     plsClaimed: '0',
   });
+
+  // Per-pool pending triple rewards
+  const [pendingTripleByPid, setPendingTripleByPid] =
+    useState<PendingTripleByPid>({});
 
   // State for pool info
   const [totalPools, setTotalPools] = useState<number>(0);
@@ -196,6 +210,34 @@ export function useVouchStaking() {
       console.error('Error fetching pending rewards:', error);
     }
   }, [metaMaskAccount, getContract]);
+
+  // Fetch pending triple for specific pool id
+  const fetchPendingTripleForPid = useCallback(
+    async (pid: number) => {
+      if (!metaMaskAccount) return;
+      try {
+        const contract = getContract();
+        const result = await contract.methods
+          .pendingStandardTriple(pid, metaMaskAccount)
+          .call();
+
+        const mapped: PendingTripleByPidItem = {
+          vouchPending: Web3.utils.fromWei(result.vouchPending || '0', 'ether'),
+          vplsPending: Web3.utils.fromWei(result.vplsPending || '0', 'ether'),
+          wplsPending: Web3.utils.fromWei(result.wplsPending || '0', 'ether'),
+        };
+
+        setPendingTripleByPid((prev) => ({ ...prev, [pid]: mapped }));
+      } catch (error) {
+        console.error(`Error fetching pending triple for pid ${pid}:`, error);
+        setPendingTripleByPid((prev) => ({
+          ...prev,
+          [pid]: { vouchPending: '0', vplsPending: '0', wplsPending: '0' },
+        }));
+      }
+    },
+    [metaMaskAccount, getContract]
+  );
 
   // Fetch holder reward info
   const fetchHolderRewardInfo = useCallback(async () => {
@@ -590,6 +632,8 @@ export function useVouchStaking() {
       fetchVplsUnlockPeriod(),
       fetchTotalVouchUnlocking(),
       fetchTotalVplsUnlocking(),
+      fetchPendingTripleForPid(1),
+      fetchPendingTripleForPid(2),
     ]);
   }, [
     fetchPendingRewards,
@@ -600,6 +644,7 @@ export function useVouchStaking() {
     fetchVplsUnlockPeriod,
     fetchTotalVouchUnlocking,
     fetchTotalVplsUnlocking,
+    fetchPendingTripleForPid,
   ]);
 
   // Effect to fetch data when component mounts or dependencies change
@@ -624,6 +669,7 @@ export function useVouchStaking() {
     loading,
     vplsPoolInfo,
     vouchPoolInfo,
+    pendingTripleByPid,
 
     // Actions
     stake,
