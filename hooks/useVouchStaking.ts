@@ -386,10 +386,10 @@ export function useVouchStaking() {
     try {
       const contract = getContract();
       const totalUnlockingResult = await contract.methods
-        .getVouchUnlock(1, metaMaskAccount)
+        .totalUnlocking(1)
         .call();
       setTotalVouchUnlocking(
-        Web3.utils.fromWei(totalUnlockingResult[0] || '0', 'ether')
+        Web3.utils.fromWei(totalUnlockingResult || '0', 'ether')
       );
     } catch (error) {
       console.error('Error fetching total VOUCH unlocking:', error);
@@ -402,10 +402,10 @@ export function useVouchStaking() {
     try {
       const contract = getContract();
       const totalUnlockingResult = await contract.methods
-        .getVouchUnlock(2, metaMaskAccount)
+        .totalUnlocking(2)
         .call();
       setTotalVplsUnlocking(
-        Web3.utils.fromWei(totalUnlockingResult[0] || '0', 'ether')
+        Web3.utils.fromWei(totalUnlockingResult || '0', 'ether')
       );
     } catch (error) {
       console.error('Error fetching total VPLS unlocking:', error);

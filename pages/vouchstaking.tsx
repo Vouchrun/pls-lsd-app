@@ -317,7 +317,7 @@ export default function Vouchstaking() {
                     <p className='text-[13px] font-normal text-[#A6A6A6]'>
                       {loading
                         ? '...'
-                        : formatNumber(totalVouchUnlocking, {
+                        : formatNumber(totalVplsUnlocking, {
                             decimals: 2,
                           })}{' '}
                     </p>
