@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { Icomoon } from 'components/icon/Icomoon';
 import { FarmsTabs } from './FarmsTab';
 import { CustomNumberInput } from 'components/common/CustomNumberInput';
@@ -6,9 +6,12 @@ import { CustomButton } from 'components/common/CustomButton';
 import { LPPoolData } from 'hooks/useLpFarms';
 import { formatNumber } from 'utils/numberUtils';
 import { useWalletAccount } from 'hooks/useWalletAccount';
+import snackbarUtil from 'utils/snackbarUtils';
 
 interface LpStakingCardProps {
   poolData: LPPoolData;
+  checkAllowance: (lpTokenAddress: string, amount: string) => Promise<boolean>;
+  onApprove: (lpTokenAddress: string, amount: string) => Promise<any>;
   onStake: (
     pid: number,
     amount: string,
@@ -16,19 +19,25 @@ interface LpStakingCardProps {
   ) => Promise<any>;
   onUnstake: (pid: number, amount: string) => Promise<any>;
   onClaim: (pid: number) => Promise<any>;
-  isProcessing: boolean;
+  refreshData: () => Promise<void>;
 }
 
 export const LpStakingCard: React.FC<LpStakingCardProps> = ({
   poolData,
+  checkAllowance,
+  onApprove,
   onStake,
   onUnstake,
   onClaim,
-  isProcessing,
+  refreshData,
 }) => {
   const { metaMaskAccount } = useWalletAccount();
   const [selectedTab, setSelectedTab] = useState<'stake' | 'unstake'>('stake');
   const [amount, setAmount] = useState('');
+  const [isStakeProcessing, setIsStakeProcessing] = useState(false);
+  const [isApproveProcessing, setIsApproveProcessing] = useState(false);
+  const [isClaimProcessing, setIsClaimProcessing] = useState(false);
+  const [needsApproval, setNeedsApproval] = useState(false);
 
   const maxAmount = useMemo(() => {
     if (selectedTab === 'stake') {
@@ -45,9 +54,34 @@ export const LpStakingCard: React.FC<LpStakingCardProps> = ({
     return Number(amount) <= Number(maxAmount);
   }, [amount, maxAmount]);
 
-  const buttonDisabled = useMemo(() => {
-    return !metaMaskAccount || isProcessing || !amount || !isValidAmount;
-  }, [metaMaskAccount, isProcessing, amount, isValidAmount]);
+  // Check approval when amount changes
+  useEffect(() => {
+    const checkApproval = async () => {
+      if (
+        selectedTab === 'stake' &&
+        amount &&
+        isValidAmount &&
+        metaMaskAccount &&
+        poolData.config.lpTokenAddress
+      ) {
+        const hasAllowance = await checkAllowance(
+          poolData.config.lpTokenAddress,
+          amount
+        );
+        setNeedsApproval(!hasAllowance);
+      } else {
+        setNeedsApproval(false);
+      }
+    };
+    checkApproval();
+  }, [
+    amount,
+    isValidAmount,
+    selectedTab,
+    metaMaskAccount,
+    poolData.config.lpTokenAddress,
+    checkAllowance,
+  ]);
 
   const handleMax = useCallback(() => {
     if (Number(maxAmount) > 0) {
@@ -55,39 +89,96 @@ export const LpStakingCard: React.FC<LpStakingCardProps> = ({
     }
   }, [maxAmount]);
 
-  const handleAction = useCallback(async () => {
+  const handleApprove = useCallback(async () => {
     if (!metaMaskAccount || !amount || !isValidAmount) return;
 
+    setIsApproveProcessing(true);
     try {
-      if (selectedTab === 'stake') {
-        await onStake(poolData.pid, amount, poolData.config.lpTokenAddress);
-      } else {
-        await onUnstake(poolData.pid, amount);
-      }
-      setAmount('');
-    } catch (error) {
-      console.error('Action error:', error);
+      snackbarUtil.info('Approval in progress...');
+      await onApprove(poolData.config.lpTokenAddress, amount);
+      snackbarUtil.success('Approval successful!');
+      setNeedsApproval(false);
+    } catch (error: any) {
+      console.error('Approval error:', error);
+      snackbarUtil.error(error?.message || 'Approval failed');
+    } finally {
+      setIsApproveProcessing(false);
     }
   }, [
     metaMaskAccount,
     amount,
     isValidAmount,
-    selectedTab,
+    poolData.config.lpTokenAddress,
+    onApprove,
+  ]);
+
+  const handleStake = useCallback(async () => {
+    if (!metaMaskAccount || !amount || !isValidAmount) return;
+
+    setIsStakeProcessing(true);
+    try {
+      snackbarUtil.info('Staking in progress...');
+      await onStake(poolData.pid, amount, poolData.config.lpTokenAddress);
+      snackbarUtil.success('Staking successful!');
+      setAmount('');
+      await refreshData();
+    } catch (error: any) {
+      console.error('Staking error:', error);
+      snackbarUtil.error(error?.message || 'Staking failed');
+    } finally {
+      setIsStakeProcessing(false);
+    }
+  }, [
+    metaMaskAccount,
+    amount,
+    isValidAmount,
     poolData.pid,
     poolData.config.lpTokenAddress,
     onStake,
+    refreshData,
+  ]);
+
+  const handleUnstake = useCallback(async () => {
+    if (!metaMaskAccount || !amount || !isValidAmount) return;
+
+    setIsStakeProcessing(true);
+    try {
+      snackbarUtil.info('Unstaking in progress...');
+      await onUnstake(poolData.pid, amount);
+      snackbarUtil.success('Unstaking successful!');
+      setAmount('');
+      await refreshData();
+    } catch (error: any) {
+      console.error('Unstaking error:', error);
+      snackbarUtil.error(error?.message || 'Unstaking failed');
+    } finally {
+      setIsStakeProcessing(false);
+    }
+  }, [
+    metaMaskAccount,
+    amount,
+    isValidAmount,
+    poolData.pid,
     onUnstake,
+    refreshData,
   ]);
 
   const handleClaim = useCallback(async () => {
     if (!metaMaskAccount) return;
 
+    setIsClaimProcessing(true);
     try {
+      snackbarUtil.info('Claiming rewards...');
       await onClaim(poolData.pid);
-    } catch (error) {
+      snackbarUtil.success('Rewards claimed successfully!');
+      await refreshData();
+    } catch (error: any) {
       console.error('Claim error:', error);
+      snackbarUtil.error(error?.message || 'Claim failed');
+    } finally {
+      setIsClaimProcessing(false);
     }
-  }, [metaMaskAccount, poolData.pid, onClaim]);
+  }, [metaMaskAccount, poolData.pid, onClaim, refreshData]);
 
   return (
     <div className='border-[1px] border-solid border-[#FE8A3C] rounded-[30px] w-full'>
@@ -255,24 +346,50 @@ export const LpStakingCard: React.FC<LpStakingCardProps> = ({
 
             {/* Action Buttons */}
             <div className='mt-[20px] flex max-w-[350px] mb-[38px] justify-between mx-auto'>
-              <button
-                onClick={handleAction}
-                disabled={buttonDisabled}
-                className='text-[#1B1B1F] h-[45px] w-[160px] bg-gradient-to-r from-[#ff8533] to-[#ffa162] hover:from-[#ff7520] hover:to-[#ff9550] disabled:opacity-50 disabled:cursor-not-allowed font-medium rounded-[50px] transition-all duration-200'
-              >
-                {isProcessing
-                  ? 'Processing...'
-                  : selectedTab === 'stake'
-                  ? 'Stake'
-                  : 'Unstake'}
-              </button>
+              {/* First button - Stake/Unstake/Approve */}
+              {selectedTab === 'stake' && needsApproval ? (
+                <button
+                  onClick={handleApprove}
+                  disabled={
+                    !metaMaskAccount ||
+                    isApproveProcessing ||
+                    !amount ||
+                    !isValidAmount
+                  }
+                  className='text-[#1B1B1F] h-[45px] w-[160px] bg-gradient-to-r from-[#3b82f6] to-[#2563eb] hover:from-[#2563eb] hover:to-[#1d4ed8] disabled:opacity-50 disabled:cursor-not-allowed font-medium rounded-[50px] transition-all duration-200'
+                >
+                  {isApproveProcessing ? 'Approving...' : 'Approve LP'}
+                </button>
+              ) : (
+                <button
+                  onClick={
+                    selectedTab === 'stake' ? handleStake : handleUnstake
+                  }
+                  disabled={
+                    !metaMaskAccount ||
+                    isStakeProcessing ||
+                    !amount ||
+                    !isValidAmount ||
+                    (selectedTab === 'stake' && needsApproval)
+                  }
+                  className='text-[#1B1B1F] h-[45px] w-[160px] bg-gradient-to-r from-[#ff8533] to-[#ffa162] hover:from-[#ff7520] hover:to-[#ff9550] disabled:opacity-50 disabled:cursor-not-allowed font-medium rounded-[50px] transition-all duration-200'
+                >
+                  {isStakeProcessing
+                    ? selectedTab === 'stake'
+                      ? 'Staking...'
+                      : 'Unstaking...'
+                    : selectedTab === 'stake'
+                    ? 'Stake'
+                    : 'Unstake'}
+                </button>
+              )}
 
               <button
                 onClick={handleClaim}
-                disabled={!metaMaskAccount || isProcessing}
+                disabled={!metaMaskAccount || isClaimProcessing}
                 className='text-[#1B1B1F] h-[45px] w-[160px] bg-gradient-to-r from-[#ff8533] to-[#ffa162] hover:from-[#ff7520] hover:to-[#ff9550] disabled:opacity-50 disabled:cursor-not-allowed font-medium rounded-[50px] transition-all duration-200'
               >
-                {isProcessing ? 'Processing...' : 'Claim Rewards'}
+                {isClaimProcessing ? 'Claiming...' : 'Claim Rewards'}
               </button>
             </div>
           </div>
