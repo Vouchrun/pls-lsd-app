@@ -140,7 +140,7 @@ export default function Vouchstaking() {
                     <span className='text-[#FFFBFA] mr-[3px]'>
                       {loading
                         ? '...'
-                        : formatNumber(userTotalVplsStaked, { decimals: 4 })}
+                        : formatNumber(userTotalVplsStaked, { decimals: 8 })}
                     </span>
                     vPLS
                   </p>
@@ -162,7 +162,7 @@ export default function Vouchstaking() {
                     <span className='text-[#FFFBFA] mr-[3px]'>
                       {loading
                         ? '-'
-                        : formatNumber(totalVouchUnlocking, { decimals: 4 })}
+                        : formatNumber(totalVouchUnlocking, { decimals: 8 })}
                     </span>
                     vPLS
                   </p>
@@ -420,7 +420,7 @@ export default function Vouchstaking() {
                     <span className='text-[#FFFBFA] mr-[3px]'>
                       {loading
                         ? '...'
-                        : formatNumber(userTotalVouchStaked, { decimals: 4 })}
+                        : formatNumber(userTotalVouchStaked, { decimals: 8 })}
                     </span>
                     VOUCH
                   </p>
@@ -442,7 +442,7 @@ export default function Vouchstaking() {
                     <span className='text-[#FFFBFA] mr-[3px]'>
                       {loading
                         ? '...'
-                        : formatNumber(totalVouchUnlocking, { decimals: 4 })}
+                        : formatNumber(totalVouchUnlocking, { decimals: 8 })}
                     </span>
                     VOUCH
                   </p>

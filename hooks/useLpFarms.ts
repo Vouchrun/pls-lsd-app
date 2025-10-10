@@ -237,12 +237,15 @@ export function useLpFarms() {
             console.error(`Error fetching user info for pid ${pid}:`, error);
           }
 
-          // Get user unstaking amount
+          // Get user unstaking amount (for LP farms, this should be 0 since unstake is immediate)
           try {
-            const unstakingResult = await contract.methods
-              .totalUnlocking(pid)
+            const unlockResult = await contract.methods
+              .getUnlock(pid, metaMaskAccount)
               .call();
-            userUnstaking = Web3.utils.fromWei(unstakingResult || '0', 'ether');
+            userUnstaking = Web3.utils.fromWei(
+              unlockResult.amount || '0',
+              'ether'
+            );
           } catch (error) {
             console.error(
               `Error fetching unstaking amount for pid ${pid}:`,
