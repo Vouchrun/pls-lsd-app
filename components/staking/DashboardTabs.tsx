@@ -128,7 +128,7 @@ export const DashboardTabs = (props: Props) => {
             href='/lp-farms'
             // onClick={() => props.onChangeTab("withdraw")}
           >
-            LP Farms
+            LP Staking
           </Link>
         </div>
       </div>

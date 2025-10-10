@@ -346,7 +346,7 @@ export function useVouchStaking() {
     try {
       const contract = getContract();
       const unlockPeriodResult = await contract.methods
-        .vouchUnlockPeriod()
+        .standardUnlockPeriod()
         .call();
       // Convert from seconds to days
       const unlockPeriodDays = Math.ceil(
@@ -367,7 +367,7 @@ export function useVouchStaking() {
       // For now, using the same vouchUnlockPeriod as there doesn't seem to be a separate vPLS unlock period
       // If a separate vplsUnlockPeriod method exists in the contract, update this line
       const unlockPeriodResult = await contract.methods
-        .vouchUnlockPeriod()
+        .standardUnlockPeriod()
         .call();
       // Convert from seconds to days
       const unlockPeriodDays = Math.ceil(
@@ -383,35 +383,43 @@ export function useVouchStaking() {
 
   // Fetch total VOUCH unlocking
   const fetchTotalVouchUnlocking = useCallback(async () => {
+    if (!metaMaskAccount) {
+      setTotalVouchUnlocking('0');
+      return;
+    }
     try {
       const contract = getContract();
-      const totalUnlockingResult = await contract.methods
-        .totalUnlocking(1)
+      const unlockResult = await contract.methods
+        .getUnlock(1, metaMaskAccount)
         .call();
       setTotalVouchUnlocking(
-        Web3.utils.fromWei(totalUnlockingResult || '0', 'ether')
+        Web3.utils.fromWei(unlockResult.amount || '0', 'ether')
       );
     } catch (error) {
       console.error('Error fetching total VOUCH unlocking:', error);
       setTotalVouchUnlocking('0');
     }
-  }, [getContract]);
+  }, [getContract, metaMaskAccount]);
 
   // Fetch total VPLS unlocking
   const fetchTotalVplsUnlocking = useCallback(async () => {
+    if (!metaMaskAccount) {
+      setTotalVplsUnlocking('0');
+      return;
+    }
     try {
       const contract = getContract();
-      const totalUnlockingResult = await contract.methods
-        .totalUnlocking(2)
+      const unlockResult = await contract.methods
+        .getUnlock(2, metaMaskAccount)
         .call();
       setTotalVplsUnlocking(
-        Web3.utils.fromWei(totalUnlockingResult || '0', 'ether')
+        Web3.utils.fromWei(unlockResult.amount || '0', 'ether')
       );
     } catch (error) {
       console.error('Error fetching total VPLS unlocking:', error);
       setTotalVplsUnlocking('0');
     }
-  }, [getContract]);
+  }, [getContract, metaMaskAccount]);
 
   // Stake tokens
   const stake = useCallback(
@@ -477,7 +485,7 @@ export function useVouchStaking() {
     ]
   );
 
-  // Unstake tokens
+  // Unstake tokens (for standard pools, this initiates the unlock period)
   const unstake = useCallback(
     async (pid: number, amount: string) => {
       if (!metaMaskAccount) throw new Error('Wallet not connected');
@@ -488,19 +496,19 @@ export function useVouchStaking() {
         const amountWei = Web3.utils.toWei(amount, 'ether');
 
         const gasEstimate = await contract.methods
-          .unstake(pid, amountWei)
+          .startUnlock(pid, amountWei)
           .estimateGas({
             from: metaMaskAccount,
           });
 
-        const result = await contract.methods.unstake(pid, amountWei).send({
+        const result = await contract.methods.startUnlock(pid, amountWei).send({
           from: metaMaskAccount,
           gas: Math.floor(gasEstimate * 1.2),
         });
 
         return result;
       } catch (error) {
-        console.error('Error unstaking:', error);
+        console.error('Error starting unlock:', error);
         throw error;
       } finally {
         setLoading(false);
