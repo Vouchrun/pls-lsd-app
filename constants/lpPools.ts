@@ -11,11 +11,20 @@ export interface LPPoolConfig {
 export const LP_POOLS: LPPoolConfig[] = [
   {
     pid: 3,
-    name: 'VOUCH/vPLS',
-    symbol: 'VOUCH-vPLS',
+    name: 'VOUCH/PLS',
+    symbol: 'VOUCH-PLS',
     token0Icon: '/favicon.png', // VOUCH icon
-    token1Icon: '/images/token/vPLS_trans.svg', // vPLS icon
+    token1Icon: '/images/token/PLS.svg', // PLS icon
     lpTokenAddress: '0x801C369cB1443c087Cd327DfB53AECf378F6ff85', // TODO: Replace with actual LP token address
+    dexUrl: '#', // TODO: Add DEX URL
+  },
+  {
+    pid: 4,
+    name: 'vPLS/PLS',
+    symbol: 'vPLS-PLS',
+    token0Icon: '/images/token/vPLS_trans.svg', // vPLS icon 
+    token1Icon: '/images/token/PLS.svg', // PLS icon
+    lpTokenAddress: '0x46814b3f18d90625b6e166bc2917bb64a635d797', // TODO: Replace with actual LP token address
     dexUrl: '#', // TODO: Add DEX URL
   },
   // Add more LP pools here as needed
