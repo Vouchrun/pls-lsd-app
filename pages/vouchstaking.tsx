@@ -84,7 +84,7 @@ export default function Vouchstaking() {
       <div className='max-w-[1360px] bg-color-bg2 border-color-border1 border justify-center m-auto rounded-[30px] h-[1200px] max-lg:h-auto'>
         <div className='py-[20px] mb-[16px] bg-[#333] rounded-t-[30px] rounded-t-0'>
           <p className='text-[24px] max-md:text-[20px] font-normal text-[#E8EFFD] text-center'>
-            My Vouch Holdings
+            vPLS and VOUCH Staking Pools
           </p>
         </div>
         <div className='grid grid-cols-1 lg:grid-cols-2 gap-4 px-[35px] max-sm:px-[21px] relative'>
