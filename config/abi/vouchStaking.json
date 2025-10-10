@@ -410,7 +410,7 @@
         "type": "uint256"
       }
     ],
-    "name": "Unstake",
+    "name": "UnlockCanceled",
     "type": "event"
   },
   {
@@ -435,32 +435,7 @@
         "type": "uint256"
       }
     ],
-    "name": "VouchUnlockCanceled",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "user",
-        "type": "address"
-      },
-      {
-        "indexed": true,
-        "internalType": "uint256",
-        "name": "pid",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "amount",
-        "type": "uint256"
-      }
-    ],
-    "name": "VouchUnlockFinalized",
+    "name": "UnlockFinalized",
     "type": "event"
   },
   {
@@ -479,7 +454,7 @@
         "type": "uint256"
       }
     ],
-    "name": "VouchUnlockPeriodUpdated",
+    "name": "UnlockPeriodUpdated",
     "type": "event"
   },
   {
@@ -510,7 +485,32 @@
         "type": "uint256"
       }
     ],
-    "name": "VouchUnlockRequested",
+    "name": "UnlockRequested",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "user",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "pid",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "Unstake",
     "type": "event"
   },
   {
@@ -596,26 +596,6 @@
         "internalType": "uint256",
         "name": "_allocPoint",
         "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_updateInterval",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_updateRatio",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_updateThreshold",
-        "type": "uint256"
-      },
-      {
-        "internalType": "bool",
-        "name": "_autoUpdate",
-        "type": "bool"
       }
     ],
     "name": "addPool",
@@ -631,7 +611,7 @@
         "type": "uint256"
       }
     ],
-    "name": "cancelVouchUnlock",
+    "name": "cancelUnlock",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -664,13 +644,7 @@
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
+    "inputs": [],
     "name": "claimHolderRewards",
     "outputs": [],
     "stateMutability": "nonpayable",
@@ -710,6 +684,30 @@
         "type": "uint256[]"
       }
     ],
+    "name": "finalizeAllMaturedUnlocks",
+    "outputs": [
+      {
+        "internalType": "uint256[]",
+        "name": "finalizedPids",
+        "type": "uint256[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "amounts",
+        "type": "uint256[]"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256[]",
+        "name": "_pids",
+        "type": "uint256[]"
+      }
+    ],
     "name": "finalizeAllMaturedVouchUnlocks",
     "outputs": [
       {
@@ -734,7 +732,7 @@
         "type": "uint256"
       }
     ],
-    "name": "finalizeVouchUnlock",
+    "name": "finalizeUnlock",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -980,25 +978,6 @@
   {
     "inputs": [
       {
-        "internalType": "address",
-        "name": "_user",
-        "type": "address"
-      }
-    ],
-    "name": "getUserTotalVouchStaked",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
         "internalType": "uint256",
         "name": "_pid",
         "type": "uint256"
@@ -1009,7 +988,7 @@
         "type": "address"
       }
     ],
-    "name": "getVouchUnlock",
+    "name": "getUnlock",
     "outputs": [
       {
         "internalType": "uint256",
@@ -1053,7 +1032,7 @@
         "type": "uint256[]"
       }
     ],
-    "name": "getVouchUnlocks",
+    "name": "getUnlocks",
     "outputs": [
       {
         "internalType": "uint256[]",
@@ -1079,6 +1058,25 @@
         "internalType": "bool[]",
         "name": "readies",
         "type": "bool[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_user",
+        "type": "address"
+      }
+    ],
+    "name": "getUserTotalVouchStaked",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -1257,19 +1255,6 @@
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "poolLength",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
     "inputs": [
       {
         "internalType": "address",
@@ -1282,70 +1267,6 @@
       {
         "internalType": "uint256",
         "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "name": "rewardPoolConfig",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "initialized",
-        "type": "bool"
-      },
-      {
-        "internalType": "bool",
-        "name": "autoUpdate",
-        "type": "bool"
-      },
-      {
-        "internalType": "uint256",
-        "name": "updateInterval",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "updateRatio",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "updateThreshold",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "lastUpdateTime",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "baseVouchPerYear",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "baseVplsPerYear",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "baseWplsPerYear",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "totalAllocPoint",
         "type": "uint256"
       }
     ],
@@ -1452,6 +1373,19 @@
   {
     "inputs": [
       {
+        "internalType": "uint256",
+        "name": "_seconds",
+        "type": "uint256"
+      }
+    ],
+    "name": "setStandardUnlockPeriod",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "address",
         "name": "_rewardPool",
         "type": "address"
@@ -1486,19 +1420,6 @@
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "_seconds",
-        "type": "uint256"
-      }
-    ],
-    "name": "setVouchUnlockPeriod",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
         "name": "_pid",
         "type": "uint256"
       },
@@ -1514,6 +1435,19 @@
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "standardUnlockPeriod",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "uint256",
@@ -1526,7 +1460,7 @@
         "type": "uint256"
       }
     ],
-    "name": "startVouchUnlock",
+    "name": "startUnlock",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -1546,7 +1480,7 @@
   },
   {
     "inputs": [],
-    "name": "totalVouchUnlocking",
+    "name": "totalUnlocking",
     "outputs": [
       {
         "internalType": "uint256",
@@ -1623,19 +1557,6 @@
       {
         "internalType": "uint256",
         "name": "stdLastAccWplsPerShare",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "vouchUnlockPeriod",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
         "type": "uint256"
       }
     ],

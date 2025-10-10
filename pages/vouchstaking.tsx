@@ -13,6 +13,7 @@ export default function Vouchstaking() {
     pendingRewards,
     holderRewardInfo,
     dripRedeemed,
+    pendingTripleByPid,
     userTotalVouchStaked,
     userTotalVplsStaked,
     totalVouchUnlocking,
@@ -182,9 +183,12 @@ export default function Vouchstaking() {
                     <p className='text-[18px] font-normal text-[#FFFBFA] text-center'>
                       {loading
                         ? '...'
-                        : formatNumber(dripRedeemed.vplsClaimed, {
-                            decimals: 6,
-                          })}
+                        : formatNumber(
+                            pendingTripleByPid?.[2]?.vplsPending || '0',
+                            {
+                              decimals: 6,
+                            }
+                          )}
                     </p>
                     <p className='text-[18px] font-normal text-[#A6A6A6] text-center'>
                       {' '}
@@ -195,9 +199,12 @@ export default function Vouchstaking() {
                     <p className='text-[18px] font-normal text-[#FFFBFA] text-center'>
                       {loading
                         ? '...'
-                        : formatNumber(dripRedeemed.vouchClaimed, {
-                            decimals: 6,
-                          })}
+                        : formatNumber(
+                            pendingTripleByPid?.[2]?.vouchPending || '0',
+                            {
+                              decimals: 6,
+                            }
+                          )}
                     </p>
                     <p className='text-[18px] font-normal text-[#A6A6A6] text-center'>
                       {' '}
@@ -208,9 +215,12 @@ export default function Vouchstaking() {
                     <p className='text-[18px] font-normal text-[#FFFBFA] text-center'>
                       {loading
                         ? '...'
-                        : formatNumber(dripRedeemed.plsClaimed, {
-                            decimals: 6,
-                          })}
+                        : formatNumber(
+                            pendingTripleByPid?.[2]?.wplsPending || '0',
+                            {
+                              decimals: 6,
+                            }
+                          )}
                     </p>
                     <p className='text-[18px] font-normal text-[#A6A6A6] text-center'>
                       {' '}
@@ -307,7 +317,7 @@ export default function Vouchstaking() {
                     <p className='text-[13px] font-normal text-[#A6A6A6]'>
                       {loading
                         ? '...'
-                        : formatNumber(totalVouchUnlocking, {
+                        : formatNumber(totalVplsUnlocking, {
                             decimals: 2,
                           })}{' '}
                     </p>
@@ -454,9 +464,12 @@ export default function Vouchstaking() {
                     <p className='text-[18px] font-normal text-[#FFFBFA] text-center'>
                       {loading
                         ? '...'
-                        : formatNumber(pendingRewards.standardTotal, {
-                            decimals: 6,
-                          })}
+                        : formatNumber(
+                            pendingTripleByPid?.[1]?.vplsPending || '0',
+                            {
+                              decimals: 6,
+                            }
+                          )}
                     </p>
                     <p className='text-[18px] font-normal text-[#A6A6A6] text-center'>
                       {' '}
@@ -467,9 +480,12 @@ export default function Vouchstaking() {
                     <p className='text-[18px] font-normal text-[#FFFBFA] text-center'>
                       {loading
                         ? '...'
-                        : formatNumber(pendingRewards.standardTotal, {
-                            decimals: 6,
-                          })}
+                        : formatNumber(
+                            pendingTripleByPid?.[1]?.vouchPending || '0',
+                            {
+                              decimals: 6,
+                            }
+                          )}
                     </p>
                     <p className='text-[18px] font-normal text-[#A6A6A6] text-center'>
                       {' '}
@@ -480,9 +496,12 @@ export default function Vouchstaking() {
                     <p className='text-[18px] font-normal text-[#FFFBFA] text-center'>
                       {loading
                         ? '...'
-                        : formatNumber(pendingRewards.standardTotal, {
-                            decimals: 6,
-                          })}
+                        : formatNumber(
+                            pendingTripleByPid?.[1]?.wplsPending || '0',
+                            {
+                              decimals: 6,
+                            }
+                          )}
                     </p>
                     <p className='text-[18px] font-normal text-[#A6A6A6] text-center'>
                       {' '}

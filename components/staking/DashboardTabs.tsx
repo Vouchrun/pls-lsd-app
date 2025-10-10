@@ -34,7 +34,7 @@ export const DashboardTabs = (props: Props) => {
         onClick={handleClick}
       />
       <div
-        className={`w-[280px] sm:w-[280px] xl:w-[580px] h-auto p-[20px] lg:p-[.04rem] items-stretch bg-[#edece3] dark:bg-[#111111] rounded-[15px] lg:rounded-[.6rem] xl:grid absolute xl:relative top-[40px] xl:top-0 gap-0
+        className={`w-[280px] sm:w-[280px] xl:w-[650px] h-auto p-[20px] lg:p-[.04rem] items-stretch bg-[#edece3] dark:bg-[#111111] rounded-[15px] lg:rounded-[.6rem] xl:grid absolute xl:relative top-[40px] xl:top-0 gap-0
   ${isActive ? "flex flex-col" : "hidden"}
   [&>*:not(:last-child):after]:content-['|'] 
   [&>*:not(:last-child):after]:absolute 
@@ -47,7 +47,7 @@ export const DashboardTabs = (props: Props) => {
   [&>*.tab-active:after]:hidden
   [&>*:has(+_.tab-active):after]:hidden`}
         style={{
-          gridTemplateColumns: "25% 25% 25% 25%",
+          gridTemplateColumns: "20% 20% 20% 20% 20%",
         }}
       >
         <Link
@@ -114,6 +114,21 @@ export const DashboardTabs = (props: Props) => {
             // onClick={() => props.onChangeTab("withdraw")}
           >
             Vouch Staking
+          </Link>
+        </div>
+        <div className="flex items-stretch">
+          {/* <div className="ml-[.1rem] w-[0.01rem] h-[.22rem] bg-[#DEE6F7] dark:bg-bg1Dark self-center" /> */}
+          <Link
+            className={classNames(
+              "h-[35px] flex-1 ml-[.1rem] cursor-pointer flex items-center justify-center text-[.16rem] rounded-[.3rem] whitespace-nowrap",
+              router.pathname.startsWith("/lp-farms")
+                ? "text-color-highlight bg-color-highlight"
+                : "text-color-text1"
+            )}
+            href="/lp-farms"
+            // onClick={() => props.onChangeTab("withdraw")}
+          >
+            LP Farms
           </Link>
         </div>
       </div>
