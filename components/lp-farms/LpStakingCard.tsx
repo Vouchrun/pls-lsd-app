@@ -224,33 +224,6 @@ export const LpStakingCard: React.FC<LpStakingCardProps> = ({
         <FarmsTabs selectedTab={selectedTab} onTabChange={setSelectedTab} />
         <div className='text-white'>
           <div>
-            {/* Info Banner */}
-            <div className='mx-[.24rem] mt-[.16rem] p-[.12rem] bg-[#f0f0f0] dark:bg-[#2a2a2a] border border-[#d0d0d0] dark:border-[#444444] rounded-[.12rem] flex items-center'>
-              <div className='mr-[10px] text-[#6c86ad] dark:text-[#8fa4c7]'>
-                <svg
-                  width='16'
-                  height='16'
-                  viewBox='0 0 16 16'
-                  fill='currentColor'
-                >
-                  <path d='M8 0C3.584 0 0 3.584 0 8s3.584 8 8 8 8-3.584 8-8S12.416 0 8 0zm1 12H7V7h2v5zm0-6H7V4h2v2z' />
-                </svg>
-              </div>
-              <p className='text-[.12rem] text-[#666666] dark:text-[#aaaaaa] leading-[1.4]'>
-                Staked tokens have a cooldown period to unstake. During this
-                period unstaked tokens will not accrue staking rewards
-              </p>
-              <div className='ml-[10px]'>
-                <button>
-                  <img
-                    src='/images/right_sid_ic.svg'
-                    alt=''
-                    className='w-[20px]'
-                  />
-                </button>
-              </div>
-            </div>
-
             {/* Amount Input */}
             <div className='mt-[.18rem] pt-[.24rem] mx-[.24rem] bg-[#edece3] dark:bg-[#111111] rounded-[.3rem]'>
               <div className='mx-[.12rem] flex items-start'>
