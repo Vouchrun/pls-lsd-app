@@ -390,18 +390,14 @@ export function useLpFarms() {
     }
   }, [fetchLpPoolData]);
 
-  // Stake LP tokens
-  const stake = useCallback(
-    async (pid: number, amount: string, lpTokenAddress: string) => {
-      if (!metaMaskAccount) throw new Error('Wallet not connected');
-      setLoading(true);
+  // Check allowance for LP staking
+  const checkAllowance = useCallback(
+    async (lpTokenAddress: string, amount: string) => {
+      if (!metaMaskAccount) return false;
       try {
         const amountWei = Web3.utils.toWei(amount, 'ether');
-
-        // 1) Ensure allowance of LP token for staking contract
         const spender = getVouchStakingContract();
         const erc20 = getErc20Contract(lpTokenAddress);
-        const erc20ForTx = getErc20ContractForTransactions(lpTokenAddress);
 
         const currentAllowanceWei: string = await erc20.methods
           .allowance(metaMaskAccount, spender)
@@ -411,18 +407,53 @@ export function useLpFarms() {
           .toBN(currentAllowanceWei)
           .gte(Web3.utils.toBN(amountWei));
 
-        if (!isAllowanceEnough) {
-          console.log('Approving LP token...');
-          const approveGas = await erc20ForTx.methods
-            .approve(spender, amountWei)
-            .estimateGas({ from: metaMaskAccount });
+        return isAllowanceEnough;
+      } catch (error) {
+        console.error('Error checking allowance:', error);
+        return false;
+      }
+    },
+    [metaMaskAccount, getErc20Contract]
+  );
 
-          await erc20ForTx.methods
-            .approve(spender, amountWei)
-            .send({ from: metaMaskAccount, gas: Math.floor(approveGas * 1.2) });
-        }
+  // Approve LP tokens for staking
+  const approve = useCallback(
+    async (lpTokenAddress: string, amount: string) => {
+      if (!metaMaskAccount) throw new Error('Wallet not connected');
+      setLoading(true);
+      try {
+        const amountWei = Web3.utils.toWei(amount, 'ether');
+        const spender = getVouchStakingContract();
+        const erc20ForTx = getErc20ContractForTransactions(lpTokenAddress);
 
-        // 2) Perform stake
+        const approveGas = await erc20ForTx.methods
+          .approve(spender, amountWei)
+          .estimateGas({ from: metaMaskAccount });
+
+        const receipt = await erc20ForTx.methods
+          .approve(spender, amountWei)
+          .send({ from: metaMaskAccount, gas: Math.floor(approveGas * 1.2) });
+
+        return receipt;
+      } catch (error) {
+        console.error('Error approving LP tokens:', error);
+        throw error;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [metaMaskAccount, getErc20ContractForTransactions]
+  );
+
+  // Stake LP tokens
+  const stake = useCallback(
+    async (pid: number, amount: string, lpTokenAddress: string) => {
+      if (!metaMaskAccount) throw new Error('Wallet not connected');
+      setLoading(true);
+      try {
+        const amountWei = Web3.utils.toWei(amount, 'ether');
+
+        // Perform stake
         console.log('Staking LP tokens...', pid, amountWei);
         const stakingContractForTx = getContractForTransactions();
 
@@ -438,12 +469,7 @@ export function useLpFarms() {
         setLoading(false);
       }
     },
-    [
-      metaMaskAccount,
-      getErc20Contract,
-      getContractForTransactions,
-      getErc20ContractForTransactions,
-    ]
+    [metaMaskAccount, getContractForTransactions]
   );
 
   // Unstake LP tokens
@@ -524,6 +550,8 @@ export function useLpFarms() {
     loading,
 
     // Actions
+    checkAllowance,
+    approve,
     stake,
     unstake,
     claim,

@@ -3,55 +3,17 @@ import { useLpFarms } from 'hooks/useLpFarms';
 import { LpStakingCard } from 'components/lp-farms/LpStakingCard';
 
 export default function LpFarms() {
-  const { lpPoolsData, lpPools, loading, stake, unstake, claim, refreshData } =
-    useLpFarms();
-
-  const [isProcessing, setIsProcessing] = useState(false);
-
-  const handleStake = useCallback(
-    async (pid: number, amount: string, lpTokenAddress: string) => {
-      setIsProcessing(true);
-      try {
-        await stake(pid, amount, lpTokenAddress);
-        await refreshData();
-      } catch (error) {
-        console.error('Stake error:', error);
-      } finally {
-        setIsProcessing(false);
-      }
-    },
-    [stake, refreshData]
-  );
-
-  const handleUnstake = useCallback(
-    async (pid: number, amount: string) => {
-      setIsProcessing(true);
-      try {
-        await unstake(pid, amount);
-        await refreshData();
-      } catch (error) {
-        console.error('Unstake error:', error);
-      } finally {
-        setIsProcessing(false);
-      }
-    },
-    [unstake, refreshData]
-  );
-
-  const handleClaim = useCallback(
-    async (pid: number) => {
-      setIsProcessing(true);
-      try {
-        await claim(pid);
-        await refreshData();
-      } catch (error) {
-        console.error('Claim error:', error);
-      } finally {
-        setIsProcessing(false);
-      }
-    },
-    [claim, refreshData]
-  );
+  const {
+    lpPoolsData,
+    lpPools,
+    loading,
+    checkAllowance,
+    approve,
+    stake,
+    unstake,
+    claim,
+    refreshData,
+  } = useLpFarms();
 
   return (
     <>
@@ -80,10 +42,12 @@ export default function LpFarms() {
                   <LpStakingCard
                     key={pool.pid}
                     poolData={poolData}
-                    onStake={handleStake}
-                    onUnstake={handleUnstake}
-                    onClaim={handleClaim}
-                    isProcessing={isProcessing}
+                    checkAllowance={checkAllowance}
+                    onApprove={approve}
+                    onStake={stake}
+                    onUnstake={unstake}
+                    onClaim={claim}
+                    refreshData={refreshData}
                   />
                 );
               })}

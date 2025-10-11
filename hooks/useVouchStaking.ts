@@ -60,6 +60,14 @@ export interface PoolInfo {
   active: boolean;
 }
 
+export interface UnlockInfo {
+  amount: string;
+  startTime: string;
+  unlockAt: string;
+  secondsRemaining: string;
+  ready: boolean;
+}
+
 export function useVouchStaking() {
   const { metaMaskAccount } = useWalletAccount();
   const { updateFlag } = useAppSlice();
@@ -127,6 +135,22 @@ export function useVouchStaking() {
     accWplsPerShare: '',
     totalStaked: '',
     active: false,
+  });
+
+  // Unlock info for each pool
+  const [vouchUnlockInfo, setVouchUnlockInfo] = useState<UnlockInfo>({
+    amount: '0',
+    startTime: '0',
+    unlockAt: '0',
+    secondsRemaining: '0',
+    ready: false,
+  });
+  const [vplsUnlockInfo, setVplsUnlockInfo] = useState<UnlockInfo>({
+    amount: '0',
+    startTime: '0',
+    unlockAt: '0',
+    secondsRemaining: '0',
+    ready: false,
   });
 
   // Loading states
@@ -421,6 +445,65 @@ export function useVouchStaking() {
     }
   }, [getContract, metaMaskAccount]);
 
+  // Check allowance for staking
+  const checkAllowance = useCallback(
+    async (pid: number, amount: string) => {
+      if (!metaMaskAccount) return false;
+      try {
+        const amountWei = Web3.utils.toWei(amount, 'ether');
+        const vouchToken =
+          pid === 1 ? TOKEN_ADDRESSES.VOUCH : TOKEN_ADDRESSES.VPLS;
+        const spender = getVouchStakingContract();
+        const erc20 = getErc20Contract(vouchToken);
+
+        const currentAllowanceWei: string = await erc20.methods
+          .allowance(metaMaskAccount, spender)
+          .call();
+
+        const isAllowanceEnough = Web3.utils
+          .toBN(currentAllowanceWei)
+          .gte(Web3.utils.toBN(amountWei));
+
+        return isAllowanceEnough;
+      } catch (error) {
+        console.error('Error checking allowance:', error);
+        return false;
+      }
+    },
+    [metaMaskAccount, getErc20Contract]
+  );
+
+  // Approve tokens for staking
+  const approve = useCallback(
+    async (pid: number, amount: string) => {
+      if (!metaMaskAccount) throw new Error('Wallet not connected');
+      setLoading(true);
+      try {
+        const amountWei = Web3.utils.toWei(amount, 'ether');
+        const vouchToken =
+          pid === 1 ? TOKEN_ADDRESSES.VOUCH : TOKEN_ADDRESSES.VPLS;
+        const spender = getVouchStakingContract();
+        const erc20ForTx = getErc20ContractForTransactions(vouchToken);
+
+        const approveGas = await erc20ForTx.methods
+          .approve(spender, amountWei)
+          .estimateGas({ from: metaMaskAccount });
+
+        const receipt = await erc20ForTx.methods
+          .approve(spender, amountWei)
+          .send({ from: metaMaskAccount, gas: Math.floor(approveGas * 1.2) });
+
+        return receipt;
+      } catch (error) {
+        console.error('Error approving:', error);
+        throw error;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [metaMaskAccount, getErc20ContractForTransactions]
+  );
+
   // Stake tokens
   const stake = useCallback(
     async (pid: number, amount: string) => {
@@ -429,40 +512,9 @@ export function useVouchStaking() {
       try {
         const amountWei = Web3.utils.toWei(amount, 'ether');
 
-        // 1) Ensure allowance of VOUCH for staking contract
-        const vouchToken =
-          pid === 1 ? TOKEN_ADDRESSES.VOUCH : TOKEN_ADDRESSES.VPLS;
-        const spender = getVouchStakingContract();
-        const erc20 = getErc20Contract(vouchToken);
-        const erc20ForTx = getErc20ContractForTransactions(vouchToken);
-
-        const currentAllowanceWei: string = await erc20.methods
-          .allowance(metaMaskAccount, spender)
-          .call();
-
-        console.log(currentAllowanceWei, amountWei);
-        const isAllowanceEnough = Web3.utils
-          .toBN(currentAllowanceWei)
-          .gte(Web3.utils.toBN(amountWei));
-
-        if (!isAllowanceEnough) {
-          console.log('approve');
-          const approveGas = await erc20ForTx.methods
-            .approve(spender, amountWei)
-            .estimateGas({ from: metaMaskAccount });
-          console.log('approveGas', approveGas);
-
-          await erc20ForTx.methods
-            .approve(spender, amountWei)
-            .send({ from: metaMaskAccount, gas: Math.floor(approveGas * 1.2) });
-        }
-
-        // 2) Perform stake
+        // Perform stake
         console.log('stake', pid, amountWei);
         const stakingContractForTx = getContractForTransactions();
-        // const gasEstimate = await stakingContractForTx.methods
-        //   .stake(pid, amountWei)
-        //   .estimateGas({ from: metaMaskAccount });
 
         const receipt = await stakingContractForTx.methods
           .stake(pid, amountWei)
@@ -476,13 +528,7 @@ export function useVouchStaking() {
         setLoading(false);
       }
     },
-    [
-      metaMaskAccount,
-      getContract,
-      getErc20Contract,
-      getContractForTransactions,
-      getErc20ContractForTransactions,
-    ]
+    [metaMaskAccount, getContractForTransactions]
   );
 
   // Unstake tokens (for standard pools, this initiates the unlock period)
@@ -629,6 +675,118 @@ export function useVouchStaking() {
     [metaMaskAccount, getContractForTransactions]
   );
 
+  // Fetch unlock info for a pool
+  const fetchUnlockInfo = useCallback(
+    async (pid: number) => {
+      if (!metaMaskAccount) {
+        if (pid === 1) {
+          setVouchUnlockInfo({
+            amount: '0',
+            startTime: '0',
+            unlockAt: '0',
+            secondsRemaining: '0',
+            ready: false,
+          });
+        } else if (pid === 2) {
+          setVplsUnlockInfo({
+            amount: '0',
+            startTime: '0',
+            unlockAt: '0',
+            secondsRemaining: '0',
+            ready: false,
+          });
+        }
+        return;
+      }
+
+      try {
+        const contract = getContract();
+        const result = await contract.methods
+          .getUnlock(pid, metaMaskAccount)
+          .call();
+
+        const unlockInfo: UnlockInfo = {
+          amount: Web3.utils.fromWei(result.amount || '0', 'ether'),
+          startTime: result.startTime?.toString() || '0',
+          unlockAt: result.unlockAt?.toString() || '0',
+          secondsRemaining: result.secondsRemaining?.toString() || '0',
+          ready: result.ready || false,
+        };
+
+        if (pid === 1) {
+          setVouchUnlockInfo(unlockInfo);
+        } else if (pid === 2) {
+          setVplsUnlockInfo(unlockInfo);
+        }
+      } catch (error) {
+        console.error(`Error fetching unlock info for pool ${pid}:`, error);
+      }
+    },
+    [metaMaskAccount, getContract]
+  );
+
+  // Cancel unlock for a pool
+  const cancelUnlock = useCallback(
+    async (pid: number) => {
+      if (!metaMaskAccount) throw new Error('Wallet not connected');
+
+      setLoading(true);
+      try {
+        const contract = getContractForTransactions();
+
+        const gasEstimate = await contract.methods
+          .cancelUnlock(pid)
+          .estimateGas({
+            from: metaMaskAccount,
+          });
+
+        const result = await contract.methods.cancelUnlock(pid).send({
+          from: metaMaskAccount,
+          gas: Math.floor(gasEstimate * 1.2),
+        });
+
+        return result;
+      } catch (error) {
+        console.error('Error canceling unlock:', error);
+        throw error;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [metaMaskAccount, getContractForTransactions]
+  );
+
+  // Finalize unlock for a pool
+  const finalizeUnlock = useCallback(
+    async (pid: number) => {
+      if (!metaMaskAccount) throw new Error('Wallet not connected');
+
+      setLoading(true);
+      try {
+        const contract = getContractForTransactions();
+
+        const gasEstimate = await contract.methods
+          .finalizeUnlock(pid)
+          .estimateGas({
+            from: metaMaskAccount,
+          });
+
+        const result = await contract.methods.finalizeUnlock(pid).send({
+          from: metaMaskAccount,
+          gas: Math.floor(gasEstimate * 1.2),
+        });
+
+        return result;
+      } catch (error) {
+        console.error('Error finalizing unlock:', error);
+        throw error;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [metaMaskAccount, getContractForTransactions]
+  );
+
   // Refresh all data
   const refreshData = useCallback(async () => {
     await Promise.all([
@@ -642,6 +800,8 @@ export function useVouchStaking() {
       fetchTotalVplsUnlocking(),
       fetchPendingTripleForPid(1),
       fetchPendingTripleForPid(2),
+      fetchUnlockInfo(1),
+      fetchUnlockInfo(2),
     ]);
   }, [
     fetchPendingRewards,
@@ -653,6 +813,7 @@ export function useVouchStaking() {
     fetchTotalVouchUnlocking,
     fetchTotalVplsUnlocking,
     fetchPendingTripleForPid,
+    fetchUnlockInfo,
   ]);
 
   // Effect to fetch data when component mounts or dependencies change
@@ -678,14 +839,20 @@ export function useVouchStaking() {
     vplsPoolInfo,
     vouchPoolInfo,
     pendingTripleByPid,
+    vouchUnlockInfo,
+    vplsUnlockInfo,
 
     // Actions
+    checkAllowance,
+    approve,
     stake,
     unstake,
     claim,
     claimAll,
     claimAllHolderRewards,
     exit,
+    cancelUnlock,
+    finalizeUnlock,
     refreshData,
 
     // Utilities
