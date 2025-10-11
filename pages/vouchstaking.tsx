@@ -120,7 +120,7 @@ export default function Vouchstaking() {
                   <span className='text-[#FFFBFA] mr-[3px]'>
                     {tokensLoading
                       ? '...'
-                      : formatNumber(vplsBalance.balance, { decimals: 4 })}
+                      : formatNumber(vplsBalance.balance, { decimals: 2 })}
                   </span>
                   vPLS
                 </p>
@@ -387,7 +387,7 @@ export default function Vouchstaking() {
                   </a>
                 </p>
                 <p className='text-[13px] font-normal text-[#A6A6A6] mt-[3px]'>
-                  The Liquid Staking Token of Vouch. Stake to receive Rewards.
+                  The Vouch Ecosystem Token. Stake to receive Rewards.
                 </p>
               </div>
             </div>
@@ -400,7 +400,7 @@ export default function Vouchstaking() {
                   <span className='text-[#FFFBFA] mr-[3px]'>
                     {tokensLoading
                       ? '...'
-                      : formatNumber(vouchBalance.balance, { decimals: 4 })}
+                      : formatNumber(vouchBalance.balance, { decimals: 2 })}
                   </span>
                   VOUCH
                 </p>
