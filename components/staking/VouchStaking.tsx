@@ -407,8 +407,18 @@ export const VouchStaking: React.FC<VouchStakingProps> = ({
           </button>
         )}
 
-        {/* Dynamic second button based on unlock state */}
-        {hasActiveUnlock ? (
+        {/* Dynamic second button based on tab and unlock state */}
+        {selectedTab === 'stake' ? (
+          // On Stake Tab: Always show Claim Rewards button
+          <button
+            onClick={handleClaim}
+            disabled={!metaMaskAccount || isClaimProcessing}
+            className='h-[45px] w-[160px] bg-gradient-to-r from-[#ff8533] to-[#ffa162] hover:from-[#ff7520] hover:to-[#ff9550] disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium rounded-[50px] transition-all duration-200'
+          >
+            {isClaimProcessing ? 'Claiming...' : 'Claim Rewards'}
+          </button>
+        ) : // On Unstake Tab: Show Cancel/Finalize buttons if active unlock
+        hasActiveUnlock ? (
           vouchUnlockInfo.ready ? (
             <button
               onClick={handleFinalizeUnlock}
@@ -427,6 +437,7 @@ export const VouchStaking: React.FC<VouchStakingProps> = ({
             </button>
           )
         ) : (
+          // No active unlock on Unstake Tab: Show Claim Rewards
           <button
             onClick={handleClaim}
             disabled={!metaMaskAccount || isClaimProcessing}

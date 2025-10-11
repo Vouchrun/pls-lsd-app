@@ -206,6 +206,13 @@ export function useVouchStaking() {
   const getErc20ContractForTransactions = useCallback(
     (tokenAddress: string) => {
       const web3 = getEthWeb3ForTransactions();
+      // Ensure the contract is created with a valid address
+      if (
+        !tokenAddress ||
+        tokenAddress === '0x0000000000000000000000000000000000000000'
+      ) {
+        throw new Error('Invalid token address');
+      }
       return new web3.eth.Contract(ERC20_MINI_ABI, tokenAddress);
     },
     []
@@ -333,10 +340,10 @@ export function useVouchStaking() {
       // Get user total vouch staked if user is connected
       if (metaMaskAccount) {
         const userStakedResult = await contract.methods
-          .getUserTotalVouchStaked(metaMaskAccount)
+          .userInfo(1, metaMaskAccount)
           .call();
         setUserTotalVouchStaked(
-          Web3.utils.fromWei(userStakedResult || '0', 'ether')
+          Web3.utils.fromWei(userStakedResult[0] || '0', 'ether')
         );
 
         // Get user total vpls staked (assuming there's a similar method for vPLS)
@@ -405,45 +412,39 @@ export function useVouchStaking() {
     }
   }, [getContract]);
 
-  // Fetch total VOUCH unlocking
+  // Fetch total VOUCH unlocking (global for pool)
   const fetchTotalVouchUnlocking = useCallback(async () => {
-    if (!metaMaskAccount) {
-      setTotalVouchUnlocking('0');
-      return;
-    }
     try {
       const contract = getContract();
-      const unlockResult = await contract.methods
-        .getUnlock(1, metaMaskAccount)
+      // Use totalUnlocking(pid) to get the global total for this pool
+      const totalUnlockingAmount = await contract.methods
+        .totalUnlocking(1)
         .call();
       setTotalVouchUnlocking(
-        Web3.utils.fromWei(unlockResult.amount || '0', 'ether')
+        Web3.utils.fromWei(totalUnlockingAmount || '0', 'ether')
       );
     } catch (error) {
       console.error('Error fetching total VOUCH unlocking:', error);
       setTotalVouchUnlocking('0');
     }
-  }, [getContract, metaMaskAccount]);
+  }, [getContract]);
 
-  // Fetch total VPLS unlocking
+  // Fetch total VPLS unlocking (global for pool)
   const fetchTotalVplsUnlocking = useCallback(async () => {
-    if (!metaMaskAccount) {
-      setTotalVplsUnlocking('0');
-      return;
-    }
     try {
       const contract = getContract();
-      const unlockResult = await contract.methods
-        .getUnlock(2, metaMaskAccount)
+      // Use totalUnlocking(pid) to get the global total for this pool
+      const totalUnlockingAmount = await contract.methods
+        .totalUnlocking(2)
         .call();
       setTotalVplsUnlocking(
-        Web3.utils.fromWei(unlockResult.amount || '0', 'ether')
+        Web3.utils.fromWei(totalUnlockingAmount || '0', 'ether')
       );
     } catch (error) {
       console.error('Error fetching total VPLS unlocking:', error);
       setTotalVplsUnlocking('0');
     }
-  }, [getContract, metaMaskAccount]);
+  }, [getContract]);
 
   // Check allowance for staking
   const checkAllowance = useCallback(
@@ -476,26 +477,75 @@ export function useVouchStaking() {
   // Approve tokens for staking
   const approve = useCallback(
     async (pid: number, amount: string) => {
-      if (!metaMaskAccount) throw new Error('Wallet not connected');
+      console.log('Approve called with:', { pid, amount, metaMaskAccount });
+
+      if (!metaMaskAccount) {
+        throw new Error('Wallet not connected');
+      }
+
+      // Validate metaMaskAccount is a valid Ethereum address
+      if (!Web3.utils.isAddress(metaMaskAccount)) {
+        throw new Error(`Invalid Ethereum address: ${metaMaskAccount}`);
+      }
+
       setLoading(true);
       try {
         const amountWei = Web3.utils.toWei(amount, 'ether');
         const vouchToken =
           pid === 1 ? TOKEN_ADDRESSES.VOUCH : TOKEN_ADDRESSES.VPLS;
         const spender = getVouchStakingContract();
+
+        console.log('Token and spender:', { vouchToken, spender });
+
+        // Validate spender address
+        if (!Web3.utils.isAddress(spender)) {
+          throw new Error(`Invalid spender address: ${spender}`);
+        }
+
+        // Validate token address
+        if (!Web3.utils.isAddress(vouchToken)) {
+          throw new Error(`Invalid token address: ${vouchToken}`);
+        }
+
         const erc20ForTx = getErc20ContractForTransactions(vouchToken);
 
-        const approveGas = await erc20ForTx.methods
-          .approve(spender, amountWei)
-          .estimateGas({ from: metaMaskAccount });
+        console.log('Attempting approval...', {
+          token: vouchToken,
+          spender,
+          amount: amountWei,
+          from: metaMaskAccount,
+        });
+
+        // First, try to estimate gas with proper error handling
+        let gasEstimate;
+        try {
+          gasEstimate = await erc20ForTx.methods
+            .approve(spender, amountWei)
+            .estimateGas({ from: metaMaskAccount });
+          console.log('Gas estimate:', gasEstimate);
+        } catch (estimateError: any) {
+          console.error('Gas estimation error:', estimateError);
+          // Use a default gas limit if estimation fails
+          gasEstimate = 100000;
+        }
 
         const receipt = await erc20ForTx.methods
           .approve(spender, amountWei)
-          .send({ from: metaMaskAccount, gas: Math.floor(approveGas * 1.2) });
+          .send({
+            from: metaMaskAccount,
+            gas: Math.floor(Number(gasEstimate) * 1.2),
+          });
 
+        console.log('Approval receipt:', receipt);
         return receipt;
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error approving:', error);
+        // Provide more detailed error message
+        if (error.message && error.message.includes('Invalid parameters')) {
+          throw new Error(
+            'Failed to approve tokens. Please ensure your wallet is properly connected and try again.'
+          );
+        }
         throw error;
       } finally {
         setLoading(false);

@@ -32,9 +32,18 @@ export function getEthWeb3() {
  * get Ethereum web3 instance for transactions (uses MetaMask provider)
  */
 export function getEthWeb3ForTransactions() {
-  if (!ethWeb3ForTransactions) {
-    ethWeb3ForTransactions = createWeb3(window.ethereum);
+  // Always create a fresh instance to ensure we have the latest provider state
+  // This is important for hardware wallets like Trezor
+  if (!window.ethereum) {
+    throw new Error(
+      'No Ethereum provider found. Please install MetaMask or connect your wallet.'
+    );
   }
+
+  // Always recreate the instance to ensure we have the latest provider state
+  // This is critical for hardware wallets like Trezor that may need to maintain connection
+  ethWeb3ForTransactions = createWeb3(window.ethereum);
+
   return ethWeb3ForTransactions;
 }
 
