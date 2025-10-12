@@ -424,7 +424,7 @@ export const VplsStaking: React.FC<VplsStakingProps> = ({
               disabled={!metaMaskAccount || isUnlockProcessing}
               className='h-[45px] w-[160px] bg-gradient-to-r from-[#28a745] to-[#20c997] hover:from-[#218838] hover:to-[#1aa179] disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium rounded-[50px] transition-all duration-200'
             >
-              {isUnlockProcessing ? 'Processing...' : 'Finalize Unlock'}
+              {isUnlockProcessing ? 'Processing...' : 'Claim Unstake'}
             </button>
           ) : (
             <button
