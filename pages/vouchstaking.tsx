@@ -18,6 +18,8 @@ export default function Vouchstaking() {
     userTotalVplsStaked,
     totalVouchUnlocking,
     totalVplsUnlocking,
+    vouchUnlockInfo,
+    vplsUnlockInfo,
     loading,
     vplsPoolInfo,
     vouchPoolInfo,
@@ -43,7 +45,8 @@ export default function Vouchstaking() {
 
   // Calculate bar chart percentages for VPLS
   const vplsUnstakingAmount = Number(totalVplsUnlocking) || 0;
-  const vplsStakedAmount = Number(userTotalVplsStaked) || 0;
+  const vplsStakedAmount =
+    Number(Web3.utils.fromWei(vplsPoolInfo.totalStaked || '0', 'ether')) || 0;
   const vplsTotalSupply = Number(vplsInfo.totalSupply) || 1;
   const vplsRemainingSupply = Math.max(
     0,
@@ -56,7 +59,8 @@ export default function Vouchstaking() {
 
   // Calculate bar chart percentages for VOUCH
   const vouchUnstakingAmount = Number(totalVouchUnlocking) || 0;
-  const vouchStakedAmount = Number(userTotalVouchStaked) || 0;
+  const vouchStakedAmount =
+    Number(Web3.utils.fromWei(vouchPoolInfo.totalStaked || '0', 'ether')) || 0;
   const vouchTotalSupply = Number(vouchInfo.totalSupply) || 1;
   const vouchRemainingSupply = Math.max(
     0,
@@ -148,7 +152,10 @@ export default function Vouchstaking() {
                     $
                     {tokensLoading
                       ? '...'
-                      : Number(vplsInfo.price) * Number(userTotalVplsStaked)}
+                      : formatNumber(
+                          Number(vplsInfo.price) * Number(userTotalVplsStaked),
+                          { decimals: 8 }
+                        )}
                   </p>
                 </div>
 
@@ -162,7 +169,7 @@ export default function Vouchstaking() {
                     <span className='text-[#FFFBFA] mr-[3px]'>
                       {loading
                         ? '-'
-                        : formatNumber(totalVouchUnlocking, { decimals: 8 })}
+                        : formatNumber(vplsUnlockInfo.amount, { decimals: 8 })}
                     </span>
                     vPLS
                   </p>
@@ -170,7 +177,11 @@ export default function Vouchstaking() {
                     $
                     {tokensLoading
                       ? '-'
-                      : Number(vplsInfo.price) * Number(totalVplsUnlocking)}
+                      : formatNumber(
+                          Number(vplsInfo.price) *
+                            Number(vplsUnlockInfo.amount),
+                          { decimals: 8 }
+                        )}
                   </p>
                 </div>
               </div>
@@ -428,7 +439,11 @@ export default function Vouchstaking() {
                     $
                     {tokensLoading
                       ? '-'
-                      : Number(vouchInfo.price) * Number(userTotalVouchStaked)}
+                      : formatNumber(
+                          Number(vouchInfo.price) *
+                            Number(userTotalVouchStaked),
+                          { decimals: 8 }
+                        )}
                   </p>
                 </div>
 
@@ -442,7 +457,7 @@ export default function Vouchstaking() {
                     <span className='text-[#FFFBFA] mr-[3px]'>
                       {loading
                         ? '...'
-                        : formatNumber(totalVouchUnlocking, { decimals: 8 })}
+                        : formatNumber(vouchUnlockInfo.amount, { decimals: 8 })}
                     </span>
                     VOUCH
                   </p>
@@ -450,7 +465,11 @@ export default function Vouchstaking() {
                     $
                     {tokensLoading
                       ? '-'
-                      : Number(vouchInfo.price) * Number(totalVouchUnlocking)}
+                      : formatNumber(
+                          Number(vouchInfo.price) *
+                            Number(vouchUnlockInfo.amount),
+                          { decimals: 8 }
+                        )}
                   </p>
                 </div>
               </div>
