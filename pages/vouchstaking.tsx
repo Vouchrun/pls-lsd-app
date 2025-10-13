@@ -3,7 +3,7 @@ import { Icomoon } from 'components/icon/Icomoon';
 import { VplsStaking } from 'components/staking/VplsStaking';
 import { VouchStaking } from 'components/staking/VouchStaking';
 import { useVouchStaking } from 'hooks/useVouchStaking';
-import { useVouchTokens } from 'hooks/useVouchTokens';
+import { TOKEN_ADDRESSES, useVouchTokens } from 'hooks/useVouchTokens';
 import { formatNumber } from 'utils/numberUtils';
 import { useApr } from 'hooks/useApr';
 import Web3 from 'web3';
@@ -106,7 +106,10 @@ export default function Vouchstaking() {
                 <p className='text-[18px] font-normal text-[#FFFBFA] flex mb-[10px]'>
                   vPLS
                   <a
-                    href='#'
+                    href={
+                      'https://scan.mypinata.cloud/ipfs/bafybeienxyoyrhn5tswclvd3gdjy5mtkkwmu37aqtml6onbf7xnb3o22pe/#/address/' +
+                      TOKEN_ADDRESSES.VPLS
+                    }
                     className='ml-[.06rem] flex items-center m-l-[2px]'
                   >
                     <Icomoon icon='share' size='.12rem' color='#FFF' />
@@ -132,7 +135,7 @@ export default function Vouchstaking() {
                 </p>
               </div>
               <button className='text-[15px] font-normal text-[#FFFBFA] border-[#333] hover:border-[#fff] border rounded-[4px] px-[17px] max-sm:px-[11px]'>
-                Stake PLS
+                <a href='/PLS/?tab=stake'>Stake PLS</a>
               </button>
             </div>
             <div className='border-color-border1 border rounded-[8px] my-[37px] relative p-l[8px]'>
@@ -393,7 +396,10 @@ export default function Vouchstaking() {
                 <p className='text-[18px] font-normal text-[#FFFBFA] flex mb-[10px]'>
                   VOUCH
                   <a
-                    href='#'
+                    href={
+                      'https://scan.mypinata.cloud/ipfs/bafybeienxyoyrhn5tswclvd3gdjy5mtkkwmu37aqtml6onbf7xnb3o22pe/#/address/' +
+                      TOKEN_ADDRESSES.VOUCH
+                    }
                     className='ml-[.06rem] flex items-center m-l-[2px]'
                   >
                     <Icomoon icon='share' size='.12rem' color='#FFF' />
