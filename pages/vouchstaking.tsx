@@ -714,13 +714,13 @@ export default function Vouchstaking() {
           onClick={() => setIsBuyModalOpen(false)}
         >
           <div
-            className='bg-[#1a1a1a] border border-[#ff8a3b] rounded-[45px] max-w-[600px] w-full max-h-[90vh] overflow-hidden relative'
+            className='bg-[#111111] border border-[#ff8a3b] rounded-[45px] max-w-[600px] w-full max-h-[90vh] overflow-hidden relative'
             onClick={(e) => e.stopPropagation()}
           >
             {/* Iframe Content */}
             <div className='overflow-y-auto max-h-[calc(90vh-60px)]'>
               <iframe
-                src='https://widget.switch.win/widget?network=pulsechain&background_color=1a1a1a&font_color=ffffff&secondary_font_color=8e9397&border_color=ff8a3b&from=0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee&to=0xD34f5ADC24d8Cc55C1e832Bdf65fFfDF80D1314f'
+                src='https://widget.switch.win/widget?network=pulsechain&background_color=111111&font_color=ffffff&secondary_font_color=8e9397&border_color=ff8a3b&from=0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee&to=0xD34f5ADC24d8Cc55C1e832Bdf65fFfDF80D1314f'
                 allow='clipboard-read; clipboard-write'
                 width='100%'
                 height='735px'
