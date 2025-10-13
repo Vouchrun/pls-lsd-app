@@ -275,7 +275,7 @@ export function useLpFarms() {
           // Get pending rewards
           try {
             const pendingResult = await contract.methods
-              .pendingStandardTriple(pid, metaMaskAccount)
+              .pendingLiquidityRewardsProjected(pid, metaMaskAccount)
               .call();
             pendingRewards = {
               vouchPending: Web3.utils.fromWei(

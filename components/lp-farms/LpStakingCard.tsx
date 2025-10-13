@@ -198,7 +198,14 @@ export const LpStakingCard: React.FC<LpStakingCardProps> = ({
           <p className='text-[18px] text-[#FFFBFA] font-normal'>
             {poolData.config.name}
           </p>
-          <a href={poolData.config.dexUrl} className='ml-[7px]'>
+          <a
+            href={
+              'https://scan.mypinata.cloud/ipfs/bafybeienxyoyrhn5tswclvd3gdjy5mtkkwmu37aqtml6onbf7xnb3o22pe/#/address/' +
+              poolData.config.lpTokenAddress
+            }
+            target='_blank'
+            className='ml-[7px]'
+          >
             <Icomoon icon='share' size='.12rem' color='#FFFBFA' />
           </a>
         </div>
@@ -231,24 +238,6 @@ export const LpStakingCard: React.FC<LpStakingCardProps> = ({
                 PLP
               </p>
               <p className='text-[13px] font-medium text-[#A6A6A6] mb-[7px] m-auto items-baseline'>
-                $0.00
-              </p>
-            </div>
-          </div>
-
-          {/* Unstaking Column */}
-          <div className='flex flex-col items-center'>
-            <div>
-              <p className='text-[14px] font-medium text-[#8E9397] mb-[7px]'>
-                Unstaking <Icomoon icon='tip' size='.12rem' color='#333333' />
-              </p>
-              <p className='text-[16px] font-normal text-[#A6A6A6] mb-[7px]'>
-                <span className='text-[#FFFBFA] mr-[3px]'>
-                  {formatNumber(poolData.userUnstaking, { decimals: 4 })}
-                </span>
-                PLP
-              </p>
-              <p className='text-[13px] font-medium text-[#A6A6A6] mb-[7px]'>
                 $0.00
               </p>
             </div>
@@ -296,12 +285,9 @@ export const LpStakingCard: React.FC<LpStakingCardProps> = ({
             <p className='text-[14px] font-medium text-[#8E9397] mb-[13px] text-center relative z-[1]'>
               Pool APY
             </p>
-            <div className='flex max-w-[160px] justify-between mx-auto mb-[10px] mt-[20px]'>
-              <p className='text-[24px] font-bold text-[#FFFBFA] text-center'>
+            <div className='flex max-w-[160px] justify-center mx-auto mb-[10px] mt-[20px]'>
+              <p className='text-[20px] font-bold text-[#ffa162] text-center'>
                 {poolData.poolApy}%
-              </p>
-              <p className='text-[18px] font-normal text-[#A6A6A6] text-center mr-[8px]'>
-                1 Yr Avg
               </p>
             </div>
           </div>
