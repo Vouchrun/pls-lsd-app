@@ -8,8 +8,10 @@ import { formatNumber } from 'utils/numberUtils';
 import { useApr } from 'hooks/useApr';
 import Web3 from 'web3';
 import { Divider } from '@mui/material';
+import { useAppSlice } from 'hooks/selector';
 
 export default function Vouchstaking() {
+    const { darkMode } = useAppSlice();
   const {
     pendingRewards,
     holderRewardInfo,
@@ -88,8 +90,8 @@ export default function Vouchstaking() {
   return (
     <div className=' mt-[37px] px-[30px] max-md:px-[15px] pt-[40px]'>
       <div className='max-w-[1360px] bg-color-bg2 border-color-border1 border justify-center m-auto rounded-[30px] h-[1200px] max-lg:h-auto'>
-        <div className='py-[20px] mb-[16px] bg-[#333] rounded-t-[30px] rounded-t-0'>
-          <p className='text-[24px] max-md:text-[20px] font-normal text-[#E8EFFD] text-center'>
+        <div className='py-[20px] mb-[16px] bg-[#e2e0d0] dark:bg-[#333] rounded-t-[30px] rounded-t-0'>
+          <p className='text-[24px] max-md:text-[20px] font-normal text-color-text1 text-center'>
             vPLS and VOUCH Staking Pools
           </p>
         </div>
@@ -103,7 +105,7 @@ export default function Vouchstaking() {
                 <img src='/images/token/vPLS_trans.svg' alt='icon' />
               </div>
               <div>
-                <p className='text-[18px] font-normal text-[#FFFBFA] flex mb-[10px]'>
+                <p className='text-[18px] font-normal text-color-text1 flex mb-[10px]'>
                   vPLS
                   <a
                     href={
@@ -112,21 +114,21 @@ export default function Vouchstaking() {
                     }
                     className='ml-[.06rem] flex items-center m-l-[2px]'
                   >
-                    <Icomoon icon='share' size='.12rem' color='#FFF' />
+                    <Icomoon icon='share' size='.12rem' color={darkMode ? '#FFF' : '#1b1b1f'} />
                   </a>
                 </p>
-                <p className='text-[13px] font-normal text-[#A6A6A6] mt-[3px]'>
+                <p className='text-[13px] font-normal text-text2/50 dark:text-text2Dark/50 mt-[3px]'>
                   The Liquid Staking Token of Vouch. Stake to receive Rewards.
                 </p>
               </div>
             </div>
             <div className='flex justify-between'>
               <div>
-                <p className='text-[15px] font-normal text-[#FFFBFA] mb-[6px]'>
+                <p className='text-[15px] font-normal text-color-text1 mb-[6px]'>
                   Available Balance
                 </p>
                 <p className='text-[28px] max-sm:text-[22px] font-normal text-[#A6A6A6]'>
-                  <span className='text-[#FFFBFA] mr-[3px]'>
+                  <span className='text-color-text1 mr-[3px]'>
                     {tokensLoading
                       ? '...'
                       : formatNumber(vplsBalance.balance, { decimals: 2 })}
@@ -134,7 +136,7 @@ export default function Vouchstaking() {
                   vPLS
                 </p>
               </div>
-              <button className='text-[15px] font-normal text-[#FFFBFA] border-[#333] hover:border-[#fff] border rounded-[4px] px-[17px] max-sm:px-[11px]'>
+              <button className='text-[15px] font-normal text-color-text1 border-[#333] hover:border-[#fff] border rounded-[4px] px-[17px] max-sm:px-[11px]'>
                 <a href='/PLS/?tab=stake'>Stake PLS</a>
               </button>
             </div>
@@ -146,7 +148,7 @@ export default function Vouchstaking() {
                     Staked <Icomoon icon='tip' size='.12rem' color='#333333' />
                   </p>
                   <p className='text-[16px] font-normal text-[#A6A6A6] mb-[7px] text-center'>
-                    <span className='text-[#FFFBFA] mr-[3px]'>
+                    <span className='text-color-text1 mr-[3px]'>
                       {loading
                         ? '...'
                         : formatNumber(userTotalVplsStaked, { decimals: 8 })}
@@ -171,7 +173,7 @@ export default function Vouchstaking() {
                     <Icomoon icon='tip' size='.12rem' color='#333333' />
                   </p>
                   <p className='text-[16px] font-normal text-[#A6A6A6] mb-[7px] text-center'>
-                    <span className='text-[#FFFBFA] mr-[3px]'>
+                    <span className='text-color-text1 mr-[3px]'>
                       {loading
                         ? '-'
                         : formatNumber(vplsUnlockInfo.amount, { decimals: 8 })}
@@ -196,7 +198,7 @@ export default function Vouchstaking() {
                     Staking Rewards
                   </p>
                   <div className='flex max-w-[160px] justify-between mx-auto mt-[20px] mb-[8px]'>
-                    <p className='text-[18px] font-normal text-[#FFFBFA] text-center'>
+                    <p className='text-[18px] font-normal text-color-text1 text-center'>
                       {loading
                         ? '...'
                         : formatNumber(
@@ -212,7 +214,7 @@ export default function Vouchstaking() {
                     </p>
                   </div>
                   <div className='flex max-w-[160px] justify-between mx-auto mb-[8px]'>
-                    <p className='text-[18px] font-normal text-[#FFFBFA] text-center'>
+                    <p className='text-[18px] font-normal text-color-text1 text-center'>
                       {loading
                         ? '...'
                         : formatNumber(
@@ -228,7 +230,7 @@ export default function Vouchstaking() {
                     </p>
                   </div>
                   <div className='flex max-w-[160px] justify-between mx-auto mb-[10px]'>
-                    <p className='text-[18px] font-normal text-[#FFFBFA] text-center'>
+                    <p className='text-[18px] font-normal text-color-text1 text-center'>
                       {loading
                         ? '...'
                         : formatNumber(
@@ -249,7 +251,7 @@ export default function Vouchstaking() {
                     Holder APR
                   </p>
                   <div className='flex max-w-[160px] justify-between mx-auto mt-[20px] mb-[8px]'>
-                    <p className='text-[18px] font-normal text-[#FFFBFA] text-center'>
+                    <p className='text-[18px] font-normal text-color-text1 text-center'>
                       {formatNumber(apr, { decimals: 2 })}%
                     </p>
                     <p className='text-[18px] font-normal text-[#A6A6A6] text-center mr-[8px]'>
@@ -258,7 +260,7 @@ export default function Vouchstaking() {
                     </p>
                   </div>
                   <div className='flex max-w-[160px] justify-between mx-auto mb-[10px]'>
-                    <p className='text-[18px] font-normal text-[#FFFBFA] text-center'>
+                    <p className='text-[18px] font-normal text-color-text1 text-center'>
                       {formatNumber(yearlyApr, { decimals: 2 })}%
                     </p>
                     <p className='text-[18px] font-normal text-[#A6A6A6] text-center mr-[8px]'>
@@ -267,8 +269,8 @@ export default function Vouchstaking() {
                     </p>
                   </div>
                 </div>
-                <div className='bg-[#333] h-[1px] w-[45px] absolute top-[49%]'></div>
-                <div className='bg-[#333] h-[1px] w-[45px] absolute right-0 top-[49%]'></div>
+                <div className='bg-[#cdcccc] dark:bg-[#333] h-[1px] w-[45px] absolute top-[49%]'></div>
+                <div className='bg-[#cdcccc] dark:bg-[#333] h-[1px] w-[45px] absolute right-0 top-[49%]'></div>
               </div>
             </div>
             <div>
@@ -280,7 +282,7 @@ export default function Vouchstaking() {
                   <p className='text-[13px] font-normal text-[#A6A6A6] mb-[8px]'>
                     VPLS Price
                   </p>
-                  <p className='text-[23px] font-normal text-[#FFFBFA]'>
+                  <p className='text-[23px] font-normal text-color-text1'>
                     ${tokensLoading ? '...' : vplsInfo.price}
                   </p>
                   <p className='text-[#A6A6A6] text-[13px] mt-[3px]'>
@@ -294,7 +296,7 @@ export default function Vouchstaking() {
                   <p className='text-[13px] font-normal text-[#A6A6A6]'>
                     Market Cap
                   </p>
-                  <p className='text-[23px] font-normal text-[#FFFBFA] mt-[9px]'>
+                  <p className='text-[23px] font-normal text-color-text1 mt-[9px]'>
                     ${tokensLoading ? '...' : vplsInfo.marketCap}
                   </p>
                 </div>
@@ -393,7 +395,7 @@ export default function Vouchstaking() {
                 />
               </div>
               <div>
-                <p className='text-[18px] font-normal text-[#FFFBFA] flex mb-[10px]'>
+                <p className='text-[18px] font-normal text-color-text1 flex mb-[10px]'>
                   VOUCH
                   <a
                     href={
@@ -412,11 +414,11 @@ export default function Vouchstaking() {
             </div>
             <div className='flex justify-between'>
               <div>
-                <p className='text-[15px] font-normal text-[#FFFBFA] mb-[6px]'>
+                <p className='text-[15px] font-normal text-color-text1 mb-[6px]'>
                   Available Balance
                 </p>
                 <p className='text-[28px] font-normal text-[#A6A6A6]'>
-                  <span className='text-[#FFFBFA] mr-[3px]'>
+                  <span className='text-color-text1 mr-[3px]'>
                     {tokensLoading
                       ? '...'
                       : formatNumber(vouchBalance.balance, { decimals: 2 })}
@@ -425,7 +427,7 @@ export default function Vouchstaking() {
                 </p>
               </div>
               <button
-                className='text-[15px] font-normal text-[#FFFBFA] border-[#333] hover:border-[#fff] border rounded-[4px] px-[17px]'
+                className='text-[15px] font-normal text-color-text1 border-[#333] hover:border-[#fff] border rounded-[4px] px-[17px]'
                 onClick={() => setIsBuyModalOpen(true)}
               >
                 BUY VOUCH
@@ -439,7 +441,7 @@ export default function Vouchstaking() {
                     Staked <Icomoon icon='tip' size='.12rem' color='#333333' />
                   </p>
                   <p className='text-[16px] font-normal text-[#A6A6A6] mb-[7px] text-center'>
-                    <span className='text-[#FFFBFA] mr-[3px]'>
+                    <span className='text-color-text1 mr-[3px]'>
                       {loading
                         ? '...'
                         : formatNumber(userTotalVouchStaked, { decimals: 8 })}
@@ -465,7 +467,7 @@ export default function Vouchstaking() {
                     <Icomoon icon='tip' size='.12rem' color='#333333' />
                   </p>
                   <p className='text-[16px] font-normal text-[#A6A6A6] mb-[7px] text-center'>
-                    <span className='text-[#FFFBFA] mr-[3px]'>
+                    <span className='text-color-text1 mr-[3px]'>
                       {loading
                         ? '...'
                         : formatNumber(vouchUnlockInfo.amount, { decimals: 8 })}
@@ -491,7 +493,7 @@ export default function Vouchstaking() {
                     Staking Rewards
                   </p>
                   <div className='flex max-w-[160px] justify-between mx-auto mt-[20px] mb-[8px]'>
-                    <p className='text-[18px] font-normal text-[#FFFBFA] text-center'>
+                    <p className='text-[18px] font-normal text-color-text1 text-center'>
                       {loading
                         ? '...'
                         : formatNumber(
@@ -507,7 +509,7 @@ export default function Vouchstaking() {
                     </p>
                   </div>
                   <div className='flex max-w-[160px] justify-between mx-auto mb-[8px]'>
-                    <p className='text-[18px] font-normal text-[#FFFBFA] text-center'>
+                    <p className='text-[18px] font-normal text-color-text1 text-center'>
                       {loading
                         ? '...'
                         : formatNumber(
@@ -523,7 +525,7 @@ export default function Vouchstaking() {
                     </p>
                   </div>
                   <div className='flex max-w-[160px] justify-between mx-auto mb-[10px]'>
-                    <p className='text-[18px] font-normal text-[#FFFBFA] text-center'>
+                    <p className='text-[18px] font-normal text-color-text1 text-center'>
                       {loading
                         ? '...'
                         : formatNumber(
@@ -544,7 +546,7 @@ export default function Vouchstaking() {
                     Holder Rewards
                   </p>
                   <div className='flex max-w-[160px] justify-between mx-auto mt-[20px] mb-[8px]'>
-                    <p className='text-[18px] font-normal text-[#FFFBFA] text-center'>
+                    <p className='text-[18px] font-normal text-color-text1 text-center'>
                       {loading
                         ? '...'
                         : formatNumber(holderRewardInfo.vplsPending, {
@@ -557,7 +559,7 @@ export default function Vouchstaking() {
                     </p>
                   </div>
                   <div className='flex max-w-[160px] justify-between mx-auto mb-[10px]'>
-                    <p className='text-[18px] font-normal text-[#FFFBFA] text-center'>
+                    <p className='text-[18px] font-normal text-color-text1 text-center'>
                       {loading
                         ? '...'
                         : formatNumber(holderRewardInfo.vouchPending, {
@@ -570,7 +572,7 @@ export default function Vouchstaking() {
                     </p>
                   </div>
                   <div className='flex max-w-[160px] justify-between mx-auto mb-[10px]'>
-                    <p className='text-[18px] font-normal text-[#FFFBFA] text-center'>
+                    <p className='text-[18px] font-normal text-color-text1 text-center'>
                       {loading
                         ? '...'
                         : formatNumber(holderRewardInfo.plsPending, {
@@ -583,8 +585,8 @@ export default function Vouchstaking() {
                     </p>
                   </div>
                 </div>
-                <div className='bg-[#333] h-[1px] w-[45px] absolute top-[49%]'></div>
-                <div className='bg-[#333] h-[1px] w-[45px] absolute right-0 top-[49%]'></div>
+                <div className='bg-[#cdcccc] dark:bg-[#333] h-[1px] w-[45px] absolute top-[49%]'></div>
+                <div className='bg-[#cdcccc] dark:bg-[#333] h-[1px] w-[45px] absolute right-0 top-[49%]'></div>
               </div>
 
               {/* Claim Holder Rewards Button */}
@@ -592,7 +594,7 @@ export default function Vouchstaking() {
                 <button
                   onClick={handleClaimHolderRewards}
                   disabled={isClaimingHolderRewards || loading}
-                  className='text-[15px] font-normal text-[#FFFBFA] bg-[#333] hover:bg-[#444] disabled:opacity-50 disabled:cursor-not-allowed border-[#333] hover:border-[#fff] border rounded-[4px] px-[20px] py-[8px] transition-colors duration-200'
+                  className='text-[15px] font-normal text-color-text1 bg-[#333] hover:bg-[#444] disabled:opacity-50 disabled:cursor-not-allowed border-[#333] hover:border-[#fff] border rounded-[4px] px-[20px] py-[8px] transition-colors duration-200'
                 >
                   {isClaimingHolderRewards
                     ? 'Claiming...'
@@ -610,7 +612,7 @@ export default function Vouchstaking() {
                   <p className='text-[13px] font-normal text-[#A6A6A6] mb-[8px]'>
                     VOUCH Price
                   </p>
-                  <p className='text-[23px] font-normal text-[#FFFBFA]'>
+                  <p className='text-[23px] font-normal text-color-text1'>
                     ${tokensLoading ? '...' : vouchInfo.price}
                   </p>
                   <p className='text-[#A6A6A6] text-[13px] mt-[3px]'>
@@ -624,7 +626,7 @@ export default function Vouchstaking() {
                   <p className='text-[13px] font-normal text-[#A6A6A6]'>
                     Market Cap
                   </p>
-                  <p className='text-[23px] font-normal text-[#FFFBFA] mt-[9px]'>
+                  <p className='text-[23px] font-normal text-color-text1 mt-[9px]'>
                     ${tokensLoading ? '...' : vouchInfo.marketCap}
                   </p>
                 </div>
