@@ -37,6 +37,7 @@ export default function Vouchstaking() {
   } = useVouchTokens();
 
   const [isClaimingHolderRewards, setIsClaimingHolderRewards] = useState(false);
+  const [isBuyModalOpen, setIsBuyModalOpen] = useState(false);
 
   // Tab states for each side
   const [vplsTab, setVplsTab] = useState<'stake' | 'unstake'>('stake');
@@ -416,7 +417,10 @@ export default function Vouchstaking() {
                   VOUCH
                 </p>
               </div>
-              <button className='text-[15px] font-normal text-[#FFFBFA] border-[#333] hover:border-[#fff] border rounded-[4px] px-[17px]'>
+              <button
+                className='text-[15px] font-normal text-[#FFFBFA] border-[#333] hover:border-[#fff] border rounded-[4px] px-[17px]'
+                onClick={() => setIsBuyModalOpen(true)}
+              >
                 BUY VOUCH
               </button>
             </div>
@@ -701,6 +705,30 @@ export default function Vouchstaking() {
           </div>
         </div>
       </div>
+
+      {/* Buy VOUCH Modal */}
+      {isBuyModalOpen && (
+        <div
+          className='fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4'
+          onClick={() => setIsBuyModalOpen(false)}
+        >
+          <div
+            className='bg-[#1a1a1a] border border-[#333] rounded-[16px] max-w-[600px] w-full max-h-[90vh] overflow-hidden relative'
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Iframe Content */}
+            <div className='overflow-y-auto max-h-[calc(90vh-60px)]'>
+              <iframe
+                src='https://widget.switch.win/widget?network=pulsechain&background_color=1a1a1a&font_color=ffffff&secondary_font_color=8e9397&border_color=ff8a3b&from=0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee&to=0xD34f5ADC24d8Cc55C1e832Bdf65fFfDF80D1314f'
+                allow='clipboard-read; clipboard-write'
+                width='100%'
+                height='700px'
+                style={{ border: 'none' }}
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
