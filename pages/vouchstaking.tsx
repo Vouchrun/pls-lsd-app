@@ -7,11 +7,11 @@ import { TOKEN_ADDRESSES, useVouchTokens } from 'hooks/useVouchTokens';
 import { formatNumber } from 'utils/numberUtils';
 import { useApr } from 'hooks/useApr';
 import Web3 from 'web3';
-import { Divider } from '@mui/material';
+import Link from 'next/link';
 import { useAppSlice } from 'hooks/selector';
 
 export default function Vouchstaking() {
-    const { darkMode } = useAppSlice();
+  const { darkMode } = useAppSlice();
   const {
     pendingRewards,
     holderRewardInfo,
@@ -114,7 +114,11 @@ export default function Vouchstaking() {
                     }
                     className='ml-[.06rem] flex items-center m-l-[2px]'
                   >
-                    <Icomoon icon='share' size='.12rem' color={darkMode ? '#FFF' : '#1b1b1f'} />
+                    <Icomoon
+                      icon='share'
+                      size='.12rem'
+                      color={darkMode ? '#FFF' : '#1b1b1f'}
+                    />
                   </a>
                 </p>
                 <p className='text-[13px] font-normal text-text2/50 dark:text-text2Dark/50 mt-[3px]'>
@@ -137,7 +141,7 @@ export default function Vouchstaking() {
                 </p>
               </div>
               <button className='text-[15px] font-normal text-color-text1 border-[#333] hover:border-[#fff] border rounded-[4px] px-[17px] max-sm:px-[11px]'>
-                <a href='/PLS/?tab=stake'>Stake PLS</a>
+                <Link href='/PLS/?tab=stake'>Stake PLS</Link>
               </button>
             </div>
             <div className='border-color-border1 border rounded-[8px] my-[37px] relative p-l[8px]'>
