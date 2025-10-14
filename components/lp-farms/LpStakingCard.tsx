@@ -7,6 +7,7 @@ import { LPPoolData } from 'hooks/useLpFarms';
 import { formatNumber } from 'utils/numberUtils';
 import { useWalletAccount } from 'hooks/useWalletAccount';
 import snackbarUtil from 'utils/snackbarUtils';
+import { useAppSlice } from 'hooks/selector';
 
 interface LpStakingCardProps {
   poolData: LPPoolData;
@@ -31,6 +32,7 @@ export const LpStakingCard: React.FC<LpStakingCardProps> = ({
   onClaim,
   refreshData,
 }) => {
+  const { darkMode } = useAppSlice();
   const { metaMaskAccount } = useWalletAccount();
   const [selectedTab, setSelectedTab] = useState<'stake' | 'unstake'>('stake');
   const [amount, setAmount] = useState('');
@@ -183,7 +185,7 @@ export const LpStakingCard: React.FC<LpStakingCardProps> = ({
   return (
     <div className='border-[1px] border-solid border-[#FE8A3C] rounded-[30px] w-full'>
       {/* Header */}
-      <div className='flex justify-between mt-[20px] border-b border-[#333] pb-[15px]'>
+      <div className='flex justify-between mt-[20px] border-b border-[#cdcccc] dark:border-[#333] pb-[15px]'>
         <div className='flex align-top ml-[18px]'>
           <img
             src={poolData.config.token0Icon}
@@ -195,7 +197,7 @@ export const LpStakingCard: React.FC<LpStakingCardProps> = ({
             alt='icon'
             className='w-[46px] h-[46px] mx-[7px]'
           />
-          <p className='text-[18px] text-[#FFFBFA] font-normal'>
+          <p className='text-[18px] text-color-text1 font-normal'>
             {poolData.config.name}
           </p>
           <a
@@ -206,17 +208,17 @@ export const LpStakingCard: React.FC<LpStakingCardProps> = ({
             target='_blank'
             className='ml-[7px]'
           >
-            <Icomoon icon='share' size='.12rem' color='#FFFBFA' />
+            <Icomoon icon='share' size='.12rem' color={darkMode ? '#FFF' : '#1b1b1f'} />
           </a>
         </div>
         <div className='mr-[18px] items-end-end flex flex-col'>
           <h2 className='text-[28px] font-normal text-[#A6A6A6]'>
-            <span className='text-[#FFFBFA]'>
+            <span className='text-color-text1'>
               {formatNumber(poolData.availableBalance, { decimals: 4 })}{' '}
             </span>
             PLP
           </h2>
-          <p className='text-[15px] font-normal text-[#FFFBFA] mt-[4px]'>
+          <p className='text-[15px] font-normal text-color-text1 mt-[4px]'>
             Available Balance
           </p>
         </div>
@@ -232,7 +234,7 @@ export const LpStakingCard: React.FC<LpStakingCardProps> = ({
                 Staked <Icomoon icon='tip' size='.12rem' color='#333333' />
               </p>
               <p className='text-[16px] font-normal text-[#A6A6A6] mb-[7px] m-auto items-baseline'>
-                <span className='text-[#FFFBFA] mr-[3px]'>
+                <span className='text-color-text1 mr-[3px]'>
                   {formatNumber(poolData.userStaked, { decimals: 4 })}
                 </span>
                 PLP
@@ -251,7 +253,7 @@ export const LpStakingCard: React.FC<LpStakingCardProps> = ({
               Staking Rewards
             </p>
             <div className='flex max-w-[160px] justify-between mx-auto mt-[20px] mb-[8px]'>
-              <p className='text-[18px] font-normal text-[#FFFBFA] text-center'>
+              <p className='text-[18px] font-normal text-color-text1 text-center'>
                 {formatNumber(poolData.pendingRewards.vplsPending, {
                   decimals: 6,
                 })}
@@ -261,7 +263,7 @@ export const LpStakingCard: React.FC<LpStakingCardProps> = ({
               </p>
             </div>
             <div className='flex max-w-[160px] justify-between mx-auto mb-[8px]'>
-              <p className='text-[18px] font-normal text-[#FFFBFA] text-center'>
+              <p className='text-[18px] font-normal text-color-text1 text-center'>
                 {formatNumber(poolData.pendingRewards.vouchPending, {
                   decimals: 6,
                 })}
@@ -271,7 +273,7 @@ export const LpStakingCard: React.FC<LpStakingCardProps> = ({
               </p>
             </div>
             <div className='flex max-w-[160px] justify-between mx-auto mb-[10px]'>
-              <p className='text-[18px] font-normal text-[#FFFBFA] text-center'>
+              <p className='text-[18px] font-normal text-color-text1 text-center'>
                 {formatNumber(poolData.pendingRewards.wplsPending, {
                   decimals: 6,
                 })}
@@ -291,8 +293,8 @@ export const LpStakingCard: React.FC<LpStakingCardProps> = ({
               </p>
             </div>
           </div>
-          <div className='bg-[#333] h-[1px] w-[45px] absolute top-[50%]'></div>
-          <div className='bg-[#333] h-[1px] w-[45px] absolute right-0 top-[50%]'></div>
+          <div className='bg-[#cdcccc] dark:bg-[#333] h-[1px] w-[45px] absolute top-[50%]'></div>
+          <div className='bg-[#cdcccc] dark:bg-[#333] h-[1px] w-[45px] absolute right-0 top-[50%]'></div>
         </div>
       </div>
 
@@ -358,7 +360,7 @@ export const LpStakingCard: React.FC<LpStakingCardProps> = ({
                     !isValidAmount ||
                     (selectedTab === 'stake' && needsApproval)
                   }
-                  className='text-[#1B1B1F] h-[45px] w-[160px] bg-gradient-to-r from-[#ff8533] to-[#ffa162] hover:from-[#ff7520] hover:to-[#ff9550] disabled:opacity-50 disabled:cursor-not-allowed font-medium rounded-[50px] transition-all duration-200'
+                  className='text-[#FFF] dark:text-[#1B1B1F] h-[45px] w-[160px] bg-gradient-to-r from-[#ff8533] to-[#ffa162] hover:from-[#ff7520] hover:to-[#ff9550] disabled:opacity-50 disabled:cursor-not-allowed font-medium rounded-[50px] transition-all duration-200'
                 >
                   {isStakeProcessing
                     ? selectedTab === 'stake'
@@ -373,7 +375,7 @@ export const LpStakingCard: React.FC<LpStakingCardProps> = ({
               <button
                 onClick={handleClaim}
                 disabled={!metaMaskAccount || isClaimProcessing}
-                className='text-[#1B1B1F] h-[45px] w-[160px] bg-gradient-to-r from-[#ff8533] to-[#ffa162] hover:from-[#ff7520] hover:to-[#ff9550] disabled:opacity-50 disabled:cursor-not-allowed font-medium rounded-[50px] transition-all duration-200'
+                className='text-[#FFF] dark:text-[#1B1B1F] h-[45px] w-[160px] bg-gradient-to-r from-[#ff8533] to-[#ffa162] hover:from-[#ff7520] hover:to-[#ff9550] disabled:opacity-50 disabled:cursor-not-allowed font-medium rounded-[50px] transition-all duration-200'
               >
                 {isClaimProcessing ? 'Claiming...' : 'Claim Rewards'}
               </button>
