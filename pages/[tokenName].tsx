@@ -511,3 +511,26 @@ const ETHPage = () => {
 };
 
 export default ETHPage;
+
+// Required for Next.js static export with dynamic routes
+export async function getStaticPaths() {
+  // Define all possible token names that should be pre-rendered
+  const tokenNames = ['PLS']; // Add more token names here if needed
+
+  const paths = tokenNames.map((tokenName) => ({
+    params: { tokenName },
+  }));
+
+  return {
+    paths,
+    fallback: false, // Return 404 for paths not in the list
+  };
+}
+
+export async function getStaticProps() {
+  // You can fetch data here if needed
+  // For now, we just return empty props
+  return {
+    props: {},
+  };
+}

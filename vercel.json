@@ -1,8 +1,12 @@
 {
   "rewrites": [
     {
-      "source": "/(.*)",
-      "destination": "/index.html"
+      "source": "/PLS",
+      "destination": "/PLS/index.html"
+    },
+    {
+      "source": "/PLS/",
+      "destination": "/PLS/index.html"
     }
   ]
 }
