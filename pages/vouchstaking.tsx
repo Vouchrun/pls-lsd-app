@@ -140,7 +140,7 @@ export default function Vouchstaking() {
                   vPLS
                 </p>
               </div>
-              <button className='text-[15px] font-normal text-color-text1 border-[#333] hover:border-[#fff] border rounded-[4px] px-[17px] max-sm:px-[11px]'>
+              <button className='text-[15px] font-normal text-color-text1 border-[#ffa162] hover:border-[#fff] border rounded-[10px] px-[17px] max-sm:px-[11px]'>
                 <Link href='/PLS/?tab=stake'>Stake PLS</Link>
               </button>
             </div>
@@ -431,7 +431,7 @@ export default function Vouchstaking() {
                 </p>
               </div>
               <button
-                className='text-[15px] font-normal text-color-text1 border-[#333] hover:border-[#fff] border rounded-[4px] px-[17px]'
+                className='text-[15px] font-normal text-color-text1  border-[#ffa162] hover:border-[#fff] border rounded-[10px] px-[17px]'
                 onClick={() => setIsBuyModalOpen(true)}
               >
                 BUY VOUCH
