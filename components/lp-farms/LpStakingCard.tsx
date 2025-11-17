@@ -200,7 +200,7 @@ export const LpStakingCard: React.FC<LpStakingCardProps> = ({
           <p className='text-[18px] text-color-text1 font-normal'>
             {poolData.config.name}
           </p>
-          {/* <a
+          <a
             href={
               'https://scan.mypinata.cloud/ipfs/bafybeienxyoyrhn5tswclvd3gdjy5mtkkwmu37aqtml6onbf7xnb3o22pe/#/address/' +
               poolData.config.lpTokenAddress
@@ -213,7 +213,7 @@ export const LpStakingCard: React.FC<LpStakingCardProps> = ({
               size='.12rem'
               color={darkMode ? '#FFF' : '#1b1b1f'}
             />
-          </a> */}
+          </a>
         </div>
         <div className='mr-[18px] items-end-end flex flex-col'>
           <h2 className='text-[28px] font-normal text-[#A6A6A6]'>
@@ -308,14 +308,14 @@ export const LpStakingCard: React.FC<LpStakingCardProps> = ({
                 {poolData.poolApy}%
               </p>
             </div>
-            <button
+            {/* <button
               className='text-[15px] font-bold font-normal text-color-text1  border-[#ffa162] hover:border-[#fff] border rounded-[10px] p-[14px] w-[120px]  text-white mx-auto flex justify-center'
               onClick={() => {}}
             >
               <a href={poolData.config.lpUrl} target='_blank'>
                 Add LP
               </a>
-            </button>
+            </button> */}
           </div>
           <div className='bg-[#cdcccc] dark:bg-[#333] h-[1px] w-[45px] absolute top-[50%]'></div>
           <div className='bg-[#cdcccc] dark:bg-[#333] h-[1px] w-[45px] absolute right-0 top-[50%]'></div>
