@@ -200,7 +200,7 @@ export const LpStakingCard: React.FC<LpStakingCardProps> = ({
           <p className='text-[18px] text-color-text1 font-normal'>
             {poolData.config.name}
           </p>
-          <a
+          {/* <a
             href={
               'https://scan.mypinata.cloud/ipfs/bafybeienxyoyrhn5tswclvd3gdjy5mtkkwmu37aqtml6onbf7xnb3o22pe/#/address/' +
               poolData.config.lpTokenAddress
@@ -213,7 +213,7 @@ export const LpStakingCard: React.FC<LpStakingCardProps> = ({
               size='.12rem'
               color={darkMode ? '#FFF' : '#1b1b1f'}
             />
-          </a>
+          </a> */}
         </div>
         <div className='mr-[18px] items-end-end flex flex-col'>
           <h2 className='text-[28px] font-normal text-[#A6A6A6]'>
@@ -245,6 +245,18 @@ export const LpStakingCard: React.FC<LpStakingCardProps> = ({
               </p>
               <p className='text-[13px] font-medium text-[#A6A6A6] mb-[7px] m-auto items-baseline'>
                 $0.00
+              </p>
+            </div>
+          </div>
+
+          {/* Allocation Column */}
+          <div className='flex flex-col items-center'>
+            <div>
+              <p className='text-[14px] font-medium text-[#8E9397] mb-[7px] m-auto items-baseline'>
+                Allocation
+              </p>
+              <p className='text-[18px] text-center font-normal text-[#ffa162] mb-[7px] m-auto items-baseline'>
+                {poolData.poolInfo.allocPoint}
               </p>
             </div>
           </div>
