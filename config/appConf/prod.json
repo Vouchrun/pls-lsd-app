@@ -3,7 +3,7 @@
     "id": 369,
     "name": "PulseChain"
   },
-  "rpc": "https://rpc-pulsechain.g4mm4.io",
+  "rpc": "https://rpc.vouch.run",
   "explorer": "https://scan.mypinata.cloud/ipfs/bafybeih3olry3is4e4lzm7rus5l3h6zrphcal5a7ayfkhzm5oivjro2cp4/#",
   "blockSeconds": 10,
   "contracts": {
@@ -20,16 +20,16 @@
       "address": "0xC3116bB002F94d2E4bB8E4D83252ee021552dEB8"
     },
     "vouchStakingContract": {
-      "address": "0x7546F95355581635a47f486B03db93e57EF8212d"
+      "address": "0x3A9dDc0F95d196DaABaD225dAE7E9ad1A01cf716"
     },
     "holderRewardsVaultContract": {
-      "address": "0x0320190903AC2064143bD93f9c18755d672f5b11"
+      "address": "0x01Ed7e957297eD923b0110b4DC15ee45EDdE7BAE"
     },
     "lpRewardPoolContract": {
-      "address": "0x985e0EA23abD62FA2019B8a97d1703795adC9588"
+      "address": "0x59888d11f3500B4ef74a5d4a83BE69AB7C2CC43f"
     },
     "stakingRewardPoolContract": {
-      "address": "0x7F244567B12dD14848763af6b309eD7C029fEEDf"
+      "address": "0x0f137D6b557c3fA6c35609b6829099C6FEda64A2"
     }
   },
   "networkBalanceContractDeploymentBlock": 21740533
