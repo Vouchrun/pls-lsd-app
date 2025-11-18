@@ -3,7 +3,7 @@
     "id": 369,
     "name": "PulseChain"
   },
-  "rpc": "https://rpc-pulsechain.g4mm4.io",
+  "rpc": "https://rpc.pulsechain.com",
   "explorer": "https://scan.mypinata.cloud/ipfs/bafybeih3olry3is4e4lzm7rus5l3h6zrphcal5a7ayfkhzm5oivjro2cp4/#",
   "blockSeconds": 10,
   "contracts": {
