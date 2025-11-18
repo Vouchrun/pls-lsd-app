@@ -57,7 +57,8 @@ export const DashboardTabs = (props: Props) => {
               props.selectedTab === 'unstake' ||
               router.pathname.startsWith('/PLS/')) &&
               !router.pathname.startsWith('/dashboard') &&
-              !router.pathname.startsWith('/vouchstaking')
+              !router.pathname.startsWith('/vouchstaking') &&
+              !router.pathname.startsWith('/lp-farms')
               ? 'text-color-highlight bg-color-highlight'
               : 'text-color-text1'
           )}

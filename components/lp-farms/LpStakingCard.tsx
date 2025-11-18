@@ -200,14 +200,7 @@ export const LpStakingCard: React.FC<LpStakingCardProps> = ({
           <p className='text-[18px] text-color-text1 font-normal'>
             {poolData.config.name}
           </p>
-          <a
-            href={
-              'https://scan.mypinata.cloud/ipfs/bafybeienxyoyrhn5tswclvd3gdjy5mtkkwmu37aqtml6onbf7xnb3o22pe/#/address/' +
-              poolData.config.lpTokenAddress
-            }
-            target='_blank'
-            className='ml-[7px]'
-          >
+          <a href={poolData.config.lpUrl} target='_blank' className='ml-[7px]'>
             <Icomoon
               icon='share'
               size='.12rem'
@@ -255,7 +248,7 @@ export const LpStakingCard: React.FC<LpStakingCardProps> = ({
               <p className='text-[14px] font-medium text-[#8E9397] mb-[7px] m-auto items-baseline'>
                 Allocation
               </p>
-              <p className='text-[18px] text-center font-normal text-[#ffa162] mb-[7px] m-auto items-baseline'>
+              <p className='text-[20px] text-center font-normal text-[#ffa162] mb-[0px] mt-[12px] m-auto items-baseline'>
                 {poolData.poolInfo.allocPoint}
               </p>
             </div>
@@ -303,7 +296,7 @@ export const LpStakingCard: React.FC<LpStakingCardProps> = ({
             <p className='text-[14px] font-medium text-[#8E9397] mb-[13px] text-center relative z-[1]'>
               Pool APY
             </p>
-            <div className='flex max-w-[160px] justify-center mx-auto mb-[10px] mt-[20px]'>
+            <div className='flex max-w-[160px] justify-center mx-auto mb-[10px] mt-[40px]'>
               <p className='text-[20px] font-bold text-[#ffa162] text-center'>
                 {poolData.poolApy}%
               </p>
