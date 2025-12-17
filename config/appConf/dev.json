@@ -3,7 +3,10 @@
     "id": 943,
     "name": "PulseChain Testnet v4"
   },
-  "rpc": "https://rpc.v4.testnet.pulsechain.com",
+  "rpc": [
+    "https://rpc.v4.testnet.pulsechain.com",
+    "https://rpc-testnet-pulsechain.g4mm4.io"
+  ],
   "explorer": "https://scan.v4.testnet.pulsechain.com/#",
   "blockSeconds": 10,
   "contracts": {

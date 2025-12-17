@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import Web3 from 'web3';
-import { getEthWeb3, getEthWeb3ForTransactions } from 'utils/web3Utils';
+import { getEthWeb3, getEthWeb3ForTransactions, executeWithRpcFallback } from 'utils/web3Utils';
 import {
   getVouchStakingContract,
   getVouchStakingContractAbi,
@@ -144,9 +144,15 @@ export function useLpFarms() {
         const rewardPoolAddress = getLPRewardPoolContract();
 
         // Fetch reward rates from contract
-        const rewardRates = await contract.methods
-          .getRewardPoolRates(rewardPoolAddress)
-          .call();
+        const rewardRates = await executeWithRpcFallback(async (web3) => {
+          const contractInstance = new web3.eth.Contract(
+            getVouchStakingContractAbi(),
+            getVouchStakingContract()
+          );
+          return await contractInstance.methods
+            .getRewardPoolRates(rewardPoolAddress)
+            .call();
+        });
 
         const vouchPerYear = parseFloat(
           Web3.utils.fromWei(rewardRates.vouchPerYear, 'ether')
@@ -215,7 +221,13 @@ export function useLpFarms() {
         const pid = pool.pid;
 
         // Get pool info
-        const poolInfoResult = await contract.methods.getPoolInfo(pid).call();
+        const poolInfoResult = await executeWithRpcFallback(async (web3) => {
+          const contractInstance = new web3.eth.Contract(
+            getVouchStakingContractAbi(),
+            getVouchStakingContract()
+          );
+          return await contractInstance.methods.getPoolInfo(pid).call();
+        });
 
         let userStaked = '0';
         let userUnstaking = '0';
@@ -229,9 +241,15 @@ export function useLpFarms() {
         if (metaMaskAccount) {
           // Get user info
           try {
-            const userInfoResult = await contract.methods
-              .userInfo(pid, metaMaskAccount)
-              .call();
+            const userInfoResult = await executeWithRpcFallback(async (web3) => {
+              const contractInstance = new web3.eth.Contract(
+                getVouchStakingContractAbi(),
+                getVouchStakingContract()
+              );
+              return await contractInstance.methods
+                .userInfo(pid, metaMaskAccount)
+                .call();
+            });
             userStaked = Web3.utils.fromWei(userInfoResult[0] || '0', 'ether');
           } catch (error) {
             console.error(`Error fetching user info for pid ${pid}:`, error);
@@ -239,9 +257,15 @@ export function useLpFarms() {
 
           // Get user unstaking amount (for LP farms, this should be 0 since unstake is immediate)
           try {
-            const unlockResult = await contract.methods
-              .getUnlock(pid, metaMaskAccount)
-              .call();
+            const unlockResult = await executeWithRpcFallback(async (web3) => {
+              const contractInstance = new web3.eth.Contract(
+                getVouchStakingContractAbi(),
+                getVouchStakingContract()
+              );
+              return await contractInstance.methods
+                .getUnlock(pid, metaMaskAccount)
+                .call();
+            });
             userUnstaking = Web3.utils.fromWei(
               unlockResult.amount || '0',
               'ether'
@@ -259,10 +283,12 @@ export function useLpFarms() {
             pool.lpTokenAddress !== '0x0000000000000000000000000000000000000000'
           ) {
             try {
-              const lpContract = getErc20Contract(pool.lpTokenAddress);
-              const balance = await lpContract.methods
-                .balanceOf(metaMaskAccount)
-                .call();
+              const balance = await executeWithRpcFallback(async (web3) => {
+                const lpContract = new web3.eth.Contract(ERC20_MINI_ABI, pool.lpTokenAddress);
+                return await lpContract.methods
+                  .balanceOf(metaMaskAccount)
+                  .call();
+              });
               availableBalance = Web3.utils.fromWei(balance || '0', 'ether');
             } catch (error) {
               console.error(
@@ -274,9 +300,15 @@ export function useLpFarms() {
 
           // Get pending rewards
           try {
-            const pendingResult = await contract.methods
-              .pendingLiquidityRewardsProjected(pid, metaMaskAccount)
-              .call();
+            const pendingResult = await executeWithRpcFallback(async (web3) => {
+              const contractInstance = new web3.eth.Contract(
+                getVouchStakingContractAbi(),
+                getVouchStakingContract()
+              );
+              return await contractInstance.methods
+                .pendingLiquidityRewardsProjected(pid, metaMaskAccount)
+                .call();
+            });
             pendingRewards = {
               vouchPending: Web3.utils.fromWei(
                 pendingResult.vouchPending || '0',
@@ -397,11 +429,13 @@ export function useLpFarms() {
       try {
         const amountWei = Web3.utils.toWei(amount, 'ether');
         const spender = getVouchStakingContract();
-        const erc20 = getErc20Contract(lpTokenAddress);
 
-        const currentAllowanceWei: string = await erc20.methods
-          .allowance(metaMaskAccount, spender)
-          .call();
+        const currentAllowanceWei: string = await executeWithRpcFallback(async (web3) => {
+          const erc20 = new web3.eth.Contract(ERC20_MINI_ABI, lpTokenAddress);
+          return await erc20.methods
+            .allowance(metaMaskAccount, spender)
+            .call();
+        });
 
         const isAllowanceEnough = Web3.utils
           .toBN(currentAllowanceWei)
@@ -413,7 +447,7 @@ export function useLpFarms() {
         return false;
       }
     },
-    [metaMaskAccount, getErc20Contract]
+    [metaMaskAccount]
   );
 
   // Approve LP tokens for staking
