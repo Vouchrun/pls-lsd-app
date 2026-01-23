@@ -6,8 +6,8 @@ import menuIcon from 'public/images/burger-menu.svg';
 import Link from 'next/link';
 
 interface Props {
-  selectedTab: 'stake' | 'unstake' | 'withdraw' | 'vouchstaking';
-  onChangeTab: (tab: 'stake' | 'unstake' | 'withdraw' | 'vouchstaking') => void;
+  selectedTab: 'stake' | 'unstake' | 'withdraw' | 'staking-pools';
+  onChangeTab: (tab: 'stake' | 'unstake' | 'withdraw' | 'staking-pools') => void;
   showWithdrawTab?: boolean;
 }
 
@@ -34,7 +34,7 @@ export const DashboardTabs = (props: Props) => {
         onClick={handleClick}
       />
       <div
-        className={`w-[280px] sm:w-[280px] xl:w-[650px] h-auto p-[20px] lg:p-[.04rem] items-stretch bg-[#edece3] dark:bg-[#111111] rounded-[15px] lg:rounded-[.6rem] xl:grid absolute xl:relative top-[40px] xl:top-0 gap-0
+        className={`w-[280px] sm:w-[280px] xl:w-[600px] h-auto p-[20px] lg:p-[.04rem] items-stretch bg-[#edece3] dark:bg-[#111111] rounded-[15px] lg:rounded-[.6rem] xl:grid absolute xl:relative top-[40px] xl:top-0 gap-0
   ${isActive ? 'flex flex-col' : 'hidden'}
   [&>*:not(:last-child):after]:content-['|'] 
   [&>*:not(:last-child):after]:absolute 
@@ -47,7 +47,7 @@ export const DashboardTabs = (props: Props) => {
   [&>*.tab-active:after]:hidden
   [&>*:has(+_.tab-active):after]:hidden`}
         style={{
-          gridTemplateColumns: '20% 20% 20% 20% 20%',
+          gridTemplateColumns: '25% 25% 25% 25%',
         }}
       >
         <Link
@@ -57,8 +57,7 @@ export const DashboardTabs = (props: Props) => {
               props.selectedTab === 'unstake' ||
               router.pathname.startsWith('/PLS/')) &&
               !router.pathname.startsWith('/dashboard') &&
-              !router.pathname.startsWith('/vouchstaking') &&
-              !router.pathname.startsWith('/lp-farms')
+              !router.pathname.startsWith('/staking-pools')
               ? 'text-color-highlight bg-color-highlight'
               : 'text-color-text1'
           )}
@@ -107,29 +106,14 @@ export const DashboardTabs = (props: Props) => {
           <Link
             className={classNames(
               'h-[35px] flex-1 ml-[.1rem] cursor-pointer flex items-center justify-center text-[.16rem] rounded-[.3rem] whitespace-nowrap',
-              router.pathname.startsWith('/vouchstaking')
+              router.pathname.startsWith('/staking-pools')
                 ? 'text-color-highlight bg-color-highlight'
                 : 'text-color-text1'
             )}
-            href='/vouchstaking'
+            href='/staking-pools'
             // onClick={() => props.onChangeTab("withdraw")}
           >
-            Vouch Staking
-          </Link>
-        </div>
-        <div className='flex items-stretch'>
-          {/* <div className="ml-[.1rem] w-[0.01rem] h-[.22rem] bg-[#DEE6F7] dark:bg-bg1Dark self-center" /> */}
-          <Link
-            className={classNames(
-              'h-[35px] flex-1 ml-[.1rem] cursor-pointer flex items-center justify-center text-[.16rem] rounded-[.3rem] whitespace-nowrap',
-              router.pathname.startsWith('/lp-farms')
-                ? 'text-color-highlight bg-color-highlight'
-                : 'text-color-text1'
-            )}
-            href='/lp-farms'
-            // onClick={() => props.onChangeTab("withdraw")}
-          >
-            LP Staking
+            Staking Pools
           </Link>
         </div>
       </div>

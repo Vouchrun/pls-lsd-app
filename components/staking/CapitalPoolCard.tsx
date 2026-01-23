@@ -1,0 +1,672 @@
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
+import { CapitalPoolData } from 'hooks/useCapitalPools';
+import { useWalletAccount } from 'hooks/useWalletAccount';
+import { useVouchTokens } from 'hooks/useVouchTokens';
+import { formatNumber } from 'utils/numberUtils';
+import { CustomButton } from '../common/CustomButton';
+import { CustomNumberInput } from '../common/CustomNumberInput';
+import { Icomoon } from '../icon/Icomoon';
+import classNames from 'classnames';
+import snackbarUtil from 'utils/snackbarUtils';
+import { useAppSlice } from 'hooks/selector';
+
+interface CapitalPoolCardProps {
+  poolData: CapitalPoolData;
+  checkVplsAllowance: (poolAddress: string, amount: string) => Promise<boolean>;
+  onApproveVpls: (poolAddress: string, amount: string) => Promise<any>;
+  onDepositVpls: (poolAddress: string, amount: string) => Promise<any>;
+  onDepositPls: (poolAddress: string, amount: string) => Promise<any>;
+  onStartUnlock: (poolAddress: string, shares: string) => Promise<any>;
+  onCancelUnlock: (poolAddress: string) => Promise<any>;
+  onFinalizeUnlock: (poolAddress: string) => Promise<any>;
+  onClaimEmissions: (pid: number) => Promise<any>;
+  refreshData: () => Promise<void>;
+}
+
+export const CapitalPoolCard: React.FC<CapitalPoolCardProps> = ({
+  poolData,
+  checkVplsAllowance,
+  onApproveVpls,
+  onDepositVpls,
+  onDepositPls,
+  onStartUnlock,
+  onCancelUnlock,
+  onFinalizeUnlock,
+  onClaimEmissions,
+  refreshData,
+}) => {
+  const { darkMode } = useAppSlice();
+  const { metaMaskAccount } = useWalletAccount();
+  const { vplsBalance, plsBalance, vplsInfo, loading: tokensLoading } = useVouchTokens();
+
+  const [selectedTab, setSelectedTab] = useState<'stake' | 'unstake'>('stake');
+  const [depositType, setDepositType] = useState<'vpls' | 'pls'>('vpls');
+  const [amount, setAmount] = useState('');
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [isApproveProcessing, setIsApproveProcessing] = useState(false);
+  const [isClaimProcessing, setIsClaimProcessing] = useState(false);
+  const [isUnlockProcessing, setIsUnlockProcessing] = useState(false);
+  const [timeRemaining, setTimeRemaining] = useState('');
+  const [needsApproval, setNeedsApproval] = useState(false);
+
+  // Check if there's an active unlock
+  const hasActiveUnlock = useMemo(() => {
+    return Number(poolData.unlockInfo.shares) > 0;
+  }, [poolData.unlockInfo.shares]);
+
+  // Update countdown timer
+  useEffect(() => {
+    if (!hasActiveUnlock) {
+      setTimeRemaining('');
+      return;
+    }
+
+    const updateTimer = () => {
+      const unlockAtTimestamp = Number(poolData.unlockInfo.unlockTime);
+      const currentTimestamp = Math.floor(Date.now() / 1000);
+      const seconds = unlockAtTimestamp - currentTimestamp;
+
+      if (seconds <= 0) {
+        setTimeRemaining('Ready to finalize');
+        return;
+      }
+
+      const days = Math.floor(seconds / (24 * 60 * 60));
+      const hours = Math.floor((seconds % (24 * 60 * 60)) / (60 * 60));
+      const minutes = Math.floor((seconds % (60 * 60)) / 60);
+      const secs = seconds % 60;
+
+      if (days > 0) {
+        setTimeRemaining(`${days}d ${hours}h ${minutes}m`);
+      } else if (hours > 0) {
+        setTimeRemaining(`${hours}h ${minutes}m ${secs}s`);
+      } else if (minutes > 0) {
+        setTimeRemaining(`${minutes}m ${secs}s`);
+      } else {
+        setTimeRemaining(`${secs}s`);
+      }
+    };
+
+    updateTimer();
+    const interval = setInterval(updateTimer, 1000);
+    return () => clearInterval(interval);
+  }, [hasActiveUnlock, poolData.unlockInfo.unlockTime]);
+
+  const maxAmount = useMemo(() => {
+    if (selectedTab === 'stake') {
+      return depositType === 'vpls'
+        ? vplsBalance.balance || '0'
+        : plsBalance.balance || '0';
+    } else {
+      return poolData.userPosition.userShares || '0';
+    }
+  }, [
+    selectedTab,
+    depositType,
+    vplsBalance.balance,
+    plsBalance.balance,
+    poolData.userPosition.userShares,
+  ]);
+
+  const isValidAmount = useMemo(() => {
+    if (!amount || isNaN(Number(amount)) || Number(amount) <= 0) {
+      return false;
+    }
+    return Number(amount) <= Number(maxAmount);
+  }, [amount, maxAmount]);
+
+  // Check approval when amount changes (only for vPLS deposits)
+  useEffect(() => {
+    const checkApproval = async () => {
+      if (
+        selectedTab === 'stake' &&
+        depositType === 'vpls' &&
+        amount &&
+        isValidAmount &&
+        metaMaskAccount
+      ) {
+        const hasAllowance = await checkVplsAllowance(poolData.address, amount);
+        setNeedsApproval(!hasAllowance);
+      } else {
+        setNeedsApproval(false);
+      }
+    };
+    checkApproval();
+  }, [
+    amount,
+    isValidAmount,
+    selectedTab,
+    depositType,
+    metaMaskAccount,
+    poolData.address,
+    checkVplsAllowance,
+  ]);
+
+  const handleMax = useCallback(() => {
+    if (Number(maxAmount) > 0) {
+      setAmount(maxAmount);
+    }
+  }, [maxAmount]);
+
+  const handleApprove = useCallback(async () => {
+    if (!metaMaskAccount || !amount || !isValidAmount) return;
+
+    setIsApproveProcessing(true);
+    try {
+      snackbarUtil.info('Approval in progress...');
+      await onApproveVpls(poolData.address, amount);
+      snackbarUtil.success('Approval successful!');
+      setNeedsApproval(false);
+    } catch (error: any) {
+      console.error('Approval error:', error);
+      snackbarUtil.error(error?.message || 'Approval failed');
+    } finally {
+      setIsApproveProcessing(false);
+    }
+  }, [metaMaskAccount, amount, isValidAmount, poolData.address, onApproveVpls]);
+
+  const handleDeposit = useCallback(async () => {
+    if (!metaMaskAccount || !amount || !isValidAmount) return;
+
+    setIsProcessing(true);
+    try {
+      snackbarUtil.info('Deposit in progress...');
+      if (depositType === 'vpls') {
+        await onDepositVpls(poolData.address, amount);
+      } else {
+        await onDepositPls(poolData.address, amount);
+      }
+      snackbarUtil.success('Deposit successful!');
+      setAmount('');
+      await refreshData();
+    } catch (error: any) {
+      console.error('Deposit error:', error);
+      snackbarUtil.error(error?.message || 'Deposit failed');
+    } finally {
+      setIsProcessing(false);
+    }
+  }, [
+    metaMaskAccount,
+    amount,
+    isValidAmount,
+    depositType,
+    poolData.address,
+    onDepositVpls,
+    onDepositPls,
+    refreshData,
+  ]);
+
+  const handleUnstake = useCallback(async () => {
+    if (!metaMaskAccount || !amount || !isValidAmount) return;
+
+    setIsProcessing(true);
+    try {
+      snackbarUtil.info('Unstaking in progress...');
+      await onStartUnlock(poolData.address, amount);
+      snackbarUtil.success('Unstaking initiated!');
+      setAmount('');
+      await refreshData();
+    } catch (error: any) {
+      console.error('Unstaking error:', error);
+      snackbarUtil.error(error?.message || 'Unstaking failed');
+    } finally {
+      setIsProcessing(false);
+    }
+  }, [metaMaskAccount, amount, isValidAmount, poolData.address, onStartUnlock, refreshData]);
+
+  const handleClaim = useCallback(async () => {
+    if (!metaMaskAccount || poolData.vouchStakingPid === null) return;
+
+    setIsClaimProcessing(true);
+    try {
+      snackbarUtil.info('Claiming rewards...');
+      await onClaimEmissions(poolData.vouchStakingPid);
+      snackbarUtil.success('Rewards claimed successfully!');
+      await refreshData();
+    } catch (error: any) {
+      console.error('Claiming error:', error);
+      snackbarUtil.error(error?.message || 'Claim failed');
+    } finally {
+      setIsClaimProcessing(false);
+    }
+  }, [metaMaskAccount, poolData.vouchStakingPid, onClaimEmissions, refreshData]);
+
+  const handleCancelUnlock = useCallback(async () => {
+    if (!metaMaskAccount) return;
+
+    setIsUnlockProcessing(true);
+    try {
+      snackbarUtil.info('Canceling unstake...');
+      await onCancelUnlock(poolData.address);
+      snackbarUtil.success('Unstake canceled!');
+      await refreshData();
+    } catch (error: any) {
+      console.error('Cancel unlock error:', error);
+      snackbarUtil.error(error?.message || 'Cancel failed');
+    } finally {
+      setIsUnlockProcessing(false);
+    }
+  }, [metaMaskAccount, poolData.address, onCancelUnlock, refreshData]);
+
+  const handleFinalizeUnlock = useCallback(async () => {
+    if (!metaMaskAccount) return;
+
+    setIsUnlockProcessing(true);
+    try {
+      snackbarUtil.info('Finalizing unstake...');
+      await onFinalizeUnlock(poolData.address);
+      snackbarUtil.success('Unstake finalized!');
+      await refreshData();
+    } catch (error: any) {
+      console.error('Finalize unlock error:', error);
+      snackbarUtil.error(error?.message || 'Finalize failed');
+    } finally {
+      setIsUnlockProcessing(false);
+    }
+  }, [metaMaskAccount, poolData.address, onFinalizeUnlock, refreshData]);
+
+  return (
+    <div className=''>
+      {/* Header with badge and title */}
+      <div className='flex items-center mb-[37px]'>
+        <div className='w-[66px] h-[66px] mr-[16px]'>
+          <img src='/images/token/vPLS_trans.svg' alt='icon' />
+        </div>
+        <div>
+          <p className='text-[18px] font-normal text-color-text1 flex mb-[10px]'>
+            vPLS{' '}
+            <span className='ml-[10px] px-[10px] py-[2px] bg-[#FE8A3C] text-white text-[12px] font-medium rounded-[4px]'>
+              Capital Pool
+            </span>
+          </p>
+          <p className='text-[13px] font-normal text-text2/50 dark:text-text2Dark/50 mt-[3px]'>
+            Stake vPLS or PLS to receive Rewards.
+          </p>
+        </div>
+      </div>
+
+      {/* Balance Section */}
+      <div className='flex justify-between'>
+        <div>
+          <p className='text-[15px] font-normal text-color-text1 mb-[6px]'>
+            Available Balance
+          </p>
+          <p className='text-[28px] max-sm:text-[22px] font-normal text-[#A6A6A6]'>
+            <span className='text-color-text1 mr-[3px]'>
+              {selectedTab === 'stake'
+                ? depositType === 'vpls'
+                  ? formatNumber(vplsBalance.balance, { decimals: 2 })
+                  : formatNumber(plsBalance.balance, { decimals: 2 })
+                : formatNumber(poolData.userPosition.userShares, { decimals: 2 })}
+            </span>
+            {selectedTab === 'stake'
+              ? depositType === 'vpls'
+                ? 'vPLS'
+                : 'PLS'
+              : 'Shares'}
+          </p>
+        </div>
+      </div>
+
+      {/* Stats Section */}
+      <div className='border-color-border1 border rounded-[8px] my-[37px] relative p-l[8px]'>
+        <div className='grid grid-cols-2 gap-4 py-[18px]'>
+          {/* Staked Column */}
+          <div className='flex flex-col items-center'>
+            <p className='text-[14px] font-medium text-[#8E9397] mb-[7px] text-center'>
+              Staked <Icomoon icon='tip' size='.12rem' color='#333333' />
+            </p>
+            <p className='text-[16px] font-normal text-[#A6A6A6] mb-[7px] text-center'>
+              <span className='text-color-text1 mr-[3px]'>
+                {formatNumber(poolData.userPosition.userShares, { decimals: 8 })}
+              </span>
+              Shares
+            </p>
+            <p className='text-[13px] font-medium text-[#A6A6A6] mb-[7px] text-center'>
+              {formatNumber(poolData.userPosition.vplsValue, { decimals: 4 })} vPLS
+              / {formatNumber(poolData.userPosition.plsValue, { decimals: 4 })} PLS
+            </p>
+          </div>
+
+          {/* Unstaking Column */}
+          <div className='flex flex-col items-center'>
+            <p className='text-[14px] font-medium text-[#8E9397] mb-[7px] text-center'>
+              Unstaking <Icomoon icon='tip' size='.12rem' color='#333333' />
+            </p>
+            <p className='text-[16px] font-normal text-[#A6A6A6] mb-[7px] text-center'>
+              <span className='text-color-text1 mr-[3px]'>
+                {formatNumber(poolData.unlockInfo.shares, { decimals: 8 })}
+              </span>
+              Shares
+            </p>
+            <p className='text-[13px] font-medium text-[#A6A6A6] mb-[7px] text-center'>
+              {formatNumber(poolData.unlockInfo.vplsAmount, { decimals: 4 })} vPLS
+            </p>
+          </div>
+        </div>
+
+        {/* Rewards and Pool Info Section */}
+        <div className='grid grid-flow-col grid-rows-1 max-sm:grid-rows-2 gap-4 max-sm:gap-2 mt-[20px]'>
+          <div>
+            <p className='text-[14px] font-medium text-[#8E9397] mb-[13px] text-center relative z-[1]'>
+              Staking Rewards
+            </p>
+            <div className='flex max-w-[160px] justify-between mx-auto mt-[20px] mb-[8px]'>
+              <p className='text-[18px] font-normal text-color-text1 text-center'>
+                {formatNumber(poolData.pendingRewards.vplsPending, { decimals: 6 })}
+              </p>
+              <p className='text-[18px] font-normal text-[#A6A6A6] text-center'>vPLS</p>
+            </div>
+            <div className='flex max-w-[160px] justify-between mx-auto mb-[8px]'>
+              <p className='text-[18px] font-normal text-color-text1 text-center'>
+                {formatNumber(poolData.pendingRewards.vouchPending, { decimals: 6 })}
+              </p>
+              <p className='text-[18px] font-normal text-[#A6A6A6] text-center'>
+                VOUCH
+              </p>
+            </div>
+            <div className='flex max-w-[160px] justify-between mx-auto mb-[10px]'>
+              <p className='text-[18px] font-normal text-color-text1 text-center'>
+                {formatNumber(poolData.pendingRewards.wplsPending, { decimals: 6 })}
+              </p>
+              <p className='text-[18px] font-normal text-[#A6A6A6] text-center'>PLS</p>
+            </div>
+          </div>
+          <div>
+            <p className='text-[13px] font-medium text-[#8E9397] mb-[13px] text-center relative z-[1]'>
+              Pool Info
+            </p>
+            <div className='flex max-w-[160px] justify-between mx-auto mt-[20px] mb-[8px]'>
+              <p className='text-[14px] font-normal text-color-text1 text-center'>
+                Total Staked:
+              </p>
+              <p className='text-[14px] font-normal text-[#A6A6A6] text-center'>
+                {formatNumber(poolData.stats.totalVplsDeposited, { decimals: 2 })}
+              </p>
+            </div>
+            <div className='flex max-w-[160px] justify-between mx-auto mb-[10px]'>
+              <p className='text-[14px] font-normal text-color-text1 text-center'>
+                Unlock Period:
+              </p>
+              <p className='text-[14px] font-normal text-[#A6A6A6] text-center'>
+                {poolData.unlockPeriodDays} days
+              </p>
+            </div>
+          </div>
+          <div className='bg-[#cdcccc] dark:bg-[#333] h-[1px] w-[45px] absolute top-[49%]'></div>
+          <div className='bg-[#cdcccc] dark:bg-[#333] h-[1px] w-[45px] absolute right-0 top-[49%]'></div>
+        </div>
+      </div>
+
+      {/* Staking Interface */}
+      <div className='bg-color-bg2 rounded-[.3rem] pb-[.14rem] border-[.01rem] border-color-border1'>
+        {/* Tab Headers */}
+        <div
+          className='h-[.56rem] grid items-stretch'
+          style={{ gridTemplateColumns: '50% 50%' }}
+        >
+          <div
+            className={classNames(
+              'cursor-pointer flex items-center justify-center rounded-tl-[.3rem] text-[.16rem] text-color-text1 border-[0.01rem]',
+              selectedTab === 'stake'
+                ? 'font-[700] border-[#ff4400]/30 bg-gradient-to-r from-[#ff8533] to-[#ffa162]'
+                : 'border-color-border1 bg-[#E2E0D0] dark:bg-[#333333]'
+            )}
+            onClick={() => setSelectedTab('stake')}
+          >
+            Stake
+          </div>
+          <div
+            className={classNames(
+              'cursor-pointer flex items-center justify-center rounded-tr-[.3rem] text-[.16rem] text-color-text1 border-[0.01rem]',
+              selectedTab === 'unstake'
+                ? 'font-[700] border-[#ff4400]/30 bg-gradient-to-r from-[#ff8533] to-[#ffa162]'
+                : 'border-color-border1 bg-[#E2E0D0] dark:bg-[#333333]'
+            )}
+            onClick={() => setSelectedTab('unstake')}
+          >
+            Unstake
+          </div>
+        </div>
+
+        {/* Deposit Type Selector (only on Stake tab) */}
+        {selectedTab === 'stake' && (
+          <div className='mx-[.24rem] mt-[.16rem] flex gap-2'>
+            <button
+              className={classNames(
+                'flex-1 py-[.08rem] px-[.12rem] rounded-[.08rem] text-[.14rem] font-medium transition-colors',
+                depositType === 'vpls'
+                  ? 'bg-[#ffa162] text-white'
+                  : 'bg-[#E2E0D0] dark:bg-[#333333] text-color-text1'
+              )}
+              onClick={() => setDepositType('vpls')}
+            >
+              Deposit vPLS
+            </button>
+            <button
+              className={classNames(
+                'flex-1 py-[.08rem] px-[.12rem] rounded-[.08rem] text-[.14rem] font-medium transition-colors',
+                depositType === 'pls'
+                  ? 'bg-[#ffa162] text-white'
+                  : 'bg-[#E2E0D0] dark:bg-[#333333] text-color-text1'
+              )}
+              onClick={() => setDepositType('pls')}
+            >
+              Deposit PLS
+            </button>
+          </div>
+        )}
+
+        {/* Cooldown Message */}
+        {selectedTab === 'unstake' && !hasActiveUnlock && (
+          <div className='mx-[.24rem] mt-[.16rem] p-[.12rem] bg-[#f0f0f0] dark:bg-[#2a2a2a] border border-[#d0d0d0] dark:border-[#444444] rounded-[.12rem] flex items-center'>
+            <div className='mr-[.08rem] text-[#6c86ad] dark:text-[#8fa4c7]'>
+              <svg width='16' height='16' viewBox='0 0 16 16' fill='currentColor'>
+                <path d='M8 0C3.584 0 0 3.584 0 8s3.584 8 8 8 8-3.584 8-8S12.416 0 8 0zm1 12H7V7h2v5zm0-6H7V4h2v2z' />
+              </svg>
+            </div>
+            <div className='text-[.12rem] text-[#666666] dark:text-[#aaaaaa] leading-[1.4]'>
+              Staked tokens have a{' '}
+              <span className='font-semibold'>
+                {poolData.unlockPeriodDays} day
+                {poolData.unlockPeriodDays !== 1 ? 's' : ''}
+              </span>{' '}
+              cool down period to unstake. During this period unstaked tokens will
+              not accrue staking rewards.
+            </div>
+          </div>
+        )}
+
+        {/* Active Unlock Status */}
+        {hasActiveUnlock && (
+          <div className='mx-[.24rem] mt-[.16rem] p-[.12rem] bg-[#fff3cd] dark:bg-[#3d3410] border border-[#ffc107] dark:border-[#664d03] rounded-[.12rem]'>
+            <div className='flex items-center justify-between'>
+              <div className='flex items-center'>
+                <div className='mr-[.08rem] text-[#856404] dark:text-[#ffecb5]'>
+                  <svg width='16' height='16' viewBox='0 0 16 16' fill='currentColor'>
+                    <path d='M8 0C3.584 0 0 3.584 0 8s3.584 8 8 8 8-3.584 8-8S12.416 0 8 0zm1 12H7V7h2v5zm0-6H7V4h2v2z' />
+                  </svg>
+                </div>
+                <div>
+                  <div className='text-[.12rem] font-semibold text-[#856404] dark:text-[#ffecb5]'>
+                    Active Unstake in Progress
+                  </div>
+                  <div className='text-[.11rem] text-[#856404] dark:text-[#ffecb5] mt-[.04rem]'>
+                    Amount: {formatNumber(poolData.unlockInfo.vplsAmount, { decimals: 4 })}{' '}
+                    vPLS
+                  </div>
+                </div>
+              </div>
+              <div className='text-right'>
+                <div className='text-[.11rem] text-[#856404] dark:text-[#ffecb5]'>
+                  {poolData.unlockInfo.isReady ? (
+                    <span className='font-semibold text-green-600 dark:text-green-400'>
+                      Ready!
+                    </span>
+                  ) : (
+                    <>
+                      Time Remaining:{' '}
+                      <span className='font-semibold'>{timeRemaining}</span>
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Amount Input */}
+        <div className='mt-[.18rem] pt-[.24rem] mx-[.24rem] bg-[#edece3] dark:bg-[#111111] rounded-[.3rem]'>
+          <div className='mx-[.12rem] flex items-start'>
+            <div className='flex-1 flex justify-start flex-col pl-[.14rem]'>
+              <div className='flex items-center h-[.42rem]'>
+                <CustomNumberInput
+                  value={amount}
+                  handleValueChange={setAmount}
+                  fontSize='.24rem'
+                  placeholder='Amount'
+                />
+                <div>
+                  <CustomButton
+                    type='stroke'
+                    width='.63rem'
+                    height='.36rem'
+                    fontSize='.16rem'
+                    className='bg-color-bgPage border-color-border1'
+                    onClick={handleMax}
+                    border='0.01rem solid #6C86AD80'
+                  >
+                    Max
+                  </CustomButton>
+                </div>
+              </div>
+
+              {/* Balance Info */}
+              <div className='mt-[.1rem] text-[.14rem]'>
+                <div className='grid grid-cols-2 gap-0'>
+                  <div></div>
+                  <div className='text-color-text2 mt-[7px] mb-[14px]'>
+                    Balance: {formatNumber(maxAmount, { decimals: 4 })}{' '}
+                    {selectedTab === 'stake'
+                      ? depositType === 'vpls'
+                        ? 'vPLS'
+                        : 'PLS'
+                      : 'Shares'}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Action Buttons */}
+        <div className='mt-[20px] flex justify-center gap-4 mb-[20px]'>
+          {/* First button - Deposit/Unstake/Approve */}
+          {selectedTab === 'stake' && depositType === 'vpls' && needsApproval ? (
+            <button
+              onClick={handleApprove}
+              disabled={
+                !metaMaskAccount ||
+                isApproveProcessing ||
+                !amount ||
+                !isValidAmount
+              }
+              className='h-[45px] w-[160px] bg-gradient-to-r from-[#3b82f6] to-[#2563eb] hover:from-[#2563eb] hover:to-[#1d4ed8] disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium rounded-[50px] transition-all duration-200'
+            >
+              {isApproveProcessing ? 'Approving...' : 'Approve vPLS'}
+            </button>
+          ) : (
+            <button
+              onClick={selectedTab === 'stake' ? handleDeposit : handleUnstake}
+              disabled={
+                !metaMaskAccount ||
+                isProcessing ||
+                !amount ||
+                !isValidAmount ||
+                (selectedTab === 'stake' && depositType === 'vpls' && needsApproval)
+              }
+              className='h-[45px] w-[160px] bg-gradient-to-r from-[#ff8533] to-[#ffa162] hover:from-[#ff7520] hover:to-[#ff9550] disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium rounded-[50px] transition-all duration-200'
+            >
+              {isProcessing
+                ? selectedTab === 'stake'
+                  ? 'Depositing...'
+                  : 'Unstaking...'
+                : selectedTab === 'stake'
+                ? `Stake ${depositType.toUpperCase()}`
+                : 'Unstake'}
+            </button>
+          )}
+
+          {/* Dynamic second button based on tab and unlock state */}
+          {selectedTab === 'stake' ? (
+            <button
+              onClick={handleClaim}
+              disabled={
+                !metaMaskAccount ||
+                isClaimProcessing ||
+                poolData.vouchStakingPid === null
+              }
+              className='h-[45px] w-[160px] bg-gradient-to-r from-[#ff8533] to-[#ffa162] hover:from-[#ff7520] hover:to-[#ff9550] disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium rounded-[50px] transition-all duration-200'
+            >
+              {isClaimProcessing ? 'Claiming...' : 'Claim Rewards'}
+            </button>
+          ) : hasActiveUnlock ? (
+            poolData.unlockInfo.isReady ? (
+              <button
+                onClick={handleFinalizeUnlock}
+                disabled={!metaMaskAccount || isUnlockProcessing}
+                className='h-[45px] w-[160px] bg-gradient-to-r from-[#28a745] to-[#20c997] hover:from-[#218838] hover:to-[#1aa179] disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium rounded-[50px] transition-all duration-200'
+              >
+                {isUnlockProcessing ? 'Processing...' : 'Claim Unstake'}
+              </button>
+            ) : (
+              <button
+                onClick={handleCancelUnlock}
+                disabled={!metaMaskAccount || isUnlockProcessing}
+                className='h-[45px] w-[160px] bg-gradient-to-r from-[#dc3545] to-[#c82333] hover:from-[#c82333] hover:to-[#bd2130] disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium rounded-[50px] transition-all duration-200'
+              >
+                {isUnlockProcessing ? 'Processing...' : 'Cancel Unstake'}
+              </button>
+            )
+          ) : (
+            <button
+              onClick={handleClaim}
+              disabled={
+                !metaMaskAccount ||
+                isClaimProcessing ||
+                poolData.vouchStakingPid === null
+              }
+              className='h-[45px] w-[160px] bg-gradient-to-r from-[#ff8533] to-[#ffa162] hover:from-[#ff7520] hover:to-[#ff9550] disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium rounded-[50px] transition-all duration-200'
+            >
+              {isClaimProcessing ? 'Claiming...' : 'Claim Rewards'}
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Price and Market Cap Section */}
+      <div className='px-[30px]'>
+        <div className='mt-[37px] flex justify-between mb-[20px]'>
+          <div>
+            <p className='text-[13px] font-normal text-[#A6A6A6] mb-[8px]'>VPLS Price</p>
+            <p className='text-[23px] font-normal text-color-text1'>
+              ${tokensLoading ? '...' : vplsInfo.price}
+            </p>
+            <p className='text-[#A6A6A6] text-[13px] mt-[3px]'>
+              VPLS Token Supply:{' '}
+              {tokensLoading
+                ? '...'
+                : formatNumber(vplsInfo.totalSupply, { decimals: 2 })}
+            </p>
+          </div>
+          <div>
+            <p className='text-[13px] font-normal text-[#A6A6A6]'>Market Cap</p>
+            <p className='text-[23px] font-normal text-color-text1 mt-[9px]'>
+              ${tokensLoading ? '...' : vplsInfo.marketCap}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
