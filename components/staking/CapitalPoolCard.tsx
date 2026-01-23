@@ -9,6 +9,12 @@ import { Icomoon } from '../icon/Icomoon';
 import classNames from 'classnames';
 import snackbarUtil from 'utils/snackbarUtils';
 import { useAppSlice } from 'hooks/selector';
+import { usePoolApy } from 'hooks/usePoolApy';
+import { useVplsPrice } from 'hooks/useVplsPrice';
+import { useVouchPrice } from 'hooks/useVouchPrice';
+import { usePrice } from 'hooks/usePrice';
+import { getEthWeb3 } from 'utils/web3Utils';
+import { getVouchStakingContract, getVouchStakingContractAbi, getStakingRewardPoolContract } from 'config/contract';
 
 interface CapitalPoolCardProps {
   poolData: CapitalPoolData;
@@ -38,6 +44,12 @@ export const CapitalPoolCard: React.FC<CapitalPoolCardProps> = ({
   const { darkMode } = useAppSlice();
   const { metaMaskAccount } = useWalletAccount();
   const { vplsBalance, plsBalance, vplsInfo, loading: tokensLoading } = useVouchTokens();
+  const { vplsPrice } = useVplsPrice();
+  const { vouchPrice } = useVouchPrice();
+  const { ethPrice: plsPrice } = usePrice();
+  
+  const [poolAllocPoint, setPoolAllocPoint] = useState<number>(0);
+  const [totalAllocPoint, setTotalAllocPoint] = useState<number>(0);
 
   const [selectedTab, setSelectedTab] = useState<'stake' | 'unstake'>('stake');
   const [depositType, setDepositType] = useState<'vpls' | 'pls'>('vpls');
@@ -96,7 +108,7 @@ export const CapitalPoolCard: React.FC<CapitalPoolCardProps> = ({
     if (selectedTab === 'stake') {
       return depositType === 'vpls'
         ? vplsBalance.balance || '0'
-        : plsBalance.balance || '0';
+        : plsBalance || '0';
     } else {
       return poolData.userPosition.userShares || '0';
     }
@@ -104,7 +116,7 @@ export const CapitalPoolCard: React.FC<CapitalPoolCardProps> = ({
     selectedTab,
     depositType,
     vplsBalance.balance,
-    plsBalance.balance,
+    plsBalance,
     poolData.userPosition.userShares,
   ]);
 
@@ -114,6 +126,99 @@ export const CapitalPoolCard: React.FC<CapitalPoolCardProps> = ({
     }
     return Number(amount) <= Number(maxAmount);
   }, [amount, maxAmount]);
+
+  // Fetch pool allocation point and total allocation points
+  useEffect(() => {
+    const fetchAllocPoints = async () => {
+      if (!poolData.vouchStakingPid) {
+        setPoolAllocPoint(0);
+        setTotalAllocPoint(0);
+        return;
+      }
+
+      try {
+        const web3 = getEthWeb3();
+        const contract = new web3.eth.Contract(
+          getVouchStakingContractAbi(),
+          getVouchStakingContract()
+        );
+        
+        // Fetch pool info to get pool's allocation point
+        const poolInfo = await contract.methods.getPoolInfo(poolData.vouchStakingPid).call();
+        setPoolAllocPoint(Number(poolInfo.allocPoint) || 0);
+        
+        // Fetch total allocation points from staking reward pool (capital pools use staking reward pool)
+        const stakingRewardPool = getStakingRewardPoolContract();
+        const rewardRates = await contract.methods
+          .getRewardPoolRates(stakingRewardPool)
+          .call();
+        setTotalAllocPoint(parseFloat(rewardRates.totalAllocPoint_) || 0);
+      } catch (error) {
+        console.error('Error fetching allocation points:', error);
+        setPoolAllocPoint(0);
+        setTotalAllocPoint(0);
+      }
+    };
+
+    fetchAllocPoints();
+  }, [poolData.vouchStakingPid]);
+
+  // Calculate total staked value in USD
+  const totalStakedValue = useMemo(() => {
+    const totalVpls = Number(poolData.stats.totalVplsDeposited) || 0;
+    return totalVpls * vplsPrice;
+  }, [poolData.stats.totalVplsDeposited, vplsPrice]);
+
+  // Calculate pool rate percentage
+  const poolRate = useMemo(() => {
+    if (totalAllocPoint === 0 || poolAllocPoint === 0) {
+      return 0;
+    }
+    return (poolAllocPoint / totalAllocPoint) * 100;
+  }, [poolAllocPoint, totalAllocPoint]);
+
+  // Calculate USD value of staked PLS
+  const stakedPlsUsdValue = useMemo(() => {
+    const plsAmount = Number(poolData.userPosition.plsValue) || 0;
+    return plsAmount * (plsPrice || 0);
+  }, [poolData.userPosition.plsValue, plsPrice]);
+
+  // Calculate APY using the hook
+  const apyData = usePoolApy(
+    poolData.vouchStakingPid || 0,
+    totalStakedValue,
+    poolAllocPoint,
+    false, // Capital pools are not liquidity pools
+    vouchPrice,
+    vplsPrice,
+    plsPrice || 0
+  );
+
+  // Calculate pool statistics for the progress bar
+  const poolStats = useMemo(() => {
+    const staked = Number(poolData.stats.totalVplsDeposited) || 0;
+    const unstaking = Number(poolData.unlockInfo.vplsAmount) || 0;
+    const totalSupply = tokensLoading 
+      ? 0 
+      : Number(vplsInfo.totalSupply) || 0;
+    
+    const total = staked + unstaking;
+    const unstakingPercentage = total > 0 ? (unstaking / total) * 100 : 0;
+    const stakedPercentage = total > 0 ? (staked / total) * 100 : 0;
+
+    return {
+      staked,
+      unstaking,
+      totalSupply,
+      unstakingPercentage: Math.max(1, unstakingPercentage), // Minimum 1% for visibility
+      stakedPercentage: Math.max(1, stakedPercentage), // Minimum 1% for visibility
+    };
+  }, [
+    poolData.stats.totalVplsDeposited,
+    poolData.unlockInfo.vplsAmount,
+    vplsInfo.totalSupply,
+    tokensLoading,
+  ]);
 
   // Check approval when amount changes (only for vPLS deposits)
   useEffect(() => {
@@ -267,64 +372,89 @@ export const CapitalPoolCard: React.FC<CapitalPoolCardProps> = ({
 
   return (
     <div className=''>
-      {/* Header with badge and title */}
-      <div className='flex items-center mb-[37px]'>
-        <div className='w-[66px] h-[66px] mr-[16px]'>
-          <img src='/images/token/vPLS_trans.svg' alt='icon' />
-        </div>
-        <div>
-          <p className='text-[18px] font-normal text-color-text1 flex mb-[10px]'>
-            vPLS{' '}
-            <span className='ml-[10px] px-[10px] py-[2px] bg-[#FE8A3C] text-white text-[12px] font-medium rounded-[4px]'>
-              Capital Pool
-            </span>
-          </p>
-          <p className='text-[13px] font-normal text-text2/50 dark:text-text2Dark/50 mt-[3px]'>
-            Stake vPLS or PLS to receive Rewards.
-          </p>
-        </div>
-      </div>
-
-      {/* Balance Section */}
       <div className='flex justify-between'>
-        <div>
-          <p className='text-[15px] font-normal text-color-text1 mb-[6px]'>
-            Available Balance
-          </p>
-          <p className='text-[28px] max-sm:text-[22px] font-normal text-[#A6A6A6]'>
-            <span className='text-color-text1 mr-[3px]'>
+        {/* Header with badge and title */}
+        <div className='flex items-center'>
+          <div className='w-[66px] h-[66px] mr-[16px]'>
+            <img src='/images/token/vPLS_trans.svg' alt='icon' />
+          </div>
+          <div>
+            <p className='text-[18px] font-normal text-color-text1 flex mb-[10px]'>
+              vPLS{' '}  <img src='/images/pls_ic.svg' alt='icon' className='ml-[6px]' />
+              <span className='ml-[10px] px-[10px] py-[2px] pr-[5px] bg-[#FE8A3C] text-[#000] text-[15px] font-normal rounded-[10px] flex gap-[8px]'>
+                Capital Pool
+                <Icomoon icon='tip' size='.12rem' color='#000'  />
+              </span>
+            </p>
+            <p className='text-[13px] font-normal text-text2/50 dark:text-text2Dark/50 mt-[3px]'>
+              Stake vPLS to receive Rewards.
+            </p>
+          </div>
+        </div>
+
+        {/* Balance Section */}
+        <div className='flex justify-between mt-[5px]'>
+          <div className='flex flex-col items-end'>
+            <p className='text-[15px] font-normal text-[#E8EFFD] mb-[6px]'>
+              Available Balance
+            </p>
+            <p className='text-[18px] max-sm:text-[18px] font-normal text-[#A6A6A6]'>
+              <span className=' mr-[3px] text-[18px] text-[#E8EFFD]'>
+                {selectedTab === 'stake'
+                  ? formatNumber(vplsBalance.balance, { decimals: 2 })
+                  : formatNumber(poolData.userPosition.userShares, { decimals: 2 })}
+              </span>
               {selectedTab === 'stake'
                 ? depositType === 'vpls'
-                  ? formatNumber(vplsBalance.balance, { decimals: 2 })
-                  : formatNumber(plsBalance.balance, { decimals: 2 })
-                : formatNumber(poolData.userPosition.userShares, { decimals: 2 })}
-            </span>
-            {selectedTab === 'stake'
-              ? depositType === 'vpls'
-                ? 'vPLS'
-                : 'PLS'
-              : 'Shares'}
-          </p>
+                  ? 'vPLS'
+                  : 'PLS'
+                : 'Shares'}
+            </p>
+           {selectedTab === 'stake' && <p className='text-[18px] max-sm:text-[18px] font-normal text-[#E8EFFD] mt-[6px]'>
+              {formatNumber(plsBalance || '0', { decimals: 2 })}
+              <span className=' ml-[3px] text-[18px] text-[#A6A6A6]'>PLS</span>
+            </p>}
+          </div>
         </div>
       </div>
 
       {/* Stats Section */}
       <div className='border-color-border1 border rounded-[8px] my-[37px] relative p-l[8px]'>
-        <div className='grid grid-cols-2 gap-4 py-[18px]'>
-          {/* Staked Column */}
+        <div className='grid grid-cols-3 gap-4 py-[18px]'>
+          {/* Pool Column */}
           <div className='flex flex-col items-center'>
+            <p className='text-[14px] font-medium text-[#8E9397] mb-[7px] text-center'>
+              Pool Rate  <Icomoon icon='tip' size='.12rem' color='#333333' />
+            </p>
+            <p className='text-[16px] font-normal text-[#A6A6A6] mb-[7px] text-center'>
+              <span className='text-color-text1 mr-[3px]'>
+                {formatNumber(poolRate, { decimals: 2 })}
+              </span>
+              %
+            </p>
+            <p className='text-[13px] font-medium text-[#A6A6A6] mb-[7px] text-center'>
+              Stakers  Share
+              {/* {formatNumber(poolData.userPosition.vplsValue, { decimals: 4 })} vPLS
+              / {formatNumber(poolData.userPosition.plsValue, { decimals: 4 })} PLS */}
+            </p>
+          </div>
+
+          {/* Staked Column */}
+          <div className='flex flex-col items-start'>
             <p className='text-[14px] font-medium text-[#8E9397] mb-[7px] text-center'>
               Staked <Icomoon icon='tip' size='.12rem' color='#333333' />
             </p>
             <p className='text-[16px] font-normal text-[#A6A6A6] mb-[7px] text-center'>
               <span className='text-color-text1 mr-[3px]'>
-                {formatNumber(poolData.userPosition.userShares, { decimals: 8 })}
+                {formatNumber(poolData.userPosition.plsValue, { decimals: 4 })} <span className='text-[#A6A6A6]'>PLS</span>
               </span>
-              Shares
+              <span className='font-normal text-[#A6A6A6] text-[13px] ml-[20px]'>
+                ${formatNumber(stakedPlsUsdValue, { decimals: 2 })}
+              </span>
             </p>
-            <p className='text-[13px] font-medium text-[#A6A6A6] mb-[7px] text-center'>
-              {formatNumber(poolData.userPosition.vplsValue, { decimals: 4 })} vPLS
-              / {formatNumber(poolData.userPosition.plsValue, { decimals: 4 })} PLS
+            <p className='text-[16px] font-normal text-[#ffffff] mb-[7px] whitespace-nowrap'>
+              {formatNumber(poolData.userPosition.vplsValue, { decimals: 4 })} <span className='text-[#A6A6A6]'>vPLS (equivalent) </span>
+              {/* / {formatNumber(poolData.userPosition.plsValue, { decimals: 4 })} PLS */}
             </p>
           </div>
 
@@ -333,20 +463,26 @@ export const CapitalPoolCard: React.FC<CapitalPoolCardProps> = ({
             <p className='text-[14px] font-medium text-[#8E9397] mb-[7px] text-center'>
               Unstaking <Icomoon icon='tip' size='.12rem' color='#333333' />
             </p>
-            <p className='text-[16px] font-normal text-[#A6A6A6] mb-[7px] text-center'>
+            <p className='text-[16px] font-normal text-[#ffffff] mb-[7px] text-center'>
+              {formatNumber(poolData.unlockInfo.vplsAmount, { decimals: 4 })} <span className='text-[#A6A6A6]'>vPLS</span>
+            </p>
+            <p className='text-[13px] font-normal text-[#A6A6A6] mb-[7px] text-center'>$0</p>
+            {/* <p className='text-[16px] font-normal text-[#A6A6A6] mb-[7px] text-center'>
               <span className='text-color-text1 mr-[3px]'>
                 {formatNumber(poolData.unlockInfo.shares, { decimals: 8 })}
               </span>
               Shares
-            </p>
-            <p className='text-[13px] font-medium text-[#A6A6A6] mb-[7px] text-center'>
-              {formatNumber(poolData.unlockInfo.vplsAmount, { decimals: 4 })} vPLS
-            </p>
+            </p> */}
           </div>
         </div>
 
+        <div className='flex mx-auto text-center flex-col relative top-[25px]'>
+          <p className='text-[13px] font-medium text-[#FF8533] gap-1'>Vouch BOOST Capital Pool <Icomoon icon='tip' size='.12rem' color='#333333' /></p>
+          <p className='text-[13px] font-normal text-[#8E9397]'> Allocation <span className='text-[#FFFFFF]'>{poolAllocPoint > 0 ? formatNumber(poolAllocPoint, { decimals: 0 }) : '...'}</span></p>
+        </div>
+
         {/* Rewards and Pool Info Section */}
-        <div className='grid grid-flow-col grid-rows-1 max-sm:grid-rows-2 gap-4 max-sm:gap-2 mt-[20px]'>
+        <div className='grid grid-flow-col grid-rows-1 max-sm:grid-rows-2 gap-4 max-sm:gap-2 mt-[20px] pt-[20px]'>
           <div>
             <p className='text-[14px] font-medium text-[#8E9397] mb-[13px] text-center relative z-[1]'>
               Staking Rewards
@@ -374,6 +510,31 @@ export const CapitalPoolCard: React.FC<CapitalPoolCardProps> = ({
           </div>
           <div>
             <p className='text-[13px] font-medium text-[#8E9397] mb-[13px] text-center relative z-[1]'>
+              Holder APY
+            </p>
+            <div className='flex max-w-[160px] justify-between mx-auto mt-[20px] mb-[8px]'>
+              <p className='text-[14px] font-normal text-color-text1 text-center'>
+                {apyData.isCalculating
+                  ? '...'
+                  : `${formatNumber(apyData.vplsApy, { decimals: 2 })}%`}
+              </p>
+              <p className='text-[14px] font-normal text-[#A6A6A6] text-center'>
+                Yield APR
+              </p>
+            </div>
+            <div className='flex max-w-[160px] justify-between mx-auto mt-[20px] mb-[8px]'>
+              <p className='text-[14px] font-normal text-color-text1 text-center'>
+                {apyData.isCalculating
+                  ? '...'
+                  : `${formatNumber(apyData.totalApy, { decimals: 2 })}%`}
+              </p>
+              <p className='text-[14px] font-normal text-[#A6A6A6] text-center'>
+                Pool APY
+              </p>
+            </div>
+          </div>
+          {/* <div>
+            <p className='text-[13px] font-medium text-[#8E9397] mb-[13px] text-center relative z-[1]'>
               Pool Info
             </p>
             <div className='flex max-w-[160px] justify-between mx-auto mt-[20px] mb-[8px]'>
@@ -392,9 +553,9 @@ export const CapitalPoolCard: React.FC<CapitalPoolCardProps> = ({
                 {poolData.unlockPeriodDays} days
               </p>
             </div>
-          </div>
-          <div className='bg-[#cdcccc] dark:bg-[#333] h-[1px] w-[45px] absolute top-[49%]'></div>
-          <div className='bg-[#cdcccc] dark:bg-[#333] h-[1px] w-[45px] absolute right-0 top-[49%]'></div>
+          </div> */}
+          <div className='bg-[#cdcccc] dark:bg-[#333] h-[1px] w-[140px] absolute top-[49%]'></div>
+          <div className='bg-[#cdcccc] dark:bg-[#333] h-[1px] w-[140px] absolute right-0 top-[49%]'></div>
         </div>
       </div>
 
@@ -429,33 +590,6 @@ export const CapitalPoolCard: React.FC<CapitalPoolCardProps> = ({
           </div>
         </div>
 
-        {/* Deposit Type Selector (only on Stake tab) */}
-        {selectedTab === 'stake' && (
-          <div className='mx-[.24rem] mt-[.16rem] flex gap-2'>
-            <button
-              className={classNames(
-                'flex-1 py-[.08rem] px-[.12rem] rounded-[.08rem] text-[.14rem] font-medium transition-colors',
-                depositType === 'vpls'
-                  ? 'bg-[#ffa162] text-white'
-                  : 'bg-[#E2E0D0] dark:bg-[#333333] text-color-text1'
-              )}
-              onClick={() => setDepositType('vpls')}
-            >
-              Deposit vPLS
-            </button>
-            <button
-              className={classNames(
-                'flex-1 py-[.08rem] px-[.12rem] rounded-[.08rem] text-[.14rem] font-medium transition-colors',
-                depositType === 'pls'
-                  ? 'bg-[#ffa162] text-white'
-                  : 'bg-[#E2E0D0] dark:bg-[#333333] text-color-text1'
-              )}
-              onClick={() => setDepositType('pls')}
-            >
-              Deposit PLS
-            </button>
-          </div>
-        )}
 
         {/* Cooldown Message */}
         {selectedTab === 'unstake' && !hasActiveUnlock && (
@@ -526,15 +660,25 @@ export const CapitalPoolCard: React.FC<CapitalPoolCardProps> = ({
                   fontSize='.24rem'
                   placeholder='Amount'
                 />
-                <div>
+                <div className='flex flex-col items-center relative top-[25px]'>
+                  {selectedTab === 'stake' && (
+                    <select 
+                      className='gef_selct bg-[#1A1A1A] border border-[#6C86AD80] outline-none h-[36px] w-[100px] justify-center text-center rounded-[30px]'
+                      value={depositType}
+                      onChange={(e) => setDepositType(e.target.value as 'vpls' | 'pls')}
+                    >
+                      <option value='vpls'>vPLS</option>
+                      <option value='pls'>PLS</option>
+                    </select>
+                  )}
                   <CustomButton
-                    type='stroke'
-                    width='.63rem'
-                    height='.36rem'
-                    fontSize='.16rem'
-                    className='bg-color-bgPage border-color-border1'
+                    // type='stroke'
+                    // width='.63rem'
+                    // height='.36rem'
+                    // fontSize='.16rem'
+                    className='text-[14px] max_btn'
                     onClick={handleMax}
-                    border='0.01rem solid #6C86AD80'
+                  // border='0.01rem solid #6C86AD80'
                   >
                     Max
                   </CustomButton>
@@ -592,8 +736,8 @@ export const CapitalPoolCard: React.FC<CapitalPoolCardProps> = ({
                   ? 'Depositing...'
                   : 'Unstaking...'
                 : selectedTab === 'stake'
-                ? `Stake ${depositType.toUpperCase()}`
-                : 'Unstake'}
+                  ? `Stake ${depositType.toUpperCase()}`
+                  : 'Unstake'}
             </button>
           )}
 
@@ -664,6 +808,47 @@ export const CapitalPoolCard: React.FC<CapitalPoolCardProps> = ({
             <p className='text-[23px] font-normal text-color-text1 mt-[9px]'>
               ${tokensLoading ? '...' : vplsInfo.marketCap}
             </p>
+          </div>
+        </div>
+      </div>
+      <div className='mt-[24px] px-[30px]'>
+        <div className='h-[38px] border border-[#333] rounded-[8px] p-[3px] flex'>
+            <div 
+              className='bg-[#4F8CEF] rounded-l-[6px]' 
+              style={{ width: `${poolStats.unstakingPercentage}%` }}
+            ></div>
+            <div 
+              className='bg-gradient-to-r from-[#ff8533] to-[#ffa162]' 
+              style={{ width: `${poolStats.stakedPercentage}%` }}
+            ></div>
+        </div>
+        <div className='flex align-middle justify-between mt-[40px]'>
+          <div>
+            <p className='text-[#A6A6A6] text-[13px] font-medium'>Unstaking</p>
+            <div className='flex gap-[6px] mt-[10px]'>
+              <div className='h-[11px] w-[11px] rounded-[2px] bg-[#4F8CEF]'></div>
+              <p className='text-[#A6A6A6] text-[13px] font-normal'>
+                {formatNumber(poolStats.unstaking, { decimals: 2 })}
+              </p>
+            </div>
+          </div>
+          <div>
+            <p className='text-[#A6A6A6] text-[13px] font-medium'>Staked</p>
+            <div className='flex gap-[6px] mt-[10px]'>
+              <div className='h-[11px] w-[11px] rounded-[2px] bg-gradient-to-r from-[#ff8533] to-[#ffa162]'></div>
+              <p className='text-[#A6A6A6] text-[13px] font-normal'>
+                {formatNumber(poolStats.staked, { decimals: 2 })}
+              </p>
+            </div>
+          </div>
+          <div>
+            <p className='text-[#A6A6A6] text-[13px] font-medium'>Total Supply</p>
+            <div className='flex gap-[6px] mt-[10px]'>
+              <div className='h-[11px] w-[11px] rounded-[2px] bg-[#333]'></div>
+              <p className='text-[#A6A6A6] text-[13px] font-normal'>
+                {tokensLoading ? '...' : formatNumber(poolStats.totalSupply, { decimals: 2 })}
+              </p>
+            </div>
           </div>
         </div>
       </div>

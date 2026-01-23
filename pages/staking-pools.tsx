@@ -40,14 +40,14 @@ export default function StakingPools() {
 
   return (
     <div className='mt-[37px] px-[30px] max-md:px-[15px] pt-[40px]'>
-      <div className='max-w-[1360px] bg-color-bg2 border-color-border1 border justify-center m-auto rounded-[30px] min-h-[800px]'>
+      <div className='max-w-[1360px] bg-color-bg2 border-color-border1 border  justify-center m-auto rounded-[30px] min-h-[800px]'>
         {/* Main Tab Headers */}
-        <div className='flex'>
+        <div className='flex bg-[#333] rounded-tl-[30px] rounded-tr-[30px] '>
           <div
             className={classNames(
-              'flex-1 py-[20px] cursor-pointer text-center text-[24px] max-md:text-[20px] font-normal transition-colors rounded-tl-[30px]',
+              'flex-1 py-[20px] cursor-pointer text-center text-[24px] max-md:text-[20px] font-normal transition-colors rounded-tl-[30px] rounded-tr-[30px]',
               mainTab === 'vouch'
-                ? 'bg-gradient-to-r from-[#ff8533] to-[#ffa162] text-white'
+                ? 'bg-gradient-to-r from-[#ff8533] to-[#ffa162] text-[#000]'
                 : 'bg-[#e2e0d0] dark:bg-[#333] text-color-text1'
             )}
             onClick={() => setMainTab('vouch')}
@@ -56,9 +56,9 @@ export default function StakingPools() {
           </div>
           <div
             className={classNames(
-              'flex-1 py-[20px] cursor-pointer text-center text-[24px] max-md:text-[20px] font-normal transition-colors rounded-tr-[30px]',
+              'flex-1 py-[20px] cursor-pointer text-center text-[24px] max-md:text-[20px] font-normal transition-colors rounded-tl-[30px] rounded-tr-[30px]',
               mainTab === 'lp'
-                ? 'bg-gradient-to-r from-[#ff8533] to-[#ffa162] text-white'
+                ? 'bg-gradient-to-r from-[#ff8533] to-[#ffa162] text-[#000]'
                 : 'bg-[#e2e0d0] dark:bg-[#333] text-color-text1'
             )}
             onClick={() => setMainTab('lp')}
@@ -68,9 +68,9 @@ export default function StakingPools() {
         </div>
 
         {/* Tab Content */}
-        <div className='px-[35px] max-sm:px-[21px] py-[40px]'>
+        <div className='px-[35px] max-sm:px-[21px] py-[40px] border border-[#FE8A3C] rounded-b-[30px]'>
           {mainTab === 'vouch' ? (
-            <div className='grid grid-cols-1 lg:grid-cols-2 gap-8 relative'>
+            <div className='grid grid-cols-1 lg:grid-cols-2 gap-5 relative'>
               {/* Vertical separator for desktop */}
               <div className='bg-[#FE8A3C] h-[calc(100%-80px)] w-[1px] absolute left-[50%] top-[40px] max-lg:bg-transparent'></div>
               
@@ -120,7 +120,7 @@ export default function StakingPools() {
                   No LP pools available
                 </div>
               ) : (
-                <div className='grid grid-cols-2 gap-4 max-md:grid-cols-1'>
+                <div className='grid grid-cols-2 gap-2 max-md:grid-cols-1'>
                   {lpPools.map((pool) => {
                     const poolData = lpPoolsData[pool.pid];
                     if (!poolData) return null;

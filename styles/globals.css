@@ -158,3 +158,18 @@ body {
   }
 }
 .tab-active div {color: #000 !important;}
+.gef_selct{
+  color: #fff;
+  font-size: 16px;
+  font-weight: 400;
+}
+.max_btn{
+  font-size: 14px !important;
+  color: #fff !important;
+  font-weight: 400 !important;
+  text-decoration: underline;
+  height: 0;
+  width: 0;
+  background: transparent !important;
+  border: none !important;
+}

@@ -186,7 +186,7 @@ export const LpStakingCard: React.FC<LpStakingCardProps> = ({
     <div className='border-[1px] border-solid border-[#FE8A3C] rounded-[30px] w-full'>
       {/* Header */}
       <div className='flex justify-between mt-[20px] border-b border-[#cdcccc] dark:border-[#333] pb-[15px]'>
-        <div className='flex align-top ml-[18px]'>
+        <div className='flex items-center ml-[18px]'>
           <img
             src={poolData.config.token0Icon}
             alt='icon'
@@ -216,7 +216,7 @@ export const LpStakingCard: React.FC<LpStakingCardProps> = ({
             PLP
           </h2>
           <p className='text-[15px] font-normal text-color-text1 mt-[4px]'>
-            Available Balance
+            Available Balance 
           </p>
         </div>
       </div>
@@ -245,8 +245,11 @@ export const LpStakingCard: React.FC<LpStakingCardProps> = ({
           {/* Allocation Column */}
           <div className='flex flex-col items-center'>
             <div>
-              <p className='text-[14px] font-medium text-[#8E9397] mb-[7px] m-auto items-baseline'>
+              <p className='text-[14px] font-medium text-[#8E9397] mb-[7px] m-auto items-baseline flex'>
                 Allocation
+                <div className='relative top-[-7px] right-[-1px]'>
+                  <Icomoon icon='tip' size='.12rem' color='#333333'  />  
+                </div>
               </p>
               <p className='text-[20px] text-center font-normal text-[#ffa162] mb-[0px] mt-[12px] m-auto items-baseline'>
                 {poolData.poolInfo.allocPoint}
@@ -294,7 +297,7 @@ export const LpStakingCard: React.FC<LpStakingCardProps> = ({
           </div>
           <div>
             <p className='text-[14px] font-medium text-[#8E9397] mb-[13px] text-center relative z-[1]'>
-              Pool APY
+              Pool APY 
             </p>
             <div className='flex max-w-[160px] justify-center mx-auto mb-[10px] mt-[40px]'>
               <p className='text-[20px] font-bold text-[#ffa162] text-center'>

@@ -31,38 +31,41 @@ export const RewardPoolCard: React.FC<RewardPoolCardProps> = ({
 
   return (
     <div className=''>
-      {/* Header with badge and title */}
-      <div className='flex items-center mb-[37px]'>
-        <div className='w-[66px] h-[66px] mr-[16px]'>
-          <img src='/favicon.png' alt='icon' className='w-[66px] h-[66px]' />
+      <div className='flex justify-between'>
+        {/* Header with badge and title */}
+        <div className='flex items-center mb-[37px]'>
+          <div className='w-[66px] h-[66px] mr-[16px]'>
+            <img src='/favicon.png' alt='icon' className='w-[66px] h-[66px]' />
+          </div>
+          <div>
+            <p className='text-[18px] font-normal text-color-text1 flex mb-[10px]'>
+              VOUCH{' '}<img src='/images/pls_ic.svg' alt='icon' className='ml-[6px]' />
+              <span className='ml-[10px] px-[10px] py-[2px] pr-[5px] bg-[#FE8A3C] text-[#000] text-[15px] font-normal rounded-[10px] flex gap-[8px]  align-middle'>
+                Reward Pool
+                <Icomoon icon='tip' size='.12rem' color='#000' />
+              </span>
+            </p>
+            <p className='text-[13px] font-normal text-[#A6A6A6] mt-[3px]'>
+              Stake VOUCH to receive Rewards.
+            </p>
+          </div>
         </div>
-        <div>
-          <p className='text-[18px] font-normal text-color-text1 flex mb-[10px]'>
-            VOUCH{' '}
-            <span className='ml-[10px] px-[10px] py-[2px] bg-[#FE8A3C] text-white text-[12px] font-medium rounded-[4px]'>
-              Reward Pool
-            </span>
-          </p>
-          <p className='text-[13px] font-normal text-[#A6A6A6] mt-[3px]'>
-            The Vouch Ecosystem Token. Stake to receive Rewards.
-          </p>
-        </div>
-      </div>
 
-      {/* Balance Section */}
-      <div className='flex justify-between mb-[37px]'>
-        <div>
-          <p className='text-[15px] font-normal text-color-text1 mb-[6px]'>
-            Available Balance
-          </p>
-          <p className='text-[28px] max-sm:text-[22px] font-normal text-[#A6A6A6]'>
-            <span className='text-color-text1 mr-[3px]'>
-              {tokensLoading
-                ? '...'
-                : formatNumber(vouchBalance.balance, { decimals: 2 })}
-            </span>
-            VOUCH
-          </p>
+        {/* Balance Section */}
+        <div className='flex justify-between mb-[37px]'>
+          <div className='flex flex-col items-end'>
+            <p className='text-[15px] font-normal text-color-text1 mb-[6px]'>
+              Available Balance
+            </p>
+            <p className='text-[18px] max-sm:text-[18px] font-normal text-[#A6A6A6]'>
+              <span className='text-color-text1 mr-[3px]'>
+                {tokensLoading
+                  ? '...'
+                  : formatNumber(vouchBalance.balance, { decimals: 2 })}
+              </span>
+              VOUCH
+            </p>
+          </div>
         </div>
       </div>
 
@@ -87,9 +90,9 @@ export const RewardPoolCard: React.FC<RewardPoolCardProps> = ({
               {tokensLoading
                 ? '-'
                 : formatNumber(
-                    Number(vouchInfo.price) * Number(userTotalVouchStaked),
-                    { decimals: 8 }
-                  )}
+                  Number(vouchInfo.price) * Number(userTotalVouchStaked),
+                  { decimals: 8 }
+                )}
             </p>
           </div>
 
@@ -111,11 +114,16 @@ export const RewardPoolCard: React.FC<RewardPoolCardProps> = ({
               {tokensLoading
                 ? '-'
                 : formatNumber(
-                    Number(vouchInfo.price) * Number(vouchUnlockInfo.amount),
-                    { decimals: 8 }
-                  )}
+                  Number(vouchInfo.price) * Number(vouchUnlockInfo.amount),
+                  { decimals: 8 }
+                )}
             </p>
           </div>
+        </div>
+
+        <div className='flex mx-auto text-center flex-col relative top-[25px]'>
+          <p className='text-[13px] font-medium text-[#FF8533] gap-1'>VOUCH Rewards Pool <Icomoon icon='tip' size='.12rem' color='#333333' /></p>
+          <p className='text-[13px] font-normal text-[#8E9397]'> Allocation <span className='text-[#FFFFFF]'>100</span></p>
         </div>
 
         {/* Rewards Section */}
@@ -129,8 +137,8 @@ export const RewardPoolCard: React.FC<RewardPoolCardProps> = ({
                 {loading
                   ? '...'
                   : formatNumber(pendingTripleByPid?.[1]?.vplsPending || '0', {
-                      decimals: 6,
-                    })}
+                    decimals: 6,
+                  })}
               </p>
               <p className='text-[18px] font-normal text-[#A6A6A6] text-center'>
                 vPLS
@@ -141,11 +149,11 @@ export const RewardPoolCard: React.FC<RewardPoolCardProps> = ({
                 {loading
                   ? '...'
                   : formatNumber(
-                      pendingTripleByPid?.[1]?.vouchPending || '0',
-                      {
-                        decimals: 6,
-                      }
-                    )}
+                    pendingTripleByPid?.[1]?.vouchPending || '0',
+                    {
+                      decimals: 6,
+                    }
+                  )}
               </p>
               <p className='text-[18px] font-normal text-[#A6A6A6] text-center'>
                 VOUCH
@@ -156,8 +164,8 @@ export const RewardPoolCard: React.FC<RewardPoolCardProps> = ({
                 {loading
                   ? '...'
                   : formatNumber(pendingTripleByPid?.[1]?.wplsPending || '0', {
-                      decimals: 6,
-                    })}
+                    decimals: 6,
+                  })}
               </p>
               <p className='text-[18px] font-normal text-[#A6A6A6] text-center'>
                 PLS
@@ -173,8 +181,8 @@ export const RewardPoolCard: React.FC<RewardPoolCardProps> = ({
                 {loading
                   ? '...'
                   : formatNumber(holderRewardInfo.vplsPending, {
-                      decimals: 6,
-                    })}
+                    decimals: 6,
+                  })}
               </p>
               <p className='text-[18px] font-normal text-[#A6A6A6] text-center mr-[8px]'>
                 vPLS
@@ -185,8 +193,8 @@ export const RewardPoolCard: React.FC<RewardPoolCardProps> = ({
                 {loading
                   ? '...'
                   : formatNumber(holderRewardInfo.vouchPending, {
-                      decimals: 6,
-                    })}
+                    decimals: 6,
+                  })}
               </p>
               <p className='text-[18px] font-normal text-[#A6A6A6] text-center mr-[8px]'>
                 VOUCH
@@ -197,16 +205,16 @@ export const RewardPoolCard: React.FC<RewardPoolCardProps> = ({
                 {loading
                   ? '...'
                   : formatNumber(holderRewardInfo.plsPending, {
-                      decimals: 6,
-                    })}
+                    decimals: 6,
+                  })}
               </p>
               <p className='text-[18px] font-normal text-[#A6A6A6] text-center mr-[8px]'>
                 PLS
               </p>
             </div>
           </div>
-          <div className='bg-[#cdcccc] dark:bg-[#333] h-[1px] w-[45px] absolute top-[49%]'></div>
-          <div className='bg-[#cdcccc] dark:bg-[#333] h-[1px] w-[45px] absolute right-0 top-[49%]'></div>
+          <div className='bg-[#cdcccc] dark:bg-[#333] h-[1px] w-[140px] absolute top-[49%]'></div>
+          <div className='bg-[#cdcccc] dark:bg-[#333] h-[1px] w-[140px] absolute right-0 top-[49%]'></div>
         </div>
       </div>
 
@@ -238,6 +246,37 @@ export const RewardPoolCard: React.FC<RewardPoolCardProps> = ({
           </div>
         </div>
       </div>
+
+      <div className='mt-[24px] px-[30px]'>
+        <div className='h-[38px] border border-[#333] rounded-[8px] p-[3px] flex'>
+          {/* <div className='bg-[#4F8CEF] min-w-[1%] rounded-l-[6px]'></div> */}
+          <div className='bg-gradient-to-r from-[#ff8533] to-[#ffa162]  w-full'> </div>
+        </div>
+        <div className='flex align-middle justify-between mt-[40px]'>
+          <div>
+            <p className='text-[#A6A6A6] text-[13px] font-medium'>Unstaking</p>
+            <div className='flex gap-[6px] mt-[10px]'>
+              <div className='h-[11px] w-[11px] rounded-[2px] bg-[#4F8CEF]'></div>
+              <p className='text-[#A6A6A6] text-[13px] font-normal'>0</p>
+            </div>
+          </div>
+          <div>
+            <p className='text-[#A6A6A6] text-[13px] font-medium'>Staked</p>
+            <div className='flex gap-[6px] mt-[10px]'>
+              <div className='h-[11px] w-[11px] rounded-[2px] bg-gradient-to-r from-[#ff8533] to-[#ffa162]'></div>
+              <p className='text-[#A6A6A6] text-[13px] font-normal'>101.1</p>
+            </div>
+          </div>
+          <div>
+            <p className='text-[#A6A6A6] text-[13px] font-medium'>Total Supply</p>
+            <div className='flex gap-[6px] mt-[10px]'>
+              <div className='h-[11px] w-[11px] rounded-[2px] bg-[#333]'></div>
+              <p className='text-[#A6A6A6] text-[13px] font-normal'>0</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
   );
 };

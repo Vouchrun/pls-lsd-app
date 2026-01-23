@@ -341,15 +341,18 @@ export const VouchStaking: React.FC<VouchStakingProps> = ({
                 fontSize='.24rem'
                 placeholder='Amount'
               />
-              <div>
+              <div className='flex flex-col items-center relative top-[25px]'>
+                <select className='gef_selct bg-[#1A1A1A] border border-[#6C86AD80] outline-none h-[36px] w-[100px] justify-center text-center rounded-[30px]'>
+                  <option >VOUCH</option>
+                </select>
                 <CustomButton
-                  type='stroke'
-                  width='.63rem'
-                  height='.36rem'
-                  fontSize='.16rem'
-                  className='bg-color-bgPage border-color-border1'
+                  // type='stroke'
+                  // width='.63rem'
+                  // height='.36rem'
+                  // fontSize='.16rem'
+                  className='text-[14px] max_btn'
                   onClick={handleMax}
-                  border='0.01rem solid #6C86AD80'
+                // border='0.01rem solid #6C86AD80'
                 >
                   Max
                 </CustomButton>
@@ -357,7 +360,7 @@ export const VouchStaking: React.FC<VouchStakingProps> = ({
             </div>
 
             {/* Balance Info */}
-            <div className='mt-[.1rem] text-[.14rem]'>
+            <div className='mt-[.1rem] text-[.13rem]'>
               <div className='grid grid-cols-2 gap-0'>
                 <div></div>
                 <div className='text-color-text2 mt-[7px] mb-[14px]'>
@@ -402,8 +405,8 @@ export const VouchStaking: React.FC<VouchStakingProps> = ({
                 ? 'Staking...'
                 : 'Unstaking...'
               : selectedTab === 'stake'
-              ? 'Stake VOUCH'
-              : 'Unstake VOUCH'}
+                ? 'Stake VOUCH'
+                : 'Unstake VOUCH'}
           </button>
         )}
 
@@ -418,34 +421,34 @@ export const VouchStaking: React.FC<VouchStakingProps> = ({
             {isClaimProcessing ? 'Claiming...' : 'Claim Rewards'}
           </button>
         ) : // On Unstake Tab: Show Cancel/Finalize buttons if active unlock
-        hasActiveUnlock ? (
-          vouchUnlockInfo.ready ? (
-            <button
-              onClick={handleFinalizeUnlock}
-              disabled={!metaMaskAccount || isUnlockProcessing}
-              className='h-[45px] w-[160px] bg-gradient-to-r from-[#28a745] to-[#20c997] hover:from-[#218838] hover:to-[#1aa179] disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium rounded-[50px] transition-all duration-200'
-            >
-              {isUnlockProcessing ? 'Processing...' : 'Claim Unstake'}
-            </button>
+          hasActiveUnlock ? (
+            vouchUnlockInfo.ready ? (
+              <button
+                onClick={handleFinalizeUnlock}
+                disabled={!metaMaskAccount || isUnlockProcessing}
+                className='h-[45px] w-[160px] bg-gradient-to-r from-[#28a745] to-[#20c997] hover:from-[#218838] hover:to-[#1aa179] disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium rounded-[50px] transition-all duration-200'
+              >
+                {isUnlockProcessing ? 'Processing...' : 'Claim Unstake'}
+              </button>
+            ) : (
+              <button
+                onClick={handleCancelUnlock}
+                disabled={!metaMaskAccount || isUnlockProcessing}
+                className='h-[45px] w-[160px] bg-gradient-to-r from-[#dc3545] to-[#c82333] hover:from-[#c82333] hover:to-[#bd2130] disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium rounded-[50px] transition-all duration-200'
+              >
+                {isUnlockProcessing ? 'Processing...' : 'Cancel Unstake'}
+              </button>
+            )
           ) : (
+            // No active unlock on Unstake Tab: Show Claim Rewards
             <button
-              onClick={handleCancelUnlock}
-              disabled={!metaMaskAccount || isUnlockProcessing}
-              className='h-[45px] w-[160px] bg-gradient-to-r from-[#dc3545] to-[#c82333] hover:from-[#c82333] hover:to-[#bd2130] disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium rounded-[50px] transition-all duration-200'
+              onClick={handleClaim}
+              disabled={!metaMaskAccount || isClaimProcessing}
+              className='h-[45px] w-[160px] bg-gradient-to-r from-[#ff8533] to-[#ffa162] hover:from-[#ff7520] hover:to-[#ff9550] disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium rounded-[50px] transition-all duration-200'
             >
-              {isUnlockProcessing ? 'Processing...' : 'Cancel Unstake'}
+              {isClaimProcessing ? 'Claiming...' : 'Claim Rewards'}
             </button>
-          )
-        ) : (
-          // No active unlock on Unstake Tab: Show Claim Rewards
-          <button
-            onClick={handleClaim}
-            disabled={!metaMaskAccount || isClaimProcessing}
-            className='h-[45px] w-[160px] bg-gradient-to-r from-[#ff8533] to-[#ffa162] hover:from-[#ff7520] hover:to-[#ff9550] disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium rounded-[50px] transition-all duration-200'
-          >
-            {isClaimProcessing ? 'Claiming...' : 'Claim Rewards'}
-          </button>
-        )}
+          )}
       </div>
     </div>
   );

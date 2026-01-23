@@ -47,7 +47,7 @@ export const DashboardTabs = (props: Props) => {
   [&>*.tab-active:after]:hidden
   [&>*:has(+_.tab-active):after]:hidden`}
         style={{
-          gridTemplateColumns: '25% 25% 25% 25%',
+          gridTemplateColumns: '20% 20% 20% 20% 20%',
         }}
       >
         <Link
@@ -114,6 +114,23 @@ export const DashboardTabs = (props: Props) => {
             // onClick={() => props.onChangeTab("withdraw")}
           >
             Staking Pools
+          </Link>
+        </div>
+
+        <div className='flex items-stretch'>
+          {/* <div className="ml-[.1rem] w-[0.01rem] h-[.22rem] bg-[#DEE6F7] dark:bg-bg1Dark self-center" /> */}
+          <Link
+            className={classNames(
+              'h-[35px] flex-1 ml-[.1rem] cursor-pointer flex items-center justify-center text-[.16rem] rounded-[.3rem] whitespace-nowrap text-[#FFF]',
+              router.pathname.startsWith('')
+                // ? 'text-color-highlight bg-color-highlight'
+                // : 'text-color-text1'
+            )}
+            target='_blank'
+            href='https://pulseswap.io/?chain=pulsechain&from=0x0000000000000000000000000000000000000000&to=0xD34f5ADC24d8Cc55C1e832Bdf65fFfDF80D1314f'
+            // onClick={() => props.onChangeTab("withdraw")}
+          >
+            Buy VOUCH
           </Link>
         </div>
       </div>
