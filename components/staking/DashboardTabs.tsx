@@ -34,7 +34,7 @@ export const DashboardTabs = (props: Props) => {
         onClick={handleClick}
       />
       <div
-        className={`w-[280px] sm:w-[280px] xl:w-[600px] h-auto p-[20px] lg:p-[.04rem] items-stretch bg-[#edece3] dark:bg-[#111111] rounded-[15px] lg:rounded-[.6rem] xl:grid absolute xl:relative top-[40px] xl:top-0 gap-0
+        className={`w-[280px] sm:w-[280px] xl:w-[650px] h-auto p-[20px] lg:p-[.04rem] items-stretch bg-[#edece3] dark:bg-[#111111] rounded-[15px] lg:rounded-[.6rem] xl:grid absolute xl:relative top-[40px] xl:top-0 gap-0
   ${isActive ? 'flex flex-col' : 'hidden'}
   [&>*:not(:last-child):after]:content-['|'] 
   [&>*:not(:last-child):after]:absolute 
@@ -52,7 +52,7 @@ export const DashboardTabs = (props: Props) => {
       >
         <Link
           className={classNames(
-            'h-[35px] cursor-pointer flex items-center justify-center text-[.16rem] rounded-[.3rem]',
+            'h-[35px] cursor-pointer flex items-center justify-center text-[.15rem] rounded-[.3rem]',
             (props.selectedTab === 'stake' ||
               props.selectedTab === 'unstake' ||
               router.pathname.startsWith('/PLS/')) &&
@@ -72,7 +72,7 @@ export const DashboardTabs = (props: Props) => {
             {/* <div className="ml-[.1rem] w-[0.01rem] h-[.22rem] bg-[#DEE6F7] dark:bg-bg1Dark self-center" /> */}
             <Link
               className={classNames(
-                'h-[35px] flex-1 ml-[.1rem] cursor-pointer flex items-center justify-center text-[.16rem] rounded-[.3rem]',
+                'h-[35px] flex-1 ml-[.1rem] cursor-pointer flex items-center justify-center text-[.15rem] rounded-[.3rem]',
                 props.selectedTab === 'withdraw' &&
                   !router.pathname.startsWith('/dashboard')
                   ? 'text-color-highlight bg-color-highlight'
@@ -90,7 +90,7 @@ export const DashboardTabs = (props: Props) => {
           <Link
             href={'/dashboard'}
             className={classNames(
-              'h-[35px] flex-1 ml-[.1rem] cursor-pointer flex items-center justify-center text-[.16rem] rounded-[.3rem]',
+              'h-[35px] flex-1 ml-[.1rem] cursor-pointer flex items-center justify-center text-[.15rem] rounded-[.3rem]',
 
               router.pathname.startsWith('/dashboard')
                 ? 'text-color-highlight bg-color-highlight'
@@ -105,7 +105,7 @@ export const DashboardTabs = (props: Props) => {
           {/* <div className="ml-[.1rem] w-[0.01rem] h-[.22rem] bg-[#DEE6F7] dark:bg-bg1Dark self-center" /> */}
           <Link
             className={classNames(
-              'h-[35px] flex-1 ml-[.1rem] cursor-pointer flex items-center justify-center text-[.16rem] rounded-[.3rem] whitespace-nowrap',
+              'h-[35px] flex-1 ml-[.1rem] cursor-pointer flex items-center justify-center text-[.15rem] rounded-[.3rem] whitespace-nowrap',
               router.pathname.startsWith('/staking-pools')
                 ? 'text-color-highlight bg-color-highlight'
                 : 'text-color-text1'
@@ -121,7 +121,7 @@ export const DashboardTabs = (props: Props) => {
           {/* <div className="ml-[.1rem] w-[0.01rem] h-[.22rem] bg-[#DEE6F7] dark:bg-bg1Dark self-center" /> */}
           <Link
             className={classNames(
-              'h-[35px] flex-1 ml-[.1rem] cursor-pointer flex items-center justify-center text-[.16rem] rounded-[.3rem] whitespace-nowrap text-[#FFF]',
+              'h-[35px] flex-1 ml-[.1rem] cursor-pointer flex items-center justify-center text-[.15rem] rounded-[.3rem] whitespace-nowrap text-[#FFF]',
               router.pathname.startsWith('')
                 // ? 'text-color-highlight bg-color-highlight'
                 // : 'text-color-text1'

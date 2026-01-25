@@ -14,7 +14,7 @@ import { useVplsPrice } from 'hooks/useVplsPrice';
 import { useVouchPrice } from 'hooks/useVouchPrice';
 import { usePrice } from 'hooks/usePrice';
 import { getEthWeb3 } from 'utils/web3Utils';
-import { getVouchStakingContract, getVouchStakingContractAbi, getStakingRewardPoolContract } from 'config/contract';
+import { getVouchStakingContract, getVouchStakingContractAbi, getStakingRewardPoolContract, getCapitalPoolContractAbi } from 'config/contract';
 
 interface CapitalPoolCardProps {
   poolData: CapitalPoolData;
@@ -50,6 +50,7 @@ export const CapitalPoolCard: React.FC<CapitalPoolCardProps> = ({
   
   const [poolAllocPoint, setPoolAllocPoint] = useState<number>(0);
   const [totalAllocPoint, setTotalAllocPoint] = useState<number>(0);
+  const [yieldScrapeBps, setYieldScrapeBps] = useState<number>(0);
 
   const [selectedTab, setSelectedTab] = useState<'stake' | 'unstake'>('stake');
   const [depositType, setDepositType] = useState<'vpls' | 'pls'>('vpls');
@@ -127,41 +128,51 @@ export const CapitalPoolCard: React.FC<CapitalPoolCardProps> = ({
     return Number(amount) <= Number(maxAmount);
   }, [amount, maxAmount]);
 
-  // Fetch pool allocation point and total allocation points
+  // Fetch pool allocation point, total allocation points, and yield scrape BPS
   useEffect(() => {
-    const fetchAllocPoints = async () => {
+    const fetchPoolData = async () => {
       if (!poolData.vouchStakingPid) {
         setPoolAllocPoint(0);
         setTotalAllocPoint(0);
+        setYieldScrapeBps(0);
         return;
       }
 
       try {
         const web3 = getEthWeb3();
-        const contract = new web3.eth.Contract(
+        const vouchStakingContract = new web3.eth.Contract(
           getVouchStakingContractAbi(),
           getVouchStakingContract()
         );
         
         // Fetch pool info to get pool's allocation point
-        const poolInfo = await contract.methods.getPoolInfo(poolData.vouchStakingPid).call();
+        const poolInfo = await vouchStakingContract.methods.getPoolInfo(poolData.vouchStakingPid).call();
         setPoolAllocPoint(Number(poolInfo.allocPoint) || 0);
         
         // Fetch total allocation points from staking reward pool (capital pools use staking reward pool)
         const stakingRewardPool = getStakingRewardPoolContract();
-        const rewardRates = await contract.methods
+        const rewardRates = await vouchStakingContract.methods
           .getRewardPoolRates(stakingRewardPool)
           .call();
         setTotalAllocPoint(parseFloat(rewardRates.totalAllocPoint_) || 0);
+
+        // Fetch yield scrape BPS from capital pool contract
+        const capitalPoolContract = new web3.eth.Contract(
+          getCapitalPoolContractAbi(),
+          poolData.address
+        );
+        const bps = await capitalPoolContract.methods.yieldScrapeBps().call();
+        setYieldScrapeBps(Number(bps) || 0);
       } catch (error) {
-        console.error('Error fetching allocation points:', error);
+        console.error('Error fetching pool data:', error);
         setPoolAllocPoint(0);
         setTotalAllocPoint(0);
+        setYieldScrapeBps(0);
       }
     };
 
-    fetchAllocPoints();
-  }, [poolData.vouchStakingPid]);
+    fetchPoolData();
+  }, [poolData.vouchStakingPid, poolData.address]);
 
   // Calculate total staked value in USD
   const totalStakedValue = useMemo(() => {
@@ -169,13 +180,16 @@ export const CapitalPoolCard: React.FC<CapitalPoolCardProps> = ({
     return totalVpls * vplsPrice;
   }, [poolData.stats.totalVplsDeposited, vplsPrice]);
 
-  // Calculate pool rate percentage
+  // Calculate pool rate percentage (yield scraping rate) from BPS
+  // BPS (basis points): 10000 BPS = 100%, so divide by 100 to get percentage
   const poolRate = useMemo(() => {
-    if (totalAllocPoint === 0 || poolAllocPoint === 0) {
-      return 0;
-    }
-    return (poolAllocPoint / totalAllocPoint) * 100;
-  }, [poolAllocPoint, totalAllocPoint]);
+    return yieldScrapeBps / 100;
+  }, [yieldScrapeBps]);
+
+  // Calculate stakers share: 100% - yield scraping rate
+  const stakersShare = useMemo(() => {
+    return Math.max(0, 100 - poolRate);
+  }, [poolRate]);
 
   // Calculate USD value of staked PLS
   const stakedPlsUsdValue = useMemo(() => {
@@ -434,8 +448,12 @@ export const CapitalPoolCard: React.FC<CapitalPoolCardProps> = ({
             </p>
             <p className='text-[13px] font-medium text-[#A6A6A6] mb-[7px] text-center'>
               Stakers  Share
-              {/* {formatNumber(poolData.userPosition.vplsValue, { decimals: 4 })} vPLS
-              / {formatNumber(poolData.userPosition.plsValue, { decimals: 4 })} PLS */}
+            </p>
+            <p className='text-[16px] font-normal text-[#A6A6A6] mb-[7px] text-center'>
+              <span className='text-color-text1 mr-[3px]'>
+                {formatNumber(stakersShare, { decimals: 2 })}
+              </span>
+              %
             </p>
           </div>
 
@@ -575,7 +593,7 @@ export const CapitalPoolCard: React.FC<CapitalPoolCardProps> = ({
             )}
             onClick={() => setSelectedTab('stake')}
           >
-            Stake
+            Stake vPLS/PLS
           </div>
           <div
             className={classNames(
@@ -586,13 +604,13 @@ export const CapitalPoolCard: React.FC<CapitalPoolCardProps> = ({
             )}
             onClick={() => setSelectedTab('unstake')}
           >
-            Unstake
+            Unstake vPLS
           </div>
         </div>
 
 
         {/* Cooldown Message */}
-        {selectedTab === 'unstake' && !hasActiveUnlock && (
+        { !hasActiveUnlock && (
           <div className='mx-[.24rem] mt-[.16rem] p-[.12rem] bg-[#f0f0f0] dark:bg-[#2a2a2a] border border-[#d0d0d0] dark:border-[#444444] rounded-[.12rem] flex items-center'>
             <div className='mr-[.08rem] text-[#6c86ad] dark:text-[#8fa4c7]'>
               <svg width='16' height='16' viewBox='0 0 16 16' fill='currentColor'>

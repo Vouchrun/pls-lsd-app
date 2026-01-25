@@ -33,7 +33,7 @@ export const RewardPoolCard: React.FC<RewardPoolCardProps> = ({
     <div className=''>
       <div className='flex justify-between'>
         {/* Header with badge and title */}
-        <div className='flex items-center mb-[37px]'>
+        <div className='flex items-center mb-[40px]'>
           <div className='w-[66px] h-[66px] mr-[16px]'>
             <img src='/favicon.png' alt='icon' className='w-[66px] h-[66px]' />
           </div>
@@ -52,7 +52,7 @@ export const RewardPoolCard: React.FC<RewardPoolCardProps> = ({
         </div>
 
         {/* Balance Section */}
-        <div className='flex justify-between mb-[37px]'>
+        <div className='flex justify-between mb-[40px]'>
           <div className='flex flex-col items-end'>
             <p className='text-[15px] font-normal text-color-text1 mb-[6px]'>
               Available Balance
@@ -71,7 +71,7 @@ export const RewardPoolCard: React.FC<RewardPoolCardProps> = ({
 
       {/* Stats Section */}
       <div className='border-color-border1 border rounded-[8px] mb-[37px] relative p-l[8px]'>
-        <div className='grid grid-cols-2 gap-4 py-[18px]'>
+        <div className='grid grid-cols-2 gap-4 py-[18px] min-h-[120px]'>
           {/* Staked Column */}
           <div className='flex flex-col items-center'>
             <p className='text-[14px] font-medium text-[#8E9397] mb-[7px] text-center'>
@@ -127,7 +127,7 @@ export const RewardPoolCard: React.FC<RewardPoolCardProps> = ({
         </div>
 
         {/* Rewards Section */}
-        <div className='grid grid-flow-col grid-rows-1 max-sm:grid-rows-2 gap-4 max-sm:gap-2 mt-[20px]'>
+        <div className='grid grid-flow-col grid-rows-1 max-sm:grid-rows-2 gap-4 max-sm:gap-2 mt-[20px] pt-[21px]'>
           <div>
             <p className='text-[14px] font-medium text-[#8E9397] mb-[13px] text-center relative z-[1]'>
               Staking Rewards
