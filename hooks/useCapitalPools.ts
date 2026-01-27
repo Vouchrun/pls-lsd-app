@@ -16,6 +16,7 @@ import { AbiItem } from 'web3-utils';
 export interface CapitalPoolStats {
   totalShares: string;
   totalVplsDeposited: string;
+  totalUnlocking: string;
   scrapedVplsPending: string;
   plsPendingDistribution: string;
   lastMintRatio: string;
@@ -192,10 +193,11 @@ export function useCapitalPools() {
           try {
             const pool = getPoolContract(poolAddress);
 
-            const [active, stats, unlockPeriod] = await Promise.all([
+            const [active, stats, unlockPeriod, totalUnlocking] = await Promise.all([
               pool.methods.active().call(),
               pool.methods.getPoolStats().call(),
               pool.methods.unlockPeriod().call(),
+              pool.methods.totalUnlocking().call(),
             ]);
 
             // User-specific data (only if wallet is connected)
@@ -289,25 +291,29 @@ export function useCapitalPools() {
               ),
               stats: {
                 totalShares: Web3.utils.fromWei(
-                  stats.totalShares || '0',
+                  stats._totalShares || stats.totalShares || '0',
                   'ether'
                 ),
                 totalVplsDeposited: Web3.utils.fromWei(
-                  stats.totalVplsDeposited || '0',
+                  stats._totalVplsDeposited || stats.totalVplsDeposited || '0',
+                  'ether'
+                ),
+                totalUnlocking: Web3.utils.fromWei(
+                  totalUnlocking || '0',
                   'ether'
                 ),
                 scrapedVplsPending: Web3.utils.fromWei(
-                  stats.scrapedVplsPending || '0',
+                  stats._scrapedVplsPending || stats.scrapedVplsPending || '0',
                   'ether'
                 ),
                 plsPendingDistribution: Web3.utils.fromWei(
-                  stats.plsPendingDistribution || '0',
+                  stats._plsPendingDistribution || stats.plsPendingDistribution || '0',
                   'ether'
                 ),
-                lastMintRatio: stats.lastMintRatio?.toString() || '0',
-                currentMintRatio: stats.currentMintRatio?.toString() || '0',
+                lastMintRatio: (stats._lastMintRatio || stats.lastMintRatio)?.toString() || '0',
+                currentMintRatio: (stats._currentMintRatio || stats.currentMintRatio)?.toString() || '0',
                 plsMintBuffer: Web3.utils.fromWei(
-                  stats.plsMintBuffer || '0',
+                  stats._plsMintBuffer || stats.plsMintBuffer || '0',
                   'ether'
                 ),
               },

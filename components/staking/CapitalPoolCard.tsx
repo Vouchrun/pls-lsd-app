@@ -212,11 +212,11 @@ export const CapitalPoolCard: React.FC<CapitalPoolCardProps> = ({
   // Calculate pool statistics for the progress bar
   const poolStats = useMemo(() => {
     const staked = Number(poolData.stats.totalVplsDeposited) || 0;
-    const unstaking = Number(poolData.unlockInfo.vplsAmount) || 0;
+    const unstaking = Number(poolData.stats.totalUnlocking) || 0;
     const totalSupply = tokensLoading 
       ? 0 
       : Number(vplsInfo.totalSupply) || 0;
-    
+
     const total = staked + unstaking;
     const unstakingPercentage = total > 0 ? (unstaking / total) * 100 : 0;
     const stakedPercentage = total > 0 ? (staked / total) * 100 : 0;
@@ -230,7 +230,7 @@ export const CapitalPoolCard: React.FC<CapitalPoolCardProps> = ({
     };
   }, [
     poolData.stats.totalVplsDeposited,
-    poolData.unlockInfo.vplsAmount,
+    poolData.stats.totalUnlocking,
     vplsInfo.totalSupply,
     tokensLoading,
   ]);
@@ -488,7 +488,6 @@ export const CapitalPoolCard: React.FC<CapitalPoolCardProps> = ({
             </p>
             <p className='text-[16px] font-normal text-[#ffffff] mb-[7px] whitespace-nowrap'>
               {formatNumber(poolData.userPosition.vplsValue, { decimals: 2 })} <span className='text-[#A6A6A6]'>vPLS (equivalent) </span>
-              {/* / {formatNumber(poolData.userPosition.plsValue, { decimals: 2 })} PLS */}
             </p>
           </div>
 
@@ -496,22 +495,18 @@ export const CapitalPoolCard: React.FC<CapitalPoolCardProps> = ({
           <div className='flex flex-col items-center'>
             <p className='text-[14px] font-medium text-[#8E9397] mb-[7px] text-center'>
               Unstaking 
-              <Tooltip title="Assets currently in the unlocking period" placement="top" arrow>
+              <Tooltip title="Total assets in the unlocking period for the entire pool" placement="top" arrow>
                 <span>
                  <Icomoon icon='tip' size='.12rem' color='#333333' />
                 </span>
               </Tooltip>
             </p>
             <p className='text-[16px] font-normal text-[#ffffff] mb-[7px] text-center'>
-              {formatNumber(poolData.unlockInfo.vplsAmount, { decimals: 2 })} <span className='text-[#A6A6A6]'>vPLS</span>
+              {formatNumber(poolData.stats.totalUnlocking, { decimals: 2 })} <span className='text-[#A6A6A6]'>vPLS</span>
             </p>
-            <p className='text-[13px] font-normal text-[#A6A6A6] mb-[7px] text-center'>$0</p>
-            {/* <p className='text-[16px] font-normal text-[#A6A6A6] mb-[7px] text-center'>
-              <span className='text-color-text1 mr-[3px]'>
-                {formatNumber(poolData.unlockInfo.shares, { decimals: 8 })}
-              </span>
-              Shares
-            </p> */}
+            <p className='text-[13px] font-normal text-[#A6A6A6] mb-[7px] text-center'>
+              ${formatNumber(Number(poolData.stats.totalUnlocking) * vplsPrice, { decimals: 2 })}
+            </p>
           </div>
         </div>
 
