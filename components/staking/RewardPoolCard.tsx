@@ -11,7 +11,7 @@ interface RewardPoolCardProps {
 }
 
 /**
- * Reward Pool Card for VOUCH token staking
+ * Standard Reward Pool Card for VOUCH token staking
  * This is a wrapper around the existing VouchStaking component
  * with an updated header and additional stats to match the design
  */
@@ -41,7 +41,7 @@ export const RewardPoolCard: React.FC<RewardPoolCardProps> = ({
             <p className='text-[18px] font-normal text-color-text1 flex mb-[10px]'>
               VOUCH{' '}<img src='/images/pls_ic.svg' alt='icon' className='ml-[6px]' />
               <span className='ml-[10px] px-[10px] py-[2px] pr-[5px] bg-[#FE8A3C] text-[#000] text-[15px] font-normal rounded-[10px] flex gap-[8px]  align-middle'>
-                Reward Pool
+                Standard Pool
                 <Icomoon icon='tip' size='.12rem' color='#000' />
               </span>
             </p>
