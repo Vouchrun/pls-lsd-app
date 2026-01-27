@@ -264,7 +264,7 @@ export const RewardPoolCard: React.FC<RewardPoolCardProps> = ({
             <p className='text-[#A6A6A6] text-[13px] font-medium'>Staked</p>
             <div className='flex gap-[6px] mt-[10px]'>
               <div className='h-[11px] w-[11px] rounded-[2px] bg-gradient-to-r from-[#ff8533] to-[#ffa162]'></div>
-              <p className='text-[#A6A6A6] text-[13px] font-normal'>101.1</p>
+              <p className='text-[#A6A6A6] text-[13px] font-normal'>0</p>
             </div>
           </div>
           <div>
