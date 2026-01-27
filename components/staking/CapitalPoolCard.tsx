@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
+import Tooltip from '@mui/material/Tooltip';
 import { CapitalPoolData } from 'hooks/useCapitalPools';
 import { useWalletAccount } from 'hooks/useWalletAccount';
 import { useVouchTokens } from 'hooks/useVouchTokens';
@@ -397,7 +398,11 @@ export const CapitalPoolCard: React.FC<CapitalPoolCardProps> = ({
               vPLS{' '}  <img src='/images/pls_ic.svg' alt='icon' className='ml-[6px]' />
               <span className='ml-[10px] px-[10px] py-[2px] pr-[5px] bg-[#FE8A3C] text-[#000] text-[15px] font-normal rounded-[10px] flex gap-[8px]'>
                 Capital Pool
-                <Icomoon icon='tip' size='.12rem' color='#000'  />
+                <Tooltip title="Stake vPLS to earn rewards" placement="top" arrow>
+                  <span>
+                    <Icomoon icon='tip' size='.12rem' color='#000' />
+                  </span>
+                </Tooltip>
               </span>
             </p>
             <p className='text-[13px] font-normal text-text2/50 dark:text-text2Dark/50 mt-[3px]'>
@@ -422,7 +427,7 @@ export const CapitalPoolCard: React.FC<CapitalPoolCardProps> = ({
                 ? depositType === 'vpls'
                   ? 'vPLS'
                   : 'PLS'
-                : 'Shares'}
+                : 'vPLS'}
             </p>
            {selectedTab === 'stake' && <p className='text-[18px] max-sm:text-[18px] font-normal text-[#E8EFFD] mt-[6px]'>
               {formatNumber(plsBalance || '0', { decimals: 2 })}
@@ -438,7 +443,12 @@ export const CapitalPoolCard: React.FC<CapitalPoolCardProps> = ({
           {/* Pool Column */}
           <div className='flex flex-col items-center'>
             <p className='text-[14px] font-medium text-[#8E9397] mb-[7px] text-center'>
-              Pool Rate  <Icomoon icon='tip' size='.12rem' color='#333333' />
+              Pool Rate  
+              <Tooltip title="The percentage of yield retained by the pool" placement="top" arrow>
+                <span>
+                  <Icomoon icon='tip' size='.12rem' color='#333333' />
+                </span>
+              </Tooltip>
             </p>
             <p className='text-[16px] font-normal text-[#A6A6A6] mb-[7px] text-center'>
               <span className='text-color-text1 mr-[3px]'>
@@ -460,29 +470,40 @@ export const CapitalPoolCard: React.FC<CapitalPoolCardProps> = ({
           {/* Staked Column */}
           <div className='flex flex-col items-start'>
             <p className='text-[14px] font-medium text-[#8E9397] mb-[7px] text-center'>
-              Staked <Icomoon icon='tip' size='.12rem' color='#333333' />
+              Staked 
+              <Tooltip title="Your total staked balance" placement="top" arrow>
+                <span>
+                  <Icomoon icon='tip' size='.12rem' color='#333333' />
+                </span>
+              </Tooltip>
             </p>
-            <p className='text-[16px] font-normal text-[#A6A6A6] mb-[7px] text-center'>
+            <p className='text-[16px] font-normal text-[#A6A6A6] mb-[7px] text-center whitespace-nowrap'>
               <span className='text-color-text1 mr-[3px]'>
-                {formatNumber(poolData.userPosition.plsValue, { decimals: 4 })} <span className='text-[#A6A6A6]'>PLS</span>
+                {formatNumber(poolData.userPosition.plsValue, { decimals: 2 })}
               </span>
-              <span className='font-normal text-[#A6A6A6] text-[13px] ml-[20px]'>
-                ${formatNumber(stakedPlsUsdValue, { decimals: 2 })}
+              <span className='text-[#A6A6A6]'>PLS</span>
+              <span className='font-normal text-[#A6A6A6] text-[13px] ml-[10px]'>
+                (${formatNumber(stakedPlsUsdValue, { decimals: 2 })})
               </span>
             </p>
             <p className='text-[16px] font-normal text-[#ffffff] mb-[7px] whitespace-nowrap'>
-              {formatNumber(poolData.userPosition.vplsValue, { decimals: 4 })} <span className='text-[#A6A6A6]'>vPLS (equivalent) </span>
-              {/* / {formatNumber(poolData.userPosition.plsValue, { decimals: 4 })} PLS */}
+              {formatNumber(poolData.userPosition.vplsValue, { decimals: 2 })} <span className='text-[#A6A6A6]'>vPLS (equivalent) </span>
+              {/* / {formatNumber(poolData.userPosition.plsValue, { decimals: 2 })} PLS */}
             </p>
           </div>
 
           {/* Unstaking Column */}
           <div className='flex flex-col items-center'>
             <p className='text-[14px] font-medium text-[#8E9397] mb-[7px] text-center'>
-              Unstaking <Icomoon icon='tip' size='.12rem' color='#333333' />
+              Unstaking 
+              <Tooltip title="Assets currently in the unlocking period" placement="top" arrow>
+                <span>
+                 <Icomoon icon='tip' size='.12rem' color='#333333' />
+                </span>
+              </Tooltip>
             </p>
             <p className='text-[16px] font-normal text-[#ffffff] mb-[7px] text-center'>
-              {formatNumber(poolData.unlockInfo.vplsAmount, { decimals: 4 })} <span className='text-[#A6A6A6]'>vPLS</span>
+              {formatNumber(poolData.unlockInfo.vplsAmount, { decimals: 2 })} <span className='text-[#A6A6A6]'>vPLS</span>
             </p>
             <p className='text-[13px] font-normal text-[#A6A6A6] mb-[7px] text-center'>$0</p>
             {/* <p className='text-[16px] font-normal text-[#A6A6A6] mb-[7px] text-center'>
@@ -495,7 +516,14 @@ export const CapitalPoolCard: React.FC<CapitalPoolCardProps> = ({
         </div>
 
         <div className='flex mx-auto text-center flex-col relative top-[25px]'>
-          <p className='text-[13px] font-medium text-[#FF8533] gap-1'>Vouch BOOST Capital Pool <Icomoon icon='tip' size='.12rem' color='#333333' /></p>
+          <p className='text-[13px] font-medium text-[#FF8533] gap-1'>
+            Vouch BOOST Capital Pool 
+            <Tooltip title="Pool weight determining reward allocation" placement="top" arrow>
+              <span>
+                <Icomoon icon='tip' size='.12rem' color='#333333' />
+              </span>
+             </Tooltip>
+          </p>
           <p className='text-[13px] font-normal text-[#8E9397]'> Allocation <span className='text-[#FFFFFF]'>{poolAllocPoint > 0 ? formatNumber(poolAllocPoint, { decimals: 0 }) : '...'}</span></p>
         </div>
 
@@ -507,13 +535,13 @@ export const CapitalPoolCard: React.FC<CapitalPoolCardProps> = ({
             </p>
             <div className='flex max-w-[160px] justify-between mx-auto mt-[20px] mb-[8px]'>
               <p className='text-[18px] font-normal text-color-text1 text-center'>
-                {formatNumber(poolData.pendingRewards.vplsPending, { decimals: 6 })}
+                {formatNumber(poolData.pendingRewards.vplsPending, { decimals: 2 })}
               </p>
               <p className='text-[18px] font-normal text-[#A6A6A6] text-center'>vPLS</p>
             </div>
             <div className='flex max-w-[160px] justify-between mx-auto mb-[8px]'>
               <p className='text-[18px] font-normal text-color-text1 text-center'>
-                {formatNumber(poolData.pendingRewards.vouchPending, { decimals: 6 })}
+                {formatNumber(poolData.pendingRewards.vouchPending, { decimals: 2 })}
               </p>
               <p className='text-[18px] font-normal text-[#A6A6A6] text-center'>
                 VOUCH
@@ -521,7 +549,7 @@ export const CapitalPoolCard: React.FC<CapitalPoolCardProps> = ({
             </div>
             <div className='flex max-w-[160px] justify-between mx-auto mb-[10px]'>
               <p className='text-[18px] font-normal text-color-text1 text-center'>
-                {formatNumber(poolData.pendingRewards.wplsPending, { decimals: 6 })}
+                {formatNumber(poolData.pendingRewards.wplsPending, { decimals: 2 })}
               </p>
               <p className='text-[18px] font-normal text-[#A6A6A6] text-center'>PLS</p>
             </div>
@@ -689,6 +717,16 @@ export const CapitalPoolCard: React.FC<CapitalPoolCardProps> = ({
                       <option value='pls'>PLS</option>
                     </select>
                   )}
+                  {selectedTab === 'unstake' && (
+                    <select 
+                      className='gef_selct bg-[#1A1A1A] border border-[#6C86AD80] outline-none h-[36px] w-[100px] justify-center text-center rounded-[30px]'
+                      value={depositType}
+                      onChange={(e) => setDepositType(e.target.value as 'vpls' | 'pls')}
+                    >
+                      <option value='vpls'>vPLS</option>
+                    </select>
+                  )}
+                    
                   <CustomButton
                     // type='stroke'
                     // width='.63rem'
@@ -704,16 +742,16 @@ export const CapitalPoolCard: React.FC<CapitalPoolCardProps> = ({
               </div>
 
               {/* Balance Info */}
-              <div className='mt-[.1rem] text-[.14rem]'>
+              <div className='mt-[.18rem] text-[.14rem]'>
                 <div className='grid grid-cols-2 gap-0'>
                   <div></div>
                   <div className='text-color-text2 mt-[7px] mb-[14px]'>
-                    Balance: {formatNumber(maxAmount, { decimals: 4 })}{' '}
+                    Balance: {formatNumber(maxAmount, { decimals: 2 })}{' '}
                     {selectedTab === 'stake'
                       ? depositType === 'vpls'
                         ? 'vPLS'
                         : 'PLS'
-                      : 'Shares'}
+                      : 'vPLS (Staked)'}
                   </div>
                 </div>
               </div>

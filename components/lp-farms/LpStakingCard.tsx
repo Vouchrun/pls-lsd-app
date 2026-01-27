@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
+import Tooltip from '@mui/material/Tooltip';
 import { Icomoon } from 'components/icon/Icomoon';
 import { FarmsTabs } from './FarmsTab';
 import { CustomNumberInput } from 'components/common/CustomNumberInput';
@@ -228,7 +229,12 @@ export const LpStakingCard: React.FC<LpStakingCardProps> = ({
           <div className='flex flex-col items-center'>
             <div>
               <p className='text-[14px] font-medium text-[#8E9397] mb-[7px] m-auto items-baseline'>
-                Staked <Icomoon icon='tip' size='.12rem' color='#333333' />
+                Staked 
+                <Tooltip title="Your total staked LP tokens" placement="top" arrow>
+                  <span>
+                    <Icomoon icon='tip' size='.12rem' color='#333333' />
+                  </span>
+                </Tooltip>
               </p>
               <p className='text-[16px] font-normal text-[#A6A6A6] mb-[7px] m-auto items-baseline'>
                 <span className='text-color-text1 mr-[3px]'>
@@ -248,7 +254,11 @@ export const LpStakingCard: React.FC<LpStakingCardProps> = ({
               <p className='text-[14px] font-medium text-[#8E9397] mb-[7px] m-auto items-baseline flex'>
                 Allocation
                 <div className='relative top-[-7px] right-[-1px]'>
-                  <Icomoon icon='tip' size='.12rem' color='#333333'  />  
+                  <Tooltip title="Pool weight for reward distribution" placement="top" arrow>
+                    <span>
+                      <Icomoon icon='tip' size='.12rem' color='#333333'  />  
+                    </span>
+                  </Tooltip>
                 </div>
               </p>
               <p className='text-[20px] text-center font-normal text-[#ffa162] mb-[0px] mt-[12px] m-auto items-baseline'>

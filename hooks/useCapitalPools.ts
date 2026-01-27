@@ -161,7 +161,7 @@ export function useCapitalPools() {
         .getAllPools()
         .call();
 
-      console.log('poolAddresses', poolAddresses);
+      
       if (poolAddresses.length === 0) {
         setCapitalPools([]);
         return;
@@ -255,7 +255,7 @@ export function useCapitalPools() {
               if (pid !== null) {
                 try {
                   const pendingResult = await vouchStaking.methods
-                    .pendingCapitalRewardsProjected(pid, metaMaskAccount)
+                    .pendingLiquidityRewardsProjected(pid, metaMaskAccount)
                     .call();
 
                   pendingRewards = {

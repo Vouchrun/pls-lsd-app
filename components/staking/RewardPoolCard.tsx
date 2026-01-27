@@ -1,8 +1,10 @@
 import React from 'react';
+import Tooltip from '@mui/material/Tooltip';
 import { VouchStaking } from './VouchStaking';
 import { useVouchStaking } from 'hooks/useVouchStaking';
 import { useVouchTokens } from 'hooks/useVouchTokens';
 import { formatNumber } from 'utils/numberUtils';
+import Web3 from 'web3';
 import { Icomoon } from '../icon/Icomoon';
 
 interface RewardPoolCardProps {
@@ -24,6 +26,8 @@ export const RewardPoolCard: React.FC<RewardPoolCardProps> = ({
     vouchUnlockInfo,
     pendingTripleByPid,
     holderRewardInfo,
+    totalVouchUnlocking,
+    vouchPoolInfo,
     loading,
   } = useVouchStaking();
 
@@ -42,7 +46,11 @@ export const RewardPoolCard: React.FC<RewardPoolCardProps> = ({
               VOUCH{' '}<img src='/images/pls_ic.svg' alt='icon' className='ml-[6px]' />
               <span className='ml-[10px] px-[10px] py-[2px] pr-[5px] bg-[#FE8A3C] text-[#000] text-[15px] font-normal rounded-[10px] flex gap-[8px]  align-middle'>
                 Standard Pool
-                <Icomoon icon='tip' size='.12rem' color='#000' />
+                <Tooltip title="Stake VOUCH to earn rewards" placement="top" arrow>
+                  <span>
+                    <Icomoon icon='tip' size='.12rem' color='#000' />
+                  </span>
+                </Tooltip>
               </span>
             </p>
             <p className='text-[13px] font-normal text-[#A6A6A6] mt-[3px]'>
@@ -59,11 +67,15 @@ export const RewardPoolCard: React.FC<RewardPoolCardProps> = ({
             </p>
             <p className='text-[18px] max-sm:text-[18px] font-normal text-[#A6A6A6]'>
               <span className='text-color-text1 mr-[3px]'>
-                {tokensLoading
-                  ? '...'
-                  : formatNumber(vouchBalance.balance, { decimals: 2 })}
+                {selectedTab === 'stake'
+                  ? tokensLoading
+                    ? '...'
+                    : formatNumber(vouchBalance.balance, { decimals: 2 })
+                  : loading
+                    ? '...'
+                    : formatNumber(userTotalVouchStaked, { decimals: 2 })}
               </span>
-              VOUCH
+              {selectedTab === 'stake' ? 'VOUCH' : 'VOUCH (Staked)'}
             </p>
           </div>
         </div>
@@ -74,14 +86,20 @@ export const RewardPoolCard: React.FC<RewardPoolCardProps> = ({
         <div className='grid grid-cols-2 gap-4 py-[18px] min-h-[120px]'>
           {/* Staked Column */}
           <div className='flex flex-col items-center'>
+
             <p className='text-[14px] font-medium text-[#8E9397] mb-[7px] text-center'>
-              Staked <Icomoon icon='tip' size='.12rem' color='#333333' />
+              Staked 
+              <Tooltip title="Total VOUCH staked" placement="top" arrow>
+                <span>
+                  <Icomoon icon='tip' size='.12rem' color='#333333' />
+                </span>
+              </Tooltip>
             </p>
             <p className='text-[16px] font-normal text-[#A6A6A6] mb-[7px] text-center'>
               <span className='text-color-text1 mr-[3px]'>
                 {loading
                   ? '...'
-                  : formatNumber(userTotalVouchStaked, { decimals: 8 })}
+                  : formatNumber(userTotalVouchStaked, { decimals: 2 })}
               </span>
               VOUCH
             </p>
@@ -91,21 +109,27 @@ export const RewardPoolCard: React.FC<RewardPoolCardProps> = ({
                 ? '-'
                 : formatNumber(
                   Number(vouchInfo.price) * Number(userTotalVouchStaked),
-                  { decimals: 8 }
+                  { decimals: 2 }
                 )}
             </p>
           </div>
 
           {/* Unstaking Column */}
           <div className='flex flex-col items-center'>
+
             <p className='text-[14px] font-medium text-[#8E9397] mb-[7px] text-center'>
-              Unstaking <Icomoon icon='tip' size='.12rem' color='#333333' />
+              Unstaking 
+              <Tooltip title="VOUCH tokens in unlocking period" placement="top" arrow>
+                <span>
+                  <Icomoon icon='tip' size='.12rem' color='#333333' />
+                </span>
+              </Tooltip>
             </p>
             <p className='text-[16px] font-normal text-[#A6A6A6] mb-[7px] text-center'>
               <span className='text-color-text1 mr-[3px]'>
                 {loading
                   ? '...'
-                  : formatNumber(vouchUnlockInfo.amount, { decimals: 8 })}
+                  : formatNumber(vouchUnlockInfo.amount, { decimals: 2 })}
               </span>
               VOUCH
             </p>
@@ -115,14 +139,22 @@ export const RewardPoolCard: React.FC<RewardPoolCardProps> = ({
                 ? '-'
                 : formatNumber(
                   Number(vouchInfo.price) * Number(vouchUnlockInfo.amount),
-                  { decimals: 8 }
+                  { decimals: 2 }
                 )}
             </p>
           </div>
         </div>
 
+
         <div className='flex mx-auto text-center flex-col relative top-[25px]'>
-          <p className='text-[13px] font-medium text-[#FF8533] gap-1'>VOUCH Rewards Pool <Icomoon icon='tip' size='.12rem' color='#333333' /></p>
+          <p className='text-[13px] font-medium text-[#FF8533] gap-1'>
+            VOUCH Rewards Pool 
+            <Tooltip title="Pool allocation for VOUCH rewards" placement="top" arrow>
+              <span>
+                <Icomoon icon='tip' size='.12rem' color='#333333' />
+              </span>
+            </Tooltip>
+          </p>
           <p className='text-[13px] font-normal text-[#8E9397]'> Allocation <span className='text-[#FFFFFF]'>100</span></p>
         </div>
 
@@ -137,7 +169,7 @@ export const RewardPoolCard: React.FC<RewardPoolCardProps> = ({
                 {loading
                   ? '...'
                   : formatNumber(pendingTripleByPid?.[1]?.vplsPending || '0', {
-                    decimals: 6,
+                    decimals: 2,
                   })}
               </p>
               <p className='text-[18px] font-normal text-[#A6A6A6] text-center'>
@@ -151,7 +183,7 @@ export const RewardPoolCard: React.FC<RewardPoolCardProps> = ({
                   : formatNumber(
                     pendingTripleByPid?.[1]?.vouchPending || '0',
                     {
-                      decimals: 6,
+                      decimals: 2,
                     }
                   )}
               </p>
@@ -164,7 +196,7 @@ export const RewardPoolCard: React.FC<RewardPoolCardProps> = ({
                 {loading
                   ? '...'
                   : formatNumber(pendingTripleByPid?.[1]?.wplsPending || '0', {
-                    decimals: 6,
+                    decimals: 2,
                   })}
               </p>
               <p className='text-[18px] font-normal text-[#A6A6A6] text-center'>
@@ -181,7 +213,7 @@ export const RewardPoolCard: React.FC<RewardPoolCardProps> = ({
                 {loading
                   ? '...'
                   : formatNumber(holderRewardInfo.vplsPending, {
-                    decimals: 6,
+                    decimals: 2,
                   })}
               </p>
               <p className='text-[18px] font-normal text-[#A6A6A6] text-center mr-[8px]'>
@@ -193,7 +225,7 @@ export const RewardPoolCard: React.FC<RewardPoolCardProps> = ({
                 {loading
                   ? '...'
                   : formatNumber(holderRewardInfo.vouchPending, {
-                    decimals: 6,
+                    decimals: 2,
                   })}
               </p>
               <p className='text-[18px] font-normal text-[#A6A6A6] text-center mr-[8px]'>
@@ -205,7 +237,7 @@ export const RewardPoolCard: React.FC<RewardPoolCardProps> = ({
                 {loading
                   ? '...'
                   : formatNumber(holderRewardInfo.plsPending, {
-                    decimals: 6,
+                    decimals: 2,
                   })}
               </p>
               <p className='text-[18px] font-normal text-[#A6A6A6] text-center mr-[8px]'>
@@ -257,21 +289,45 @@ export const RewardPoolCard: React.FC<RewardPoolCardProps> = ({
             <p className='text-[#A6A6A6] text-[13px] font-medium'>Unstaking</p>
             <div className='flex gap-[6px] mt-[10px]'>
               <div className='h-[11px] w-[11px] rounded-[2px] bg-[#4F8CEF]'></div>
-              <p className='text-[#A6A6A6] text-[13px] font-normal'>0</p>
+             <p className='text-[13px] font-normal text-[#A6A6A6]'>
+                      {loading
+                        ? '...'
+                        : formatNumber(totalVouchUnlocking, {
+                            decimals: 2,
+                          })}{' '}
+                    </p>
             </div>
           </div>
           <div>
             <p className='text-[#A6A6A6] text-[13px] font-medium'>Staked</p>
             <div className='flex gap-[6px] mt-[10px]'>
               <div className='h-[11px] w-[11px] rounded-[2px] bg-gradient-to-r from-[#ff8533] to-[#ffa162]'></div>
-              <p className='text-[#A6A6A6] text-[13px] font-normal'>0</p>
+               <p className='text-[13px] font-normal text-[#A6A6A6]'>
+                      {loading
+                        ? '-'
+                        : formatNumber(
+                            Web3.utils.fromWei(
+                              vouchPoolInfo.totalStaked,
+                              'ether'
+                            ),
+                            {
+                              decimals: 2,
+                            }
+                          )}{' '}
+                    </p>
             </div>
           </div>
           <div>
             <p className='text-[#A6A6A6] text-[13px] font-medium'>Total Supply</p>
             <div className='flex gap-[6px] mt-[10px]'>
               <div className='h-[11px] w-[11px] rounded-[2px] bg-[#333]'></div>
-              <p className='text-[#A6A6A6] text-[13px] font-normal'>0</p>
+              <p className='text-[13px] font-normal text-[#A6A6A6]'>
+                      {tokensLoading
+                        ? '...'
+                        : formatNumber(vouchInfo.totalSupply, {
+                            decimals: 2,
+                          })}{' '}
+                    </p>
             </div>
           </div>
         </div>
