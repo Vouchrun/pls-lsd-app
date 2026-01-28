@@ -33,6 +33,9 @@
     },
     "lpRewardPoolContract": {
       "address": "0xBE76b28F3eA958c883adAfd1d4f83170aACf3D55"
+    },
+    "capitalPoolFactoryContract": {
+      "address": "0x9004D654f0D0252fA719f9760Bb81a85ABd44AC6"
     }
   },
   "networkBalanceContractDeploymentBlock": 19612112

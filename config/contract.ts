@@ -6,6 +6,8 @@ import networkBalanceContractAbi from './abi/networkBalance.json';
 import networkWithdrawContractAbi from './abi/networkWithdraw.json';
 import depositContractAbi from './abi/deposit.json';
 import vouchStakingContractAbi from './abi/vouchStaking.json';
+import capitalPoolFactoryContractAbi from './abi/capitalPoolFactory.json';
+import capitalPoolContractAbi from './abi/capitalPool.json';
 import { AbiItem } from 'web3-utils';
 
 /**
@@ -121,4 +123,28 @@ export function getNetworkBalanceContractAbi() {
  */
 export function getVouchStakingContractAbi() {
   return vouchStakingContractAbi as AbiItem[];
+}
+
+/**
+ * get CapitalPoolFactory contract address
+ */
+export function getCapitalPoolFactoryContract() {
+  if (isDev()) {
+    return appDevConfig.contracts.capitalPoolFactoryContract.address;
+  }
+  return appProdConfig.contracts.capitalPoolFactoryContract.address;
+}
+
+/**
+ * get CapitalPoolFactory contract ABI
+ */
+export function getCapitalPoolFactoryContractAbi() {
+  return capitalPoolFactoryContractAbi as AbiItem[];
+}
+
+/**
+ * get CapitalPool contract ABI
+ */
+export function getCapitalPoolContractAbi() {
+  return capitalPoolContractAbi as AbiItem[];
 }
