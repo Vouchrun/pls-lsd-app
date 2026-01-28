@@ -1,0 +1,61 @@
+[
+  {
+    "inputs": [],
+    "name": "getAllPools",
+    "outputs": [
+      {
+        "internalType": "address[]",
+        "name": "",
+        "type": "address[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "poolCount",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getAggregatedStats",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "totalPools",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "totalShares",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "totalVplsDeposited",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "totalPlsPending",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "totalPlsDistributed",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  }
+]

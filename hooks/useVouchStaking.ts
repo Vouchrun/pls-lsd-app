@@ -477,8 +477,7 @@ export function useVouchStaking() {
   // Approve tokens for staking
   const approve = useCallback(
     async (pid: number, amount: string) => {
-      console.log('Approve called with:', { pid, amount, metaMaskAccount });
-
+    
       if (!metaMaskAccount) {
         throw new Error('Wallet not connected');
       }
@@ -495,8 +494,7 @@ export function useVouchStaking() {
           pid === 1 ? TOKEN_ADDRESSES.VOUCH : TOKEN_ADDRESSES.VPLS;
         const spender = getVouchStakingContract();
 
-        console.log('Token and spender:', { vouchToken, spender });
-
+      
         // Validate spender address
         if (!Web3.utils.isAddress(spender)) {
           throw new Error(`Invalid spender address: ${spender}`);
@@ -509,12 +507,6 @@ export function useVouchStaking() {
 
         const erc20ForTx = getErc20ContractForTransactions(vouchToken);
 
-        console.log('Attempting approval...', {
-          token: vouchToken,
-          spender,
-          amount: amountWei,
-          from: metaMaskAccount,
-        });
 
         // First, try to estimate gas with proper error handling
         let gasEstimate;
@@ -522,7 +514,7 @@ export function useVouchStaking() {
           gasEstimate = await erc20ForTx.methods
             .approve(spender, amountWei)
             .estimateGas({ from: metaMaskAccount });
-          console.log('Gas estimate:', gasEstimate);
+         
         } catch (estimateError: any) {
           console.error('Gas estimation error:', estimateError);
           // Use a default gas limit if estimation fails
@@ -536,7 +528,7 @@ export function useVouchStaking() {
             gas: Math.floor(Number(gasEstimate) * 1.2),
           });
 
-        console.log('Approval receipt:', receipt);
+        
         return receipt;
       } catch (error: any) {
         console.error('Error approving:', error);
@@ -563,7 +555,6 @@ export function useVouchStaking() {
         const amountWei = Web3.utils.toWei(amount, 'ether');
 
         // Perform stake
-        console.log('stake', pid, amountWei);
         const stakingContractForTx = getContractForTransactions();
 
         const receipt = await stakingContractForTx.methods

@@ -100,7 +100,7 @@ function loadWorkingRpc(): string | null {
 function saveWorkingRpc(rpcUrl: string) {
   workingRpc = rpcUrl;
   saveStorage(STORAGE_KEY_WORKING_RPC, rpcUrl);
-  console.log(`Saved working RPC: ${rpcUrl}`);
+  
 }
 
 /**

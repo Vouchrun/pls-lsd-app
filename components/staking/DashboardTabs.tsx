@@ -6,8 +6,8 @@ import menuIcon from 'public/images/burger-menu.svg';
 import Link from 'next/link';
 
 interface Props {
-  selectedTab: 'stake' | 'unstake' | 'withdraw' | 'vouchstaking';
-  onChangeTab: (tab: 'stake' | 'unstake' | 'withdraw' | 'vouchstaking') => void;
+  selectedTab: 'stake' | 'unstake' | 'withdraw' | 'staking-pools';
+  onChangeTab: (tab: 'stake' | 'unstake' | 'withdraw' | 'staking-pools') => void;
   showWithdrawTab?: boolean;
 }
 
@@ -15,10 +15,12 @@ export const DashboardTabs = (props: Props) => {
   const router = useRouter();
   const { showWithdrawTab } = props;
 
+
   const showWithdraw = useMemo(() => {
     return showWithdrawTab || router.query.tab === 'withdraw';
   }, [router.query, showWithdrawTab]);
   const [isActive, setIsActive] = useState(false);
+  const [isBuyModalOpen, setIsBuyModalOpen] = useState(false);
   const handleClick = () => {
     setIsActive((prev) => !prev); // Toggle state
   };
@@ -52,13 +54,12 @@ export const DashboardTabs = (props: Props) => {
       >
         <Link
           className={classNames(
-            'h-[35px] cursor-pointer flex items-center justify-center text-[.16rem] rounded-[.3rem]',
+            'h-[35px] cursor-pointer flex items-center justify-center text-[.15rem] rounded-[.3rem]',
             (props.selectedTab === 'stake' ||
               props.selectedTab === 'unstake' ||
               router.pathname.startsWith('/PLS/')) &&
               !router.pathname.startsWith('/dashboard') &&
-              !router.pathname.startsWith('/vouchstaking') &&
-              !router.pathname.startsWith('/lp-farms')
+              !router.pathname.startsWith('/staking-pools')
               ? 'text-color-highlight bg-color-highlight'
               : 'text-color-text1'
           )}
@@ -73,7 +74,7 @@ export const DashboardTabs = (props: Props) => {
             {/* <div className="ml-[.1rem] w-[0.01rem] h-[.22rem] bg-[#DEE6F7] dark:bg-bg1Dark self-center" /> */}
             <Link
               className={classNames(
-                'h-[35px] flex-1 ml-[.1rem] cursor-pointer flex items-center justify-center text-[.16rem] rounded-[.3rem]',
+                'h-[35px] flex-1 ml-[.1rem] cursor-pointer flex items-center justify-center text-[.15rem] rounded-[.3rem]',
                 props.selectedTab === 'withdraw' &&
                   !router.pathname.startsWith('/dashboard')
                   ? 'text-color-highlight bg-color-highlight'
@@ -91,7 +92,7 @@ export const DashboardTabs = (props: Props) => {
           <Link
             href={'/dashboard'}
             className={classNames(
-              'h-[35px] flex-1 ml-[.1rem] cursor-pointer flex items-center justify-center text-[.16rem] rounded-[.3rem]',
+              'h-[35px] flex-1 ml-[.1rem] cursor-pointer flex items-center justify-center text-[.15rem] rounded-[.3rem]',
 
               router.pathname.startsWith('/dashboard')
                 ? 'text-color-highlight bg-color-highlight'
@@ -106,33 +107,59 @@ export const DashboardTabs = (props: Props) => {
           {/* <div className="ml-[.1rem] w-[0.01rem] h-[.22rem] bg-[#DEE6F7] dark:bg-bg1Dark self-center" /> */}
           <Link
             className={classNames(
-              'h-[35px] flex-1 ml-[.1rem] cursor-pointer flex items-center justify-center text-[.16rem] rounded-[.3rem] whitespace-nowrap',
-              router.pathname.startsWith('/vouchstaking')
+              'h-[35px] flex-1 ml-[.1rem] cursor-pointer flex items-center justify-center text-[.15rem] rounded-[.3rem] whitespace-nowrap',
+              router.pathname.startsWith('/staking-pools')
                 ? 'text-color-highlight bg-color-highlight'
                 : 'text-color-text1'
             )}
-            href='/vouchstaking'
+            href='/staking-pools'
             // onClick={() => props.onChangeTab("withdraw")}
           >
-            Vouch Staking
+            Staking Pools
           </Link>
         </div>
+
         <div className='flex items-stretch'>
           {/* <div className="ml-[.1rem] w-[0.01rem] h-[.22rem] bg-[#DEE6F7] dark:bg-bg1Dark self-center" /> */}
-          <Link
+          <button
             className={classNames(
-              'h-[35px] flex-1 ml-[.1rem] cursor-pointer flex items-center justify-center text-[.16rem] rounded-[.3rem] whitespace-nowrap',
-              router.pathname.startsWith('/lp-farms')
-                ? 'text-color-highlight bg-color-highlight'
-                : 'text-color-text1'
+              'h-[35px] flex-1 ml-[.1rem] cursor-pointer flex items-center justify-center text-[.15rem] rounded-[.3rem] whitespace-nowrap text-[#FFF]',
+              router.pathname.startsWith('')
+                // ? 'text-color-highlight bg-color-highlight'
+                // : 'text-color-text1'
             )}
-            href='/lp-farms'
+            onClick={() => setIsBuyModalOpen(true)}
             // onClick={() => props.onChangeTab("withdraw")}
           >
-            LP Staking
-          </Link>
+            Buy VOUCH
+          </button>
         </div>
+
       </div>
+
+      {/* Buy VOUCH Modal */}
+      {isBuyModalOpen && (
+        <div
+          className='fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4'
+          onClick={() => setIsBuyModalOpen(false)}
+        >
+          <div
+            className='bg-[#111111] border border-[#ff8a3b] rounded-[45px] max-w-[600px] w-full max-h-[90vh] overflow-hidden relative'
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Iframe Content */}
+            <div className='overflow-y-auto max-h-[calc(90vh-60px)]'>
+              <iframe
+                src='https://widget.switch.win/widget?network=pulsechain&background_color=111111&font_color=ffffff&secondary_font_color=8e9397&border_color=ff8a3b&from=0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee&to=0xD34f5ADC24d8Cc55C1e832Bdf65fFfDF80D1314f'
+                allow='clipboard-read; clipboard-write'
+                width='100%'
+                height='735px'
+                style={{ border: 'none' }}
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 };
