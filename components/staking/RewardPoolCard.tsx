@@ -57,7 +57,7 @@ export const RewardPoolCard: React.FC<RewardPoolCardProps> = ({
               VOUCH{' '}<img src='/images/pls_ic.svg' alt='icon' className='ml-[6px]' />
               <span className='ml-[10px] px-[10px] py-[2px] pr-[5px] bg-[#FE8A3C] text-[#000] text-[15px] font-normal rounded-[10px] flex gap-[8px]  align-middle'>
                 Standard Pool
-                <Tooltip title="Stake VOUCH to earn rewards" placement="top" arrow>
+                <Tooltip title="Standard Pools reward token holders for sigle sided staking. They can earn extra VOUCH, vPLS and PLS tokens in return for locking their liquid tokens." placement="top" arrow>
                   <span>
                     <Icomoon icon='tip' size='.12rem' color='#000' />
                   </span>
@@ -130,7 +130,7 @@ export const RewardPoolCard: React.FC<RewardPoolCardProps> = ({
 
             <p className='text-[14px] font-medium text-[#8E9397] mb-[7px] text-center'>
               Unstaking 
-              <Tooltip title="VOUCH tokens in unlocking period" placement="top" arrow>
+              <Tooltip title="Tokens in unlocking period." placement="top" arrow>
                 <span>
                   <Icomoon icon='tip' size='.12rem' color='#333333' />
                 </span>
@@ -160,7 +160,7 @@ export const RewardPoolCard: React.FC<RewardPoolCardProps> = ({
         <div className='flex mx-auto text-center flex-col relative top-[25px]'>
           <p className='text-[13px] font-medium text-[#FF8533] gap-1'>
             VOUCH Rewards Pool 
-            <Tooltip title="Pool allocation for VOUCH rewards" placement="top" arrow>
+            <Tooltip title="Pool weight (allocation), higher means more rewards allocated." placement="top" arrow>
               <span>
                 <Icomoon icon='tip' size='.12rem' color='#333333' />
               </span>

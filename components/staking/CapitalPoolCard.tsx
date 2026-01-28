@@ -398,7 +398,7 @@ export const CapitalPoolCard: React.FC<CapitalPoolCardProps> = ({
               vPLS{' '}  <img src='/images/pls_ic.svg' alt='icon' className='ml-[6px]' />
               <span className='ml-[10px] px-[10px] py-[2px] pr-[5px] bg-[#FE8A3C] text-[#000] text-[15px] font-normal rounded-[10px] flex gap-[8px]'>
                 Capital Pool
-                <Tooltip title="Stake vPLS to earn rewards" placement="top" arrow>
+                <Tooltip title="In return for stakers giving up a portion of their PLS Yield (at the Pool Rate), Capital Pools stakers get larger VOUCH, vPLS and PLS rewards." placement="top" arrow>
                   <span>
                     <Icomoon icon='tip' size='.12rem' color='#000' />
                   </span>
@@ -444,7 +444,7 @@ export const CapitalPoolCard: React.FC<CapitalPoolCardProps> = ({
           <div className='flex flex-col items-center'>
             <p className='text-[14px] font-medium text-[#8E9397] mb-[7px] text-center'>
               Pool Rate  
-              <Tooltip title="The percentage of yield retained by the pool" placement="top" arrow>
+              <Tooltip title="The percentage of PLS yield retained by the capital pool." placement="top" arrow>
                 <span>
                   <Icomoon icon='tip' size='.12rem' color='#333333' />
                 </span>
@@ -471,7 +471,7 @@ export const CapitalPoolCard: React.FC<CapitalPoolCardProps> = ({
           <div className='flex flex-col items-start'>
             <p className='text-[14px] font-medium text-[#8E9397] mb-[7px] text-center'>
               Staked 
-              <Tooltip title="Your total staked balance" placement="top" arrow>
+              <Tooltip title="Your total staked balance, in Capital Pools PLS amount will Increase but vPLS amount will decrease over time." placement="top" arrow>
                 <span>
                   <Icomoon icon='tip' size='.12rem' color='#333333' />
                 </span>
@@ -495,7 +495,7 @@ export const CapitalPoolCard: React.FC<CapitalPoolCardProps> = ({
           <div className='flex flex-col items-center'>
             <p className='text-[14px] font-medium text-[#8E9397] mb-[7px] text-center'>
               Unstaking 
-              <Tooltip title="Total assets in the unlocking period for the entire pool" placement="top" arrow>
+              <Tooltip title="Tokens in unlocking period." placement="top" arrow>
                 <span>
                  <Icomoon icon='tip' size='.12rem' color='#333333' />
                 </span>
@@ -513,7 +513,7 @@ export const CapitalPoolCard: React.FC<CapitalPoolCardProps> = ({
         <div className='flex mx-auto text-center flex-col relative top-[25px]'>
           <p className='text-[13px] font-medium text-[#FF8533] gap-1'>
             Vouch BOOST Capital Pool 
-            <Tooltip title="Pool weight determining reward allocation" placement="top" arrow>
+            <Tooltip title="Pool weight (allocation), higher means more rewards allocated." placement="top" arrow>
               <span>
                 <Icomoon icon='tip' size='.12rem' color='#333333' />
               </span>
