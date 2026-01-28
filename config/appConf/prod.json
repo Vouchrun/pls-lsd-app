@@ -35,6 +35,9 @@
     },
     "stakingRewardPoolContract": {
       "address": "0xC373e77fD22025f35CE8DD6C66E289Eb2951457e"
+    },
+    "capitalPoolFactoryContract": {
+      "address": "0xf7E7e96a3A08403AB528Bb970c6622D5A8Eb0e7c"
     }
   },
   "networkBalanceContractDeploymentBlock": 21740533
