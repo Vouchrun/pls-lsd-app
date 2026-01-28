@@ -360,7 +360,7 @@ export const VouchStaking: React.FC<VouchStakingProps> = ({
             </div>
 
             {/* Balance Info */}
-            <div className='mt-[.18rem] text-[.13rem]'>
+            <div className='mt-[.22rem] text-[.13rem]'>
               <div className='grid grid-cols-2 gap-0'>
                 <div></div>
                 <div className='text-color-text2 mt-[7px] mb-[14px]'>

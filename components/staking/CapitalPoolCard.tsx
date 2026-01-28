@@ -211,7 +211,9 @@ export const CapitalPoolCard: React.FC<CapitalPoolCardProps> = ({
 
   // Calculate pool statistics for the progress bar
   const poolStats = useMemo(() => {
-    const staked = Number(poolData.stats.totalVplsDeposited) || 0;
+    const stakedRaw = Number(poolData.stats.totalVplsDeposited) || 0;
+    const scrapedPending = Number(poolData.stats.scrapedVplsPending) || 0;
+    const staked = Math.max(0, stakedRaw - scrapedPending);
     const unstaking = Number(poolData.stats.totalUnlocking) || 0;
     const totalSupply = tokensLoading 
       ? 0 
@@ -737,7 +739,7 @@ export const CapitalPoolCard: React.FC<CapitalPoolCardProps> = ({
               </div>
 
               {/* Balance Info */}
-              <div className='mt-[.18rem] text-[.14rem]'>
+              <div className='mt-[.22rem] text-[.14rem]'>
                 <div className='grid grid-cols-2 gap-0'>
                   <div></div>
                   <div className='text-color-text2 mt-[7px] mb-[14px]'>
