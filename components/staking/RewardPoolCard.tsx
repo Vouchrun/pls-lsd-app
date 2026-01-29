@@ -33,16 +33,27 @@ export const RewardPoolCard: React.FC<RewardPoolCardProps> = ({
 
   const { vouchBalance, vouchInfo, loading: tokensLoading } = useVouchTokens();
 
-  // Calculate bar chart percentages for VOUCH (matching Capital Pool logic)
+  // Calculate bar chart percentages for VOUCH (based on total supply)
   const vouchUnstakingAmount = Number(totalVouchUnlocking) || 0;
   const vouchStakedAmount =
     Number(Web3.utils.fromWei(vouchPoolInfo.totalStaked || '0', 'ether')) || 0;
   const vouchTotalSupply = Number(vouchInfo.totalSupply) || 1;
 
-  // Calculate percentages based on staked + unstaking total (like Capital Pool)
-  const total = vouchStakedAmount + vouchUnstakingAmount;
-  const vouchUnstakingPercent = total > 0 ? Math.max(1, (vouchUnstakingAmount / total) * 100) : 0;
-  const vouchStakedPercent = total > 0 ? Math.max(1, (vouchStakedAmount / total) * 100) : 0;
+  // Bar segments as percentage of total supply (sum to 100%)
+  const vouchUnstakingPercent =
+    vouchTotalSupply > 0
+      ? (vouchUnstakingAmount / vouchTotalSupply) * 100
+      : 0;
+  const vouchStakedPercent =
+    vouchTotalSupply > 0 ? (vouchStakedAmount / vouchTotalSupply) * 100 : 0;
+  const vouchOtherAmount = Math.max(
+    0,
+    vouchTotalSupply - vouchStakedAmount - vouchUnstakingAmount
+  );
+  const vouchOtherPercent =
+    vouchTotalSupply > 0
+      ? (vouchOtherAmount / vouchTotalSupply) * 100
+      : 0;
 
   return (
     <div className=''>
@@ -299,6 +310,10 @@ export const RewardPoolCard: React.FC<RewardPoolCardProps> = ({
             <div 
               className='bg-gradient-to-r from-[#ff8533] to-[#ffa162]' 
               style={{ width: `${vouchStakedPercent}%` }}
+            ></div>
+            <div 
+              className='bg-[#333] rounded-r-[6px]' 
+              style={{ width: `${vouchOtherPercent}%` }}
             ></div>
         </div>
         <div className='flex align-middle justify-between mt-[40px]'>

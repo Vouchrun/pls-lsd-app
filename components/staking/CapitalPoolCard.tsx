@@ -11,6 +11,7 @@ import classNames from 'classnames';
 import snackbarUtil from 'utils/snackbarUtils';
 import { useAppSlice } from 'hooks/selector';
 import { usePoolApy } from 'hooks/usePoolApy';
+import { useApr } from 'hooks/useApr';
 import { useVplsPrice } from 'hooks/useVplsPrice';
 import { useVouchPrice } from 'hooks/useVouchPrice';
 import { usePrice } from 'hooks/usePrice';
@@ -45,6 +46,7 @@ export const CapitalPoolCard: React.FC<CapitalPoolCardProps> = ({
   const { darkMode } = useAppSlice();
   const { metaMaskAccount } = useWalletAccount();
   const { vplsBalance, plsBalance, vplsInfo, loading: tokensLoading } = useVouchTokens();
+  const { apr: systemApr7Day } = useApr();
   const { vplsPrice } = useVplsPrice();
   const { vouchPrice } = useVouchPrice();
   const { ethPrice: plsPrice } = usePrice();
@@ -175,11 +177,13 @@ export const CapitalPoolCard: React.FC<CapitalPoolCardProps> = ({
     fetchPoolData();
   }, [poolData.vouchStakingPid, poolData.address]);
 
-  // Calculate total staked value in USD
+  // Calculate total staked value in USD (excluding scraped pending – not earning)
   const totalStakedValue = useMemo(() => {
     const totalVpls = Number(poolData.stats.totalVplsDeposited) || 0;
-    return totalVpls * vplsPrice;
-  }, [poolData.stats.totalVplsDeposited, vplsPrice]);
+    const scrapedPending = Number(poolData.stats.scrapedVplsPending) || 0;
+    const effectiveVpls = Math.max(0, totalVpls - scrapedPending);
+    return effectiveVpls * vplsPrice;
+  }, [poolData.stats.totalVplsDeposited, poolData.stats.scrapedVplsPending, vplsPrice]);
 
   // Calculate pool rate percentage (yield scraping rate) from BPS
   // BPS (basis points): 10000 BPS = 100%, so divide by 100 to get percentage
@@ -191,6 +195,12 @@ export const CapitalPoolCard: React.FC<CapitalPoolCardProps> = ({
   const stakersShare = useMemo(() => {
     return Math.max(0, 100 - poolRate);
   }, [poolRate]);
+
+  // Yield APR = system APR (7-day avg) / pool rate
+  const yieldApr = useMemo(() => {
+    if (systemApr7Day == null || poolRate <= 0) return undefined;
+    return systemApr7Day / poolRate;
+  }, [systemApr7Day, poolRate]);
 
   // Calculate USD value of staked PLS
   const stakedPlsUsdValue = useMemo(() => {
@@ -209,7 +219,7 @@ export const CapitalPoolCard: React.FC<CapitalPoolCardProps> = ({
     plsPrice || 0
   );
 
-  // Calculate pool statistics for the progress bar
+  // Calculate pool statistics for the progress bar (based on total supply)
   const poolStats = useMemo(() => {
     const stakedRaw = Number(poolData.stats.totalVplsDeposited) || 0;
     const scrapedPending = Number(poolData.stats.scrapedVplsPending) || 0;
@@ -219,16 +229,20 @@ export const CapitalPoolCard: React.FC<CapitalPoolCardProps> = ({
       ? 0 
       : Number(vplsInfo.totalSupply) || 0;
 
-    const total = staked + unstaking;
-    const unstakingPercentage = total > 0 ? (unstaking / total) * 100 : 0;
-    const stakedPercentage = total > 0 ? (staked / total) * 100 : 0;
+    // Bar segments as percentage of total supply (sum to 100%)
+    const unstakingPercentage = totalSupply > 0 ? (unstaking / totalSupply) * 100 : 0;
+    const stakedPercentage = totalSupply > 0 ? (staked / totalSupply) * 100 : 0;
+    const otherSupply = Math.max(0, totalSupply - staked - unstaking);
+    const otherPercentage = totalSupply > 0 ? (otherSupply / totalSupply) * 100 : 0;
 
     return {
       staked,
       unstaking,
       totalSupply,
-      unstakingPercentage: Math.max(1, unstakingPercentage), // Minimum 1% for visibility
-      stakedPercentage: Math.max(1, stakedPercentage), // Minimum 1% for visibility
+      otherSupply,
+      unstakingPercentage,
+      stakedPercentage,
+      otherPercentage,
     };
   }, [
     poolData.stats.totalVplsDeposited,
@@ -557,12 +571,17 @@ export const CapitalPoolCard: React.FC<CapitalPoolCardProps> = ({
             </p>
             <div className='flex max-w-[160px] justify-between mx-auto mt-[20px] mb-[8px]'>
               <p className='text-[14px] font-normal text-color-text1 text-center'>
-                {apyData.isCalculating
-                  ? '...'
-                  : `${formatNumber(apyData.vplsApy, { decimals: 2 })}%`}
+                {yieldApr !== undefined
+                  ? `${formatNumber(yieldApr, { decimals: 2 })}%`
+                  : '...'}
               </p>
               <p className='text-[14px] font-normal text-[#A6A6A6] text-center'>
                 Yield APR
+                <Tooltip title="System APR (7-day avg) ÷ Pool rate." placement="top" arrow>
+                  <span className='ml-1'>
+                    <Icomoon icon='tip' size='.12rem' color='#333333' />
+                  </span>
+                </Tooltip>
               </p>
             </div>
             <div className='flex max-w-[160px] justify-between mx-auto mt-[20px] mb-[8px]'>
@@ -873,6 +892,10 @@ export const CapitalPoolCard: React.FC<CapitalPoolCardProps> = ({
             <div 
               className='bg-gradient-to-r from-[#ff8533] to-[#ffa162]' 
               style={{ width: `${poolStats.stakedPercentage}%` }}
+            ></div>
+            <div 
+              className='bg-[#333] rounded-r-[6px]' 
+              style={{ width: `${poolStats.otherPercentage}%` }}
             ></div>
         </div>
         <div className='flex align-middle justify-between mt-[40px]'>
