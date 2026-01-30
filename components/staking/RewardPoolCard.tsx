@@ -171,7 +171,14 @@ export const RewardPoolCard: React.FC<RewardPoolCardProps> = ({
         <div className='flex mx-auto text-center flex-col relative top-[25px]'>
           <p className='text-[13px] font-medium text-[#FF8533] gap-1'>
             VOUCH Rewards Pool 
-            <Tooltip title="Pool weight (allocation), higher means more rewards allocated." placement="top" arrow>
+            <Tooltip 
+              title={
+                <div className="leading-relaxed">
+                  <div className="mb-1">The VOUCH Pool is a single sided staking rewards pool for VOUCH Holders.</div>
+                  <div className="mb-1">Staking VOUCH will give you Staking and Holder rewards.</div>
+                  <div>Higher the Pool Allocation, means more rewards for that pool.</div>
+                </div>
+              } placement="top" arrow>
               <span>
                 <Icomoon icon='tip' size='.12rem' color='#333333' />
               </span>

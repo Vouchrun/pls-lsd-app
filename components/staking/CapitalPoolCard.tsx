@@ -529,7 +529,14 @@ export const CapitalPoolCard: React.FC<CapitalPoolCardProps> = ({
         <div className='flex mx-auto text-center flex-col relative top-[25px]'>
           <p className='text-[13px] font-medium text-[#FF8533] gap-1'>
             Vouch BOOST Capital Pool 
-            <Tooltip title="Pool weight (allocation), higher means more rewards allocated." placement="top" arrow>
+            <Tooltip 
+                title={
+                  <div className="leading-relaxed">
+                    <div className="mb-1">The BOOST Pool redirects harvested PLS back into the Vouch ecosystem.</div>
+                    <div className="mb-1">This means more community validators created and positive price pressure on VOUCH token.</div>
+                    <div>Higher the Pool Allocation, means more rewards for that pool.</div>
+                  </div>
+                }  placement="top" arrow>
               <span>
                 <Icomoon icon='tip' size='.12rem' color='#333333' />
               </span>
