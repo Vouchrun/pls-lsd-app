@@ -199,7 +199,7 @@ export const CapitalPoolCard: React.FC<CapitalPoolCardProps> = ({
   // Yield APR = system APR (7-day avg) / pool rate
   const yieldApr = useMemo(() => {
     if (systemApr7Day == null || poolRate <= 0) return undefined;
-    return systemApr7Day / poolRate;
+    return systemApr7Day * (100-poolRate) /100;
   }, [systemApr7Day, poolRate]);
 
   // Calculate USD value of staked PLS

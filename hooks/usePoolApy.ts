@@ -101,6 +101,7 @@ export function usePoolApy(
       const poolVplsRewards = parseFloat(vplsPerYear) * poolShare;
       const poolPlsRewards = parseFloat(wplsPerYear) * poolShare;
 
+      
       // Calculate USD value of annual rewards
       const vouchRewardsValue = poolVouchRewards * vouchPrice;
       const vplsRewardsValue = poolVplsRewards * vplsPrice;

@@ -123,7 +123,7 @@ export const DashboardTabs = (props: Props) => {
           {/* <div className="ml-[.1rem] w-[0.01rem] h-[.22rem] bg-[#DEE6F7] dark:bg-bg1Dark self-center" /> */}
           <button
             className={classNames(
-              'h-[35px] flex-1 ml-[.1rem] cursor-pointer flex items-center justify-center text-[.15rem] rounded-[.3rem] whitespace-nowrap text-[#FFF]',
+              'h-[35px] flex-1 ml-[.1rem] cursor-pointer flex items-center justify-center text-[.15rem] rounded-[.3rem] whitespace-nowrap text-[#FFF] text-color-text1',
               router.pathname.startsWith('')
                 // ? 'text-color-highlight bg-color-highlight'
                 // : 'text-color-text1'
