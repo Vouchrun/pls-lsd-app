@@ -53,8 +53,15 @@ export function usePoolApy(
     isCalculating: false,
   });
 
+  // Minimum TVL (USD) to show APY; below this, show 0% to avoid inflated APY from dust
+  const MIN_TVL_FOR_APY_USD = 1;
+
   const calculateApy = useCallback(async () => {
-    if (totalStakedValue === 0 || poolAllocPoint === 0) {
+    if (
+      totalStakedValue === 0 ||
+      totalStakedValue < MIN_TVL_FOR_APY_USD ||
+      poolAllocPoint === 0
+    ) {
       setApyData({
         totalApy: 0,
         vouchApy: 0,
