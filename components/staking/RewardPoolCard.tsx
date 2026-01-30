@@ -178,7 +178,19 @@ export const RewardPoolCard: React.FC<RewardPoolCardProps> = ({
                   <div className="mb-1">Staking VOUCH will give you Staking and Holder rewards.</div>
                   <div>Higher the Pool Allocation, means more rewards for that pool.</div>
                 </div>
-              } placement="top" arrow>
+              } placement="top" arrow
+              slotProps={{
+                tooltip: {
+                  sx: {
+                    opacity: 1,
+                    backgroundColor: '#1A1A1A',
+                  },
+                },
+                arrow: {
+                  sx: { color: '#1A1A1A' },
+                },
+              }}
+              >
               <span>
                 <Icomoon icon='tip' size='.12rem' color='#333333' />
               </span>
