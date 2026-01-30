@@ -257,9 +257,9 @@ export function useCapitalPools() {
               if (pid !== null) {
                 try {
                   const pendingResult = await vouchStaking.methods
-                    .pendingLiquidityRewardsProjected(pid, metaMaskAccount)
+                    .pendingCapitalRewardsProjected(pid, metaMaskAccount)
                     .call();
-
+                  
                   pendingRewards = {
                     vouchPending: Web3.utils.fromWei(
                       pendingResult.vouchPending || '0',

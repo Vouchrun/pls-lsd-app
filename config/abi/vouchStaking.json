@@ -1,20 +1,175 @@
 [
   {
     "inputs": [
-      { "internalType": "uint256", "name": "_startTime", "type": "uint256" },
-      { "internalType": "address", "name": "_vouchToken", "type": "address" },
-      { "internalType": "address", "name": "_vplsToken", "type": "address" },
-      { "internalType": "address", "name": "_wplsToken", "type": "address" }
+      {
+        "internalType": "uint256",
+        "name": "_startTime",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "_vouchToken",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_vplsToken",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_wplsToken",
+        "type": "address"
+      }
     ],
     "stateMutability": "nonpayable",
     "type": "constructor"
   },
-  { "inputs": [], "name": "ReentrancyGuardReentrantCall", "type": "error" },
+  {
+    "inputs": [],
+    "name": "AmountZero",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "CapitalPoolDirectStakeNotAllowed",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "ConfigNotInitialized",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "InsufficientStaked",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "InvalidAddress",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "InvalidPoolId",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "NoActiveUnlock",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "NotAdmin",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "NotCapitalPool",
+    "type": "error"
+  },
   {
     "inputs": [
-      { "internalType": "address", "name": "token", "type": "address" }
+      {
+        "internalType": "address",
+        "name": "a",
+        "type": "address"
+      }
+    ],
+    "name": "NotContract",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "NotLiquidityPool",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "NotReady",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "NotStandardPool",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "NothingStaked",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "PlsTransferFailed",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "PoolNotActive",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "RatioTooHigh",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "ReentrancyGuardReentrantCall",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "RewardPoolSyncFailed",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "token",
+        "type": "address"
+      }
     ],
     "name": "SafeERC20FailedOperation",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "StandardPoolUnlockOnly",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "ThresholdTooHigh",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "UnlockActive",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "UnlockPeriodTooLong",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "VouchNotAllowedInLiquidity",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "WplsHolderRewardMissing",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "ZeroAddress",
     "type": "error"
   },
   {
@@ -52,6 +207,74 @@
       }
     ],
     "name": "AutoUpdateSettingsUpdated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "user",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "pid",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "vouchAmount",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "vplsAmount",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "wplsAmount",
+        "type": "uint256"
+      }
+    ],
+    "name": "CapitalClaim",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "pid",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "capitalPool",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "allocPoint",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "active",
+        "type": "bool"
+      }
+    ],
+    "name": "CapitalPoolInitialized",
     "type": "event"
   },
   {
@@ -213,6 +436,19 @@
       }
     ],
     "name": "LiquidityPoolInitialized",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "lpRewardPool",
+        "type": "address"
+      }
+    ],
+    "name": "LpRewardPoolUpdated",
     "type": "event"
   },
   {
@@ -492,22 +728,68 @@
   {
     "inputs": [],
     "name": "accPlsHolderRewardsPerShare",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [],
     "name": "accVouchHolderRewardsPerShare",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [],
     "name": "accVplsHolderRewardsPerShare",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
     "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_capitalPool",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_allocPoint",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "_rewardPool",
+        "type": "address"
+      },
+      {
+        "internalType": "bool",
+        "name": "_active",
+        "type": "bool"
+      }
+    ],
+    "name": "addCapitalPool",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -517,9 +799,21 @@
         "name": "_stakingToken",
         "type": "address"
       },
-      { "internalType": "uint256", "name": "_allocPoint", "type": "uint256" },
-      { "internalType": "address", "name": "_rewardPool", "type": "address" },
-      { "internalType": "bool", "name": "_active", "type": "bool" }
+      {
+        "internalType": "uint256",
+        "name": "_allocPoint",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "_rewardPool",
+        "type": "address"
+      },
+      {
+        "internalType": "bool",
+        "name": "_active",
+        "type": "bool"
+      }
     ],
     "name": "addLiquidityPool",
     "outputs": [],
@@ -533,9 +827,21 @@
         "name": "_stakingToken",
         "type": "address"
       },
-      { "internalType": "address", "name": "_rewardsPool", "type": "address" },
-      { "internalType": "uint256", "name": "_allocPoint", "type": "uint256" },
-      { "internalType": "bool", "name": "_active", "type": "bool" }
+      {
+        "internalType": "address",
+        "name": "_rewardsPool",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_allocPoint",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bool",
+        "name": "_active",
+        "type": "bool"
+      }
     ],
     "name": "addPool",
     "outputs": [],
@@ -544,7 +850,11 @@
   },
   {
     "inputs": [
-      { "internalType": "uint256", "name": "_pid", "type": "uint256" }
+      {
+        "internalType": "uint256",
+        "name": "_pid",
+        "type": "uint256"
+      }
     ],
     "name": "cancelUnlock",
     "outputs": [],
@@ -553,7 +863,30 @@
   },
   {
     "inputs": [
-      { "internalType": "uint256", "name": "_pid", "type": "uint256" }
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "capitalPoolToPid",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_pid",
+        "type": "uint256"
+      }
     ],
     "name": "claim",
     "outputs": [],
@@ -568,8 +901,19 @@
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "claimAllHolderRewards",
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_capitalPool",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_user",
+        "type": "address"
+      }
+    ],
+    "name": "claimCapitalFor",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -583,7 +927,11 @@
   },
   {
     "inputs": [
-      { "internalType": "uint256", "name": "_pid", "type": "uint256" }
+      {
+        "internalType": "uint256",
+        "name": "_pid",
+        "type": "uint256"
+      }
     ],
     "name": "distributeHolderRewardDividends",
     "outputs": [],
@@ -592,7 +940,11 @@
   },
   {
     "inputs": [
-      { "internalType": "uint256", "name": "_pid", "type": "uint256" }
+      {
+        "internalType": "uint256",
+        "name": "_pid",
+        "type": "uint256"
+      }
     ],
     "name": "exit",
     "outputs": [],
@@ -601,7 +953,11 @@
   },
   {
     "inputs": [
-      { "internalType": "uint256[]", "name": "_pids", "type": "uint256[]" }
+      {
+        "internalType": "uint256[]",
+        "name": "_pids",
+        "type": "uint256[]"
+      }
     ],
     "name": "finalizeAllMaturedUnlocks",
     "outputs": [
@@ -610,30 +966,22 @@
         "name": "finalizedPids",
         "type": "uint256[]"
       },
-      { "internalType": "uint256[]", "name": "amounts", "type": "uint256[]" }
-    ],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "uint256[]", "name": "_pids", "type": "uint256[]" }
-    ],
-    "name": "finalizeAllMaturedVouchUnlocks",
-    "outputs": [
       {
         "internalType": "uint256[]",
-        "name": "finalizedPids",
+        "name": "amounts",
         "type": "uint256[]"
-      },
-      { "internalType": "uint256[]", "name": "amounts", "type": "uint256[]" }
+      }
     ],
     "stateMutability": "nonpayable",
     "type": "function"
   },
   {
     "inputs": [
-      { "internalType": "uint256", "name": "_pid", "type": "uint256" }
+      {
+        "internalType": "uint256",
+        "name": "_pid",
+        "type": "uint256"
+      }
     ],
     "name": "finalizeUnlock",
     "outputs": [],
@@ -642,7 +990,11 @@
   },
   {
     "inputs": [
-      { "internalType": "address", "name": "_rewardPool", "type": "address" }
+      {
+        "internalType": "address",
+        "name": "_rewardPool",
+        "type": "address"
+      }
     ],
     "name": "forceUpdateRewardPool",
     "outputs": [],
@@ -651,50 +1003,118 @@
   },
   {
     "inputs": [
-      { "internalType": "uint256", "name": "_pid", "type": "uint256" },
-      { "internalType": "address", "name": "_user", "type": "address" }
+      {
+        "internalType": "uint256",
+        "name": "_pid",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "_user",
+        "type": "address"
+      }
     ],
     "name": "getDripRedeemed",
     "outputs": [
-      { "internalType": "uint256", "name": "vouchClaimed", "type": "uint256" },
-      { "internalType": "uint256", "name": "vplsClaimed", "type": "uint256" },
-      { "internalType": "uint256", "name": "plsClaimed", "type": "uint256" }
+      {
+        "internalType": "uint256",
+        "name": "vouchClaimed",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "vplsClaimed",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "plsClaimed",
+        "type": "uint256"
+      }
     ],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [
-      { "internalType": "address", "name": "_user", "type": "address" }
+      {
+        "internalType": "address",
+        "name": "_user",
+        "type": "address"
+      }
     ],
     "name": "getDripRedeemedAll",
     "outputs": [
-      { "internalType": "uint256", "name": "vouchClaimed", "type": "uint256" },
-      { "internalType": "uint256", "name": "vplsClaimed", "type": "uint256" },
-      { "internalType": "uint256", "name": "plsClaimed", "type": "uint256" }
+      {
+        "internalType": "uint256",
+        "name": "vouchClaimed",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "vplsClaimed",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "plsClaimed",
+        "type": "uint256"
+      }
     ],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [
-      { "internalType": "address", "name": "_user", "type": "address" }
+      {
+        "internalType": "address",
+        "name": "_user",
+        "type": "address"
+      }
     ],
     "name": "getHolderRewardInfo",
     "outputs": [
-      { "internalType": "uint256", "name": "vouchPending", "type": "uint256" },
-      { "internalType": "uint256", "name": "vplsPending", "type": "uint256" },
-      { "internalType": "uint256", "name": "plsPending", "type": "uint256" },
-      { "internalType": "uint256", "name": "redeemedVouch", "type": "uint256" },
-      { "internalType": "uint256", "name": "redeemedVpls", "type": "uint256" },
-      { "internalType": "uint256", "name": "redeemedPls", "type": "uint256" }
+      {
+        "internalType": "uint256",
+        "name": "vouchPending",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "vplsPending",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "plsPending",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "redeemedVouch",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "redeemedVpls",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "redeemedPls",
+        "type": "uint256"
+      }
     ],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [
-      { "internalType": "uint256", "name": "_pid", "type": "uint256" }
+      {
+        "internalType": "uint256",
+        "name": "_pid",
+        "type": "uint256"
+      }
     ],
     "name": "getPoolInfo",
     "outputs": [
@@ -703,11 +1123,31 @@
         "name": "poolType",
         "type": "uint8"
       },
-      { "internalType": "address", "name": "stakingToken", "type": "address" },
-      { "internalType": "address", "name": "rewardsPool", "type": "address" },
-      { "internalType": "uint256", "name": "allocPoint", "type": "uint256" },
-      { "internalType": "bool", "name": "active", "type": "bool" },
-      { "internalType": "uint256", "name": "totalStaked", "type": "uint256" },
+      {
+        "internalType": "address",
+        "name": "stakingToken",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "rewardsPool",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "allocPoint",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bool",
+        "name": "active",
+        "type": "bool"
+      },
+      {
+        "internalType": "uint256",
+        "name": "totalStaked",
+        "type": "uint256"
+      },
       {
         "internalType": "uint256",
         "name": "stdAccVouchPerShare",
@@ -754,13 +1194,29 @@
   },
   {
     "inputs": [
-      { "internalType": "address", "name": "_rewardPool", "type": "address" }
+      {
+        "internalType": "address",
+        "name": "_rewardPool",
+        "type": "address"
+      }
     ],
     "name": "getRewardPoolRates",
     "outputs": [
-      { "internalType": "uint256", "name": "vouchPerYear", "type": "uint256" },
-      { "internalType": "uint256", "name": "vplsPerYear", "type": "uint256" },
-      { "internalType": "uint256", "name": "wplsPerYear", "type": "uint256" },
+      {
+        "internalType": "uint256",
+        "name": "vouchPerYear",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "vplsPerYear",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "wplsPerYear",
+        "type": "uint256"
+      },
       {
         "internalType": "uint256",
         "name": "totalAllocPoint_",
@@ -772,54 +1228,108 @@
   },
   {
     "inputs": [
-      { "internalType": "uint256", "name": "_pid", "type": "uint256" },
-      { "internalType": "address", "name": "_user", "type": "address" }
+      {
+        "internalType": "uint256",
+        "name": "_pid",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "_user",
+        "type": "address"
+      }
     ],
     "name": "getUnlock",
     "outputs": [
-      { "internalType": "uint256", "name": "amount", "type": "uint256" },
-      { "internalType": "uint256", "name": "startTime_", "type": "uint256" },
-      { "internalType": "uint256", "name": "unlockAt", "type": "uint256" },
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "startTime_",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "unlockAt",
+        "type": "uint256"
+      },
       {
         "internalType": "uint256",
         "name": "secondsRemaining",
         "type": "uint256"
       },
-      { "internalType": "bool", "name": "ready", "type": "bool" }
+      {
+        "internalType": "bool",
+        "name": "ready",
+        "type": "bool"
+      }
     ],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [
-      { "internalType": "address", "name": "_user", "type": "address" },
-      { "internalType": "uint256[]", "name": "_pids", "type": "uint256[]" }
+      {
+        "internalType": "address",
+        "name": "_user",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "_pids",
+        "type": "uint256[]"
+      }
     ],
     "name": "getUnlocks",
     "outputs": [
-      { "internalType": "uint256[]", "name": "amounts", "type": "uint256[]" },
+      {
+        "internalType": "uint256[]",
+        "name": "amounts",
+        "type": "uint256[]"
+      },
       {
         "internalType": "uint256[]",
         "name": "startTimes",
         "type": "uint256[]"
       },
-      { "internalType": "uint256[]", "name": "unlockAts", "type": "uint256[]" },
+      {
+        "internalType": "uint256[]",
+        "name": "unlockAts",
+        "type": "uint256[]"
+      },
       {
         "internalType": "uint256[]",
         "name": "secondsRemainings",
         "type": "uint256[]"
       },
-      { "internalType": "bool[]", "name": "readies", "type": "bool[]" }
+      {
+        "internalType": "bool[]",
+        "name": "readies",
+        "type": "bool[]"
+      }
     ],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [
-      { "internalType": "address", "name": "_user", "type": "address" }
+      {
+        "internalType": "address",
+        "name": "_user",
+        "type": "address"
+      }
     ],
     "name": "getUserTotalVouchStaked",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
@@ -839,87 +1349,255 @@
   {
     "inputs": [],
     "name": "lpRewardPool",
-    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [
-      { "internalType": "address", "name": "_user", "type": "address" }
+      {
+        "internalType": "address",
+        "name": "_user",
+        "type": "address"
+      }
     ],
     "name": "pendingAllRewards",
     "outputs": [
-      { "internalType": "uint256", "name": "standardTotal", "type": "uint256" },
-      { "internalType": "uint256", "name": "liqVouchTotal", "type": "uint256" },
-      { "internalType": "uint256", "name": "liqVplsTotal", "type": "uint256" },
-      { "internalType": "uint256", "name": "liqWplsTotal", "type": "uint256" },
-      { "internalType": "uint256", "name": "holderVouch", "type": "uint256" },
-      { "internalType": "uint256", "name": "holderVpls", "type": "uint256" },
-      { "internalType": "uint256", "name": "holderPls", "type": "uint256" }
+      {
+        "internalType": "uint256",
+        "name": "standardVouchTotal",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "standardVplsTotal",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "standardWplsTotal",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "liqVouchTotal",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "liqVplsTotal",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "liqWplsTotal",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "holderVouch",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "holderVpls",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "holderPls",
+        "type": "uint256"
+      }
     ],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [
-      { "internalType": "address", "name": "_user", "type": "address" }
+      {
+        "internalType": "uint256",
+        "name": "_pid",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "_user",
+        "type": "address"
+      }
+    ],
+    "name": "pendingCapitalRewardsProjected",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "vouchPending",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "vplsPending",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "wplsPending",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_user",
+        "type": "address"
+      }
     ],
     "name": "pendingHolderRewards",
     "outputs": [
-      { "internalType": "uint256", "name": "vouchPending", "type": "uint256" },
-      { "internalType": "uint256", "name": "vplsPending", "type": "uint256" },
-      { "internalType": "uint256", "name": "plsPending", "type": "uint256" }
+      {
+        "internalType": "uint256",
+        "name": "vouchPending",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "vplsPending",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "plsPending",
+        "type": "uint256"
+      }
     ],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [
-      { "internalType": "uint256", "name": "_pid", "type": "uint256" },
-      { "internalType": "address", "name": "_user", "type": "address" }
+      {
+        "internalType": "uint256",
+        "name": "_pid",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "_user",
+        "type": "address"
+      }
     ],
     "name": "pendingLiquidityRewardsProjected",
     "outputs": [
-      { "internalType": "uint256", "name": "vouchPending", "type": "uint256" },
-      { "internalType": "uint256", "name": "vplsPending", "type": "uint256" },
-      { "internalType": "uint256", "name": "wplsPending", "type": "uint256" }
+      {
+        "internalType": "uint256",
+        "name": "vouchPending",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "vplsPending",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "wplsPending",
+        "type": "uint256"
+      }
     ],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [
-      { "internalType": "uint256", "name": "_pid", "type": "uint256" },
-      { "internalType": "address", "name": "_user", "type": "address" }
+      {
+        "internalType": "uint256",
+        "name": "_pid",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "_user",
+        "type": "address"
+      }
     ],
     "name": "pendingStandardTriple",
     "outputs": [
-      { "internalType": "uint256", "name": "vouchPending", "type": "uint256" },
-      { "internalType": "uint256", "name": "vplsPending", "type": "uint256" },
-      { "internalType": "uint256", "name": "wplsPending", "type": "uint256" }
+      {
+        "internalType": "uint256",
+        "name": "vouchPending",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "vplsPending",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "wplsPending",
+        "type": "uint256"
+      }
     ],
     "stateMutability": "view",
     "type": "function"
   },
   {
-    "inputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
     "name": "principalStakedToken",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
   {
-    "inputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
     "name": "rewardPoolConfig",
     "outputs": [
-      { "internalType": "bool", "name": "initialized", "type": "bool" },
-      { "internalType": "bool", "name": "autoUpdate", "type": "bool" },
+      {
+        "internalType": "bool",
+        "name": "initialized",
+        "type": "bool"
+      },
+      {
+        "internalType": "bool",
+        "name": "autoUpdate",
+        "type": "bool"
+      },
       {
         "internalType": "uint256",
         "name": "updateInterval",
         "type": "uint256"
       },
-      { "internalType": "uint256", "name": "updateRatio", "type": "uint256" },
+      {
+        "internalType": "uint256",
+        "name": "updateRatio",
+        "type": "uint256"
+      },
       {
         "internalType": "uint256",
         "name": "updateThreshold",
@@ -956,9 +1634,21 @@
   },
   {
     "inputs": [
-      { "internalType": "uint256", "name": "_pid", "type": "uint256" },
-      { "internalType": "uint256", "name": "_allocPoint", "type": "uint256" },
-      { "internalType": "bool", "name": "_active", "type": "bool" }
+      {
+        "internalType": "uint256",
+        "name": "_pid",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_allocPoint",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bool",
+        "name": "_active",
+        "type": "bool"
+      }
     ],
     "name": "set",
     "outputs": [],
@@ -967,7 +1657,11 @@
   },
   {
     "inputs": [
-      { "internalType": "address", "name": "_pool", "type": "address" }
+      {
+        "internalType": "address",
+        "name": "_pool",
+        "type": "address"
+      }
     ],
     "name": "setLPRewardPool",
     "outputs": [],
@@ -976,10 +1670,26 @@
   },
   {
     "inputs": [
-      { "internalType": "address", "name": "_rewardPool", "type": "address" },
-      { "internalType": "uint256", "name": "_vouchPerYear", "type": "uint256" },
-      { "internalType": "uint256", "name": "_vplsPerYear", "type": "uint256" },
-      { "internalType": "uint256", "name": "_wplsPerYear", "type": "uint256" }
+      {
+        "internalType": "address",
+        "name": "_rewardPool",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_vouchPerYear",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_vplsPerYear",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_wplsPerYear",
+        "type": "uint256"
+      }
     ],
     "name": "setRewardPoolEmissions",
     "outputs": [],
@@ -988,19 +1698,31 @@
   },
   {
     "inputs": [
-      { "internalType": "address", "name": "_rewardPool", "type": "address" },
+      {
+        "internalType": "address",
+        "name": "_rewardPool",
+        "type": "address"
+      },
       {
         "internalType": "uint256",
         "name": "_updateInterval",
         "type": "uint256"
       },
-      { "internalType": "uint256", "name": "_updateRatio", "type": "uint256" },
+      {
+        "internalType": "uint256",
+        "name": "_updateRatio",
+        "type": "uint256"
+      },
       {
         "internalType": "uint256",
         "name": "_updateThreshold",
         "type": "uint256"
       },
-      { "internalType": "bool", "name": "_autoUpdate", "type": "bool" }
+      {
+        "internalType": "bool",
+        "name": "_autoUpdate",
+        "type": "bool"
+      }
     ],
     "name": "setRewardPoolUpdateSettings",
     "outputs": [],
@@ -1009,7 +1731,11 @@
   },
   {
     "inputs": [
-      { "internalType": "uint256", "name": "_seconds", "type": "uint256" }
+      {
+        "internalType": "uint256",
+        "name": "_seconds",
+        "type": "uint256"
+      }
     ],
     "name": "setStandardUnlockPeriod",
     "outputs": [],
@@ -1018,19 +1744,31 @@
   },
   {
     "inputs": [
-      { "internalType": "address", "name": "_rewardPool", "type": "address" },
+      {
+        "internalType": "address",
+        "name": "_rewardPool",
+        "type": "address"
+      },
       {
         "internalType": "uint256",
         "name": "_updateInterval",
         "type": "uint256"
       },
-      { "internalType": "uint256", "name": "_updateRatio", "type": "uint256" },
+      {
+        "internalType": "uint256",
+        "name": "_updateRatio",
+        "type": "uint256"
+      },
       {
         "internalType": "uint256",
         "name": "_updateThreshold",
         "type": "uint256"
       },
-      { "internalType": "bool", "name": "_autoUpdate", "type": "bool" }
+      {
+        "internalType": "bool",
+        "name": "_autoUpdate",
+        "type": "bool"
+      }
     ],
     "name": "setUpdateSettings",
     "outputs": [],
@@ -1039,8 +1777,16 @@
   },
   {
     "inputs": [
-      { "internalType": "uint256", "name": "_pid", "type": "uint256" },
-      { "internalType": "uint256", "name": "_amount", "type": "uint256" }
+      {
+        "internalType": "uint256",
+        "name": "_pid",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_amount",
+        "type": "uint256"
+      }
     ],
     "name": "stake",
     "outputs": [],
@@ -1050,14 +1796,28 @@
   {
     "inputs": [],
     "name": "standardUnlockPeriod",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [
-      { "internalType": "uint256", "name": "_pid", "type": "uint256" },
-      { "internalType": "uint256", "name": "_amount", "type": "uint256" }
+      {
+        "internalType": "uint256",
+        "name": "_pid",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_amount",
+        "type": "uint256"
+      }
     ],
     "name": "startUnlock",
     "outputs": [],
@@ -1067,21 +1827,47 @@
   {
     "inputs": [],
     "name": "totalPools",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-    "name": "totalUnlocking",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [
-      { "internalType": "uint256", "name": "_pid", "type": "uint256" },
-      { "internalType": "uint256", "name": "_amount", "type": "uint256" }
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "totalUnlocking",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_pid",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_amount",
+        "type": "uint256"
+      }
     ],
     "name": "unstake",
     "outputs": [],
@@ -1090,12 +1876,24 @@
   },
   {
     "inputs": [
-      { "internalType": "uint256", "name": "", "type": "uint256" },
-      { "internalType": "address", "name": "", "type": "address" }
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
     ],
     "name": "userInfo",
     "outputs": [
-      { "internalType": "uint256", "name": "amount", "type": "uint256" },
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      },
       {
         "internalType": "uint256",
         "name": "liqLastAccVouchPerShare",
@@ -1131,21 +1929,7 @@
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "withdraw",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "address", "name": "token", "type": "address" },
-      { "internalType": "uint256", "name": "amount", "type": "uint256" }
-    ],
-    "name": "withdrawToken",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  { "stateMutability": "payable", "type": "receive" }
+    "stateMutability": "payable",
+    "type": "receive"
+  }
 ]
