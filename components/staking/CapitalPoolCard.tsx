@@ -596,7 +596,7 @@ export const CapitalPoolCard: React.FC<CapitalPoolCardProps> = ({
               </p>
               <p className='text-[14px] font-normal text-[#A6A6A6] text-center'>
                 Yield APR
-                <Tooltip title="System APR (7-day avg) ÷ Pool rate." placement="top" arrow>
+                <Tooltip title="System APR (7-day) x Staker Share %." placement="top" arrow>
                   <span className='ml-1'>
                     <Icomoon icon='tip' size='.12rem' color='#333333' />
                   </span>
