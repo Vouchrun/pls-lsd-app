@@ -180,20 +180,20 @@ export function useLpFarms() {
         const plsRewardsValue = poolPlsRewards * plsPrice;
 
         // Minimum TVL (USD) to show APY; below this, return 0% to avoid inflated APY from dust
-        const MIN_TVL_FOR_APY_USD = 1;
-        const hasMeaningfulTvl = totalStakedValue >= MIN_TVL_FOR_APY_USD;
+        // const MIN_TVL_FOR_APY_USD = 1;
+        // const hasMeaningfulTvl = totalStakedValue >= MIN_TVL_FOR_APY_USD;
 
         // Calculate APY for each reward token
         const vouchApy =
-          hasMeaningfulTvl
+        totalStakedValue > 0
             ? (vouchRewardsValue / totalStakedValue) * 100
             : 0;
         const vplsApy =
-          hasMeaningfulTvl
+        totalStakedValue > 0
             ? (vplsRewardsValue / totalStakedValue) * 100
             : 0;
         const plsApy =
-          hasMeaningfulTvl ? (plsRewardsValue / totalStakedValue) * 100 : 0;
+        totalStakedValue > 0 ? (plsRewardsValue / totalStakedValue) * 100 : 0;
 
         // Total APY is the sum of individual APYs
         const totalApy = vouchApy + vplsApy + plsApy;
@@ -360,13 +360,11 @@ export function useLpFarms() {
             totalStakedValue = totalStakedTokens * lpTokenPrice;
 
             // Minimum TVL (USD) to show APY; below this, show 0% to avoid inflated APY from dust
-            const MIN_TVL_FOR_APY_USD = 1;
+            // const MIN_TVL_FOR_APY_USD = 1;
 
             // Calculate APY if we have meaningful values
             if (
-              totalStakedValue >= MIN_TVL_FOR_APY_USD &&
-              vouchPrice > 0 &&
-              vplsPrice > 0
+              totalStakedValue > 0 && vouchPrice > 0 && vplsPrice > 0
             ) {
               const poolAllocPoint = parseFloat(poolInfoResult.allocPoint);
               apyData = await calculatePoolApy(
