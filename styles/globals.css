@@ -170,7 +170,7 @@ body {
 
 .max_btn {
   font-size: 14px !important;
-  color: #fff !important;
+  color: #000 !important;
   font-weight: 400 !important;
   text-decoration: underline;
   height: 0;
@@ -179,4 +179,8 @@ body {
   border: none !important;
   align-items: flex-start !important;
   margin-top: 5px !important;
+}
+
+.dark .max_btn {
+  color: #fff !important;
 }

@@ -42,7 +42,7 @@ export default function StakingPools() {
     <div className='mt-[37px] px-[30px] max-md:px-[15px] pt-[40px]'>
       <div className='max-w-[1360px] bg-color-bg2 border-color-border1 border  justify-center m-auto rounded-[30px] min-h-[800px]'>
         {/* Main Tab Headers */}
-        <div className='flex dark:bg-[#333] rounded-tl-[30px] rounded-tr-[30px] '>
+        <div className='flex  bg-[#e2e0d0] dark:bg-[#333] rounded-tl-[30px] rounded-tr-[30px] '>
           <div
             className={classNames(
               'flex-1 py-[20px] cursor-pointer text-center text-[24px] max-md:text-[20px] font-normal transition-colors rounded-tl-[30px] rounded-tr-[30px]',
