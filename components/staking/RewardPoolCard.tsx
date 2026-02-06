@@ -65,7 +65,12 @@ export const RewardPoolCard: React.FC<RewardPoolCardProps> = ({
           </div>
           <div>
             <p className='text-[18px] font-normal text-color-text1 flex mb-[10px]'>
-              VOUCH{' '}<img src='/images/pls_ic.svg' alt='icon' className='ml-[6px]' />
+              VOUCH{' '}
+              <img
+                src='/images/pls_ic.svg'
+                alt='icon'
+                className='ml-[6px] invert-0 dark:invert'
+              />
               <span className='ml-[10px] px-[10px] py-[2px] pr-[5px] bg-[#FE8A3C] text-[#000] text-[15px] font-normal rounded-[10px] flex gap-[8px]  align-middle'>
                 Standard Pool
                 <Tooltip title="Standard Pools reward token holders for sigle sided staking. They can earn extra VOUCH, vPLS and PLS tokens in return for locking their liquid tokens." placement="top" arrow>
@@ -196,7 +201,7 @@ export const RewardPoolCard: React.FC<RewardPoolCardProps> = ({
               </span>
             </Tooltip>
           </p>
-          <p className='text-[13px] font-normal text-[#8E9397]'> Allocation <span className='text-[#FFFFFF]'>100</span></p>
+          <p className='text-[13px] font-normal text-[#8E9397]'> Allocation <span className='text-color-text1'>100</span></p>
         </div>
 
         {/* Rewards Section */}

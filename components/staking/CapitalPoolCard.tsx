@@ -411,7 +411,12 @@ export const CapitalPoolCard: React.FC<CapitalPoolCardProps> = ({
           </div>
           <div>
             <p className='text-[18px] font-normal text-color-text1 flex mb-[10px]'>
-              vPLS{' '}  <img src='/images/pls_ic.svg' alt='icon' className='ml-[6px]' />
+              vPLS{' '}
+              <img
+                src='/images/pls_ic.svg'
+                alt='icon'
+                className='ml-[6px] invert-0 dark:invert'
+              />
               <span className='ml-[10px] px-[10px] py-[2px] pr-[5px] bg-[#FE8A3C] text-[#000] text-[15px] font-normal rounded-[10px] flex gap-[8px]'>
                 Capital Pool
                 <Tooltip title="In return for stakers giving up a portion of their PLS Yield (at the Pool Rate), Capital Pools stakers get larger VOUCH, vPLS and PLS rewards." placement="top" arrow>
