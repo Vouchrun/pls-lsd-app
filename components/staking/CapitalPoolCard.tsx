@@ -584,36 +584,40 @@ export const CapitalPoolCard: React.FC<CapitalPoolCardProps> = ({
               <p className='text-[18px] font-normal text-[#A6A6A6] text-center'>PLS</p>
             </div>
           </div>
-          <div>
-            <p className='text-[13px] font-medium text-[#8E9397] mb-[13px] text-center relative z-[1]'>
-              Holder APY
-            </p>
-            <div className='flex max-w-[160px] justify-between mx-auto mt-[20px] mb-[8px]'>
-              <p className='text-[14px] font-normal text-color-text1 text-center'>
-                {yieldApr !== undefined
-                  ? `${formatNumber(yieldApr, { decimals: 2 })}%`
-                  : '...'}
-              </p>
-              <p className='text-[14px] font-normal text-[#A6A6A6] text-center'>
-                Yield APR
-                <Tooltip title="System APR (7-day) x Staker Share %." placement="top" arrow>
-                  <span className='ml-1'>
-                    <Icomoon icon='tip' size='.12rem' color='#333333' />
-                  </span>
-                </Tooltip>
-              </p>
-            </div>
-            <div className='flex max-w-[160px] justify-between mx-auto mt-[20px] mb-[8px]'>
-              <p className='text-[14px] font-normal text-color-text1 text-center'>
-                {apyData.isCalculating
-                  ? '...'
-                  : `${formatNumber(apyData.totalApy, { decimals: 2 })}%`}
-              </p>
-              <p className='text-[14px] font-normal text-[#A6A6A6] text-center'>
-                Pool APY
-              </p>
-            </div>
-          </div>
+<div>
+  <p className='text-[13px] font-medium text-[#8E9397] mb-[13px] text-center relative z-[1]'> Holder APY </p>
+  
+  <div className='flex justify-center'>
+    <div className='grid grid-cols-2 gap-x-2 gap-y-1'>
+      {/* Row 1 */}
+      <p className='text-[14px] font-normal text-color-text1 text-right'>
+        {yieldApr !== undefined ? `${formatNumber(yieldApr, { decimals: 2 })}%` : '...'}
+      </p>
+      <p className='text-[14px] font-normal text-[#A6A6A6] whitespace-nowrap inline-flex items-center'>
+        Yield APR
+        <Tooltip title="System APR (7-day) x Staker Share %." placement="top" arrow>
+          <span className='inline-flex'>
+            <Icomoon icon='tip' size='.12rem' color='#333333' />
+          </span>
+        </Tooltip>
+      </p>
+      
+      {/* Row 2 */}
+      <p className='text-[14px] font-normal text-color-text1 text-right'>
+        {apyData.isCalculating ? '...' : `${formatNumber(apyData.totalApy, { decimals: 2 })}%`}
+      </p>
+      <p className='text-[14px] font-normal text-[#A6A6A6] whitespace-nowrap inline-flex items-center'>
+        Pool APY
+        <Tooltip title="Staking Rewards APY" placement="top" arrow>
+          <span className='inline-flex'>
+            <Icomoon icon='tip' size='.12rem' color='#333333' />
+          </span>
+        </Tooltip>
+      </p>
+    </div>
+  </div>
+</div>
+
           {/* <div>
             <p className='text-[13px] font-medium text-[#8E9397] mb-[13px] text-center relative z-[1]'>
               Pool Info
