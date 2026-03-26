@@ -38,17 +38,18 @@ export const LP_POOLS: LPPoolConfig[] = [
     lpUrl:
       'https://pulsex.mypinata.cloud/ipfs/bafybeift2yakeymqmjmonkzlx2zyc4tty7clkwvg37suffn5bncjx4e6xq/#/add/V2/PLS/0x79BB3A0Ee435f957ce4f54eE8c3CFADc7278da0C', // Add LP URL
   },
-  {
-    pid: 5,
-    name: 'VOUCH/PCOCK', //PulseX v2
-    symbol: 'VOUCH/PCOCK',
-    token0Icon: '/images/token/VOUCH.svg', // VOUCH icon
-    token1Icon: '/images/token/PCOCK.png', // PLS icon
-    lpTokenAddress: '0xc19025bb295ad4fe158ba4e322136bbe07b71d3d', // TODO: Replace with actual LP token address
-    dexUrl: '#', // TODO: Add DEX URL
-    lpUrl:
-      'https://pulsex.mypinata.cloud/ipfs/bafybeift2yakeymqmjmonkzlx2zyc4tty7clkwvg37suffn5bncjx4e6xq/#/add/V2/0xD34f5ADC24d8Cc55C1e832Bdf65fFfDF80D1314f/0xc10A4Ed9b4042222d69ff0B374eddd47ed90fC1F', // Add LP URL
-  },
+  // PCOCK POOL HIDDEN FOR NOW
+  // {
+  //   pid: 5,
+  //   name: 'VOUCH/PCOCK', //PulseX v2
+  //   symbol: 'VOUCH/PCOCK',
+  //   token0Icon: '/images/token/VOUCH.svg', // VOUCH icon
+  //   token1Icon: '/images/token/PCOCK.png', // PLS icon
+  //   lpTokenAddress: '0xc19025bb295ad4fe158ba4e322136bbe07b71d3d', // TODO: Replace with actual LP token address
+  //   dexUrl: '#', // TODO: Add DEX URL
+  //   lpUrl:
+  //     'https://pulsex.mypinata.cloud/ipfs/bafybeift2yakeymqmjmonkzlx2zyc4tty7clkwvg37suffn5bncjx4e6xq/#/add/V2/0xD34f5ADC24d8Cc55C1e832Bdf65fFfDF80D1314f/0xc10A4Ed9b4042222d69ff0B374eddd47ed90fC1F', // Add LP URL
+  // },
   // Add more LP pools here as needed
   // {
   //   pid: 4,
