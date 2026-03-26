@@ -117,7 +117,7 @@ export default function StakingPools() {
                 </div>
               ) : lpPools.length === 0 ? (
                 <div className='text-center py-[40px] text-color-text1'>
-                  No LP pools available
+                  LP Pools Coming Soon
                 </div>
               ) : (
                 <div className='grid grid-cols-2 gap-2 max-md:grid-cols-1'>
