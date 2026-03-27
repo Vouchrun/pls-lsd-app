@@ -444,11 +444,11 @@ export const CapitalPoolCard: React.FC<CapitalPoolCardProps> = ({
                   ? formatNumber(vplsBalance.balance, { decimals: 2 })
                   : formatNumber(poolData.userPosition.userShares, { decimals: 2 })}
               </span>
-              {selectedTab === 'stake'
-                ? depositType === 'vpls'
-                  ? 'vPLS'
-                  : 'PLS'
-                : 'vPLS'}
+{selectedTab === 'stake'
+                  ? depositType === 'vpls'
+                    ? 'vPLS'
+                    : 'PLS'
+                  : 'vPLS (Staked)'}
             </p>
            {selectedTab === 'stake' && <p className='text-[18px] max-sm:text-[18px] font-normal text-color-text1 mt-[6px]'>
               {formatNumber(plsBalance || '0', { decimals: 2 })}
