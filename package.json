@@ -10,6 +10,7 @@
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
+    "@metamask/connect-evm": "^0.1.0",
     "@mui/material": "^5.18.0",
     "@mui/styles": "^5.18.0",
     "@reduxjs/toolkit": "^1.9.7",
