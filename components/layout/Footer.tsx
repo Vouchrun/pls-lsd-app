@@ -5,7 +5,7 @@ export default function Footer() {
   const { darkMode, unreadNoticeFlag } = useAppSlice();
   return (
     <div className="w-smallContentW xl:w-contentW 2xl:w-largeContentW mx-auto pb-1 flex flex-row justify-between items-center">
-      <div className="text-color-text1">v2.1.1</div>
+      <div className="text-color-text1">v2.1.2</div>
       <a
         href="https://www.stafi.io/"
         target="_blank"
