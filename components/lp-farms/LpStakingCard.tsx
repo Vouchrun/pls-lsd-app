@@ -184,7 +184,7 @@ export const LpStakingCard: React.FC<LpStakingCardProps> = ({
   }, [metaMaskAccount, poolData.pid, onClaim, refreshData]);
 
   return (
-    <div className='border-[1px] border-solid border-[#FE8A3C] rounded-[30px] w-full'>
+    <div className='border-[1px] border-solid border-[#FE8A3C] rounded-[30px] w-full h-full flex flex-col'>
       {/* Header */}
       <div className='flex justify-between mt-[20px] border-b border-[#cdcccc] dark:border-[#333] pb-[15px]'>
         <div className='flex items-center ml-[18px]'>
@@ -329,7 +329,7 @@ export const LpStakingCard: React.FC<LpStakingCardProps> = ({
       </div>
 
       {/* Staking Interface */}
-      <div className='mt-[30px]'>
+      <div className='mt-[30px] flex-grow flex flex-col'>
         <FarmsTabs selectedTab={selectedTab} onTabChange={setSelectedTab} />
         <div className='text-white'>
           <div>
