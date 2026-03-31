@@ -691,10 +691,11 @@ export const CapitalPoolCard: React.FC<CapitalPoolCardProps> = ({
             </div>
             <div className='text-[.12rem] text-[#666666] dark:text-[#aaaaaa] leading-[1.4]'>
               Staked tokens have a{' '}
-              <span className='font-semibold'>
+              {/* <span className='font-semibold'>
                 {poolData.unlockPeriodDays} day
                 {poolData.unlockPeriodDays !== 1 ? 's' : ''}
-              </span>{' '}
+              </span>{' '} */}
+              <span className='font-semibold'>1 second</span>{' '}
               cool down period to unstake. During this period unstaked tokens will
               not accrue staking rewards.
             </div>
