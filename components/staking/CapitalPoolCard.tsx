@@ -16,6 +16,7 @@ import { useVplsPrice } from 'hooks/useVplsPrice';
 import { useVouchPrice } from 'hooks/useVouchPrice';
 import { usePrice } from 'hooks/usePrice';
 import { getEthWeb3 } from 'utils/web3Utils';
+import Web3 from 'web3';
 import { getVouchStakingContract, getVouchStakingContractAbi, getStakingRewardPoolContract, getCapitalPoolContractAbi } from 'config/contract';
 
 interface CapitalPoolCardProps {
@@ -114,14 +115,14 @@ export const CapitalPoolCard: React.FC<CapitalPoolCardProps> = ({
         ? vplsBalance.balance || '0'
         : plsBalance || '0';
     } else {
-      return poolData.userPosition.userShares || '0';
+      return poolData.userPosition.vplsValue || '0';
     }
   }, [
     selectedTab,
     depositType,
     vplsBalance.balance,
     plsBalance,
-    poolData.userPosition.userShares,
+    poolData.userPosition.vplsValue,
   ]);
 
   const isValidAmount = useMemo(() => {
@@ -337,8 +338,30 @@ export const CapitalPoolCard: React.FC<CapitalPoolCardProps> = ({
 
     setIsProcessing(true);
     try {
+      const desiredVplsWei = Web3.utils.toBN(Web3.utils.toWei(amount, 'ether'));
+      const userSharesWei = Web3.utils.toBN(
+        Web3.utils.toWei(poolData.userPosition.userShares || '0', 'ether')
+      );
+      const userVplsWei = Web3.utils.toBN(
+        Web3.utils.toWei(poolData.userPosition.vplsValue || '0', 'ether')
+      );
+
+      if (userSharesWei.isZero() || userVplsWei.isZero()) {
+        throw new Error('No staked balance available to unstake');
+      }
+
+      // Convert desired vPLS to shares, rounding up so users do not receive less than requested.
+      let sharesToUnlockWei = desiredVplsWei
+        .mul(userSharesWei)
+        .add(userVplsWei.sub(Web3.utils.toBN(1)))
+        .div(userVplsWei);
+
+      if (sharesToUnlockWei.gt(userSharesWei)) {
+        sharesToUnlockWei = userSharesWei;
+      }
+
       snackbarUtil.info('Unstaking in progress...');
-      await onStartUnlock(poolData.address, amount);
+      await onStartUnlock(poolData.address, sharesToUnlockWei.toString());
       snackbarUtil.success('Unstaking initiated!');
       setAmount('');
       await refreshData();
@@ -348,7 +371,16 @@ export const CapitalPoolCard: React.FC<CapitalPoolCardProps> = ({
     } finally {
       setIsProcessing(false);
     }
-  }, [metaMaskAccount, amount, isValidAmount, poolData.address, onStartUnlock, refreshData]);
+  }, [
+    metaMaskAccount,
+    amount,
+    isValidAmount,
+    poolData.address,
+    poolData.userPosition.userShares,
+    poolData.userPosition.vplsValue,
+    onStartUnlock,
+    refreshData,
+  ]);
 
   const handleClaim = useCallback(async () => {
     if (!metaMaskAccount || poolData.vouchStakingPid === null) return;
@@ -442,7 +474,7 @@ export const CapitalPoolCard: React.FC<CapitalPoolCardProps> = ({
               <span className=' mr-[3px] text-[18px] text-color-text1'>
                 {selectedTab === 'stake'
                   ? formatNumber(vplsBalance.balance, { decimals: 2 })
-                  : formatNumber(poolData.userPosition.userShares, { decimals: 2 })}
+                  : formatNumber(poolData.userPosition.vplsValue, { decimals: 2 })}
               </span>
 {selectedTab === 'stake'
                   ? depositType === 'vpls'

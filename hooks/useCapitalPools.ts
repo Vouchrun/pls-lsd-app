@@ -502,11 +502,10 @@ export function useCapitalPools() {
 
   // Start unlock for capital pool
   const startUnlock = useCallback(
-    async (poolAddress: string, shares: string) => {
+    async (poolAddress: string, sharesWei: string) => {
       if (!metaMaskAccount) throw new Error('Wallet not connected');
       setLoading(true);
       try {
-        const sharesWei = Web3.utils.toWei(shares, 'ether');
         const pool = getPoolContractForTransactions(poolAddress);
 
         const gasEstimate = await pool.methods

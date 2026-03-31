@@ -72,7 +72,7 @@ export default function StakingPools() {
           {mainTab === 'vouch' ? (
             <div className='grid grid-cols-1 lg:grid-cols-2 gap-5 relative'>
               {/* Vertical separator for desktop */}
-              <div className='bg-[#FE8A3C] h-[calc(100%-80px)] w-[1px] absolute left-[50%] top-[40px] max-lg:bg-transparent'></div>
+              <div className='bg-[#FE8A3C] h-[calc(100%-180px)] w-[1px] absolute left-[50%] top-[110px] max-lg:bg-transparent'></div>
               
               {/* Left Side - Capital Pools */}
               <div>
