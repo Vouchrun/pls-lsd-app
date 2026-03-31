@@ -3,7 +3,10 @@
     "id": 943,
     "name": "PulseChain Testnet v4"
   },
-  "rpc": "https://rpc.v4.testnet.pulsechain.com",
+  "rpc": [
+    "https://rpc.v4.testnet.pulsechain.com",
+    "https://rpc-testnet-pulsechain.g4mm4.io"
+  ],
   "explorer": "https://scan.v4.testnet.pulsechain.com/#",
   "blockSeconds": 10,
   "contracts": {
@@ -18,6 +21,21 @@
     },
     "networkBalanceContract": {
       "address": "0x47e97e7971D13936667EE0E0b44a4Fc1eBD871Ff"
+    },
+    "vouchStakingContract": {
+      "address": "0x2fc9A89DB2676311eA208CaCd344b1025F67FA24"
+    },
+    "holderRewardsVaultContract": {
+      "address": "0xC6C26c60904EC7f3080d56E0240CC5334ED2D389"
+    },
+    "stakingRewardPoolContract": {
+      "address": "0x674823457Efe02f7f698Ff2676819905d415Fc4c"
+    },
+    "lpRewardPoolContract": {
+      "address": "0xBE76b28F3eA958c883adAfd1d4f83170aACf3D55"
+    },
+    "capitalPoolFactoryContract": {
+      "address": "0xf7E7e96a3A08403AB528Bb970c6622D5A8Eb0e7c"
     }
   },
   "networkBalanceContractDeploymentBlock": 19612112

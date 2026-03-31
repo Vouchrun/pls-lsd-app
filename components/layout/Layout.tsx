@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { NavigationItem } from "interfaces/common";
 import Head from "next/head";
 import { HideOnScroll } from "components/common/HideOnScroll";
@@ -35,6 +35,15 @@ export const Layout = (props: React.PropsWithChildren) => {
   const router = useRouter();
 
   const [navigation, setNavigation] = useState<NavigationItem[]>([]);
+
+  // Apply dark mode class to document element
+  useEffect(() => {
+    if (darkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [darkMode]);
 
   const isDashboard = router.pathname === "/dashboard";
 

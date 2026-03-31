@@ -2,7 +2,7 @@
   "name": "eth-lsd-app",
   "version": "0.1.0",
   "scripts": {
-    "dev": "NEXT_PUBLIC_ENV=dev next dev -p 5009",
+    "dev": "NEXT_PUBLIC_ENV=production next dev -p 5009",
     "build:dev": "NEXT_PUBLIC_ENV=dev next build",
     "build": "NEXT_PUBLIC_ENV=production next build",
     "start": "next start -p 5009"
@@ -10,6 +10,7 @@
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
+    "@metamask/connect-evm": "^0.1.0",
     "@mui/material": "^5.18.0",
     "@mui/styles": "^5.18.0",
     "@reduxjs/toolkit": "^1.9.7",
@@ -39,6 +40,7 @@
     "web3-utils": "1.9.0"
   },
   "resolutions": {
+    "base-x": "3.0.9",
     "clipboardy": "3.0.0"
   },
   "devDependencies": {

@@ -11,6 +11,7 @@ import {
   saveStorage,
   STORAGE_KEY_DARK_MODE,
   STORAGE_KEY_UNREAD_NOTICE,
+  STORAGE_KEY_CUSTOM_RPC,
 } from "utils/storageUtils";
 
 export interface StakeLoadingParams {
@@ -71,6 +72,7 @@ export interface AppState {
   stakeLoadingParams: StakeLoadingParams | undefined;
   unstakeLoadingParams: UnstakeLoadingParams | undefined;
   withdrawLoadingParams: WithdrawLoadingParams | undefined;
+  customRpc: string | null;
 }
 
 const initialState: AppState = {
@@ -84,6 +86,7 @@ const initialState: AppState = {
   stakeLoadingParams: undefined,
   unstakeLoadingParams: undefined,
   withdrawLoadingParams: undefined,
+  customRpc: null,
 };
 
 export const appSlice = createSlice({
@@ -139,6 +142,14 @@ export const appSlice = createSlice({
     ) => {
       state.withdrawLoadingParams = action.payload;
     },
+    setCustomRpc: (state: AppState, action: PayloadAction<string | null>) => {
+      if (action.payload) {
+        saveStorage(STORAGE_KEY_CUSTOM_RPC, action.payload);
+      } else {
+        removeStorage(STORAGE_KEY_CUSTOM_RPC);
+      }
+      state.customRpc = action.payload;
+    },
   },
 });
 
@@ -153,6 +164,7 @@ export const {
   setStakeLoadingParams,
   setUnstakeLoadingParams,
   setWithdrawLoadingParams,
+  setCustomRpc,
 } = appSlice.actions;
 
 export default appSlice.reducer;

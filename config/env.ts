@@ -23,10 +23,44 @@ export function getEthereumChainName() {
 }
 
 export function getEthereumRpc() {
-  if (isDev()) {
-    return appDevConfig.rpc;
+  const rpcConfig = isDev() ? appDevConfig.rpc : appProdConfig.rpc;
+  // Handle both string and array formats for backward compatibility
+  if (Array.isArray(rpcConfig)) {
+    return rpcConfig[0]; // Return first RPC as default
   }
-  return appProdConfig.rpc;
+  return rpcConfig;
+}
+
+/**
+ * Get all available RPC URLs as an array
+ * @param customRpc Optional custom RPC URL to prioritize (will be placed first)
+ */
+export function getAllRpcUrls(customRpc?: string | null): string[] {
+  const rpcConfig = isDev() ? appDevConfig.rpc : appProdConfig.rpc;
+  // Handle both string and array formats
+  let rpcs: string[] = [];
+  if (Array.isArray(rpcConfig)) {
+    rpcs = rpcConfig;
+  } else {
+    rpcs = [rpcConfig];
+  }
+  
+  // If custom RPC is provided, place it first (highest priority)
+  if (customRpc) {
+    return [customRpc, ...rpcs];
+  }
+  
+  return rpcs;
+}
+
+/**
+ * Get RPC URL at specific index
+ * @param index Index of the RPC to retrieve
+ * @param customRpc Optional custom RPC URL to include in the list
+ */
+export function getRpcAtIndex(index: number, customRpc?: string | null): string {
+  const rpcs = getAllRpcUrls(customRpc);
+  return rpcs[index % rpcs.length]; // Use modulo to wrap around
 }
 
 export function getExplorerUrl() {
@@ -64,10 +98,10 @@ export function getWagmiChainConfig() {
     },
     rpcUrls: {
       default: {
-        http: [getEthereumRpc()],
+        http: getAllRpcUrls(),
       },
       public: {
-        http: [getEthereumRpc()],
+        http: getAllRpcUrls(),
       },
     },
     blockExplorers: {

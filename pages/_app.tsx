@@ -1,23 +1,23 @@
-import { Fade, ThemeProvider, styled } from "@mui/material";
-import { Layout } from "components/layout/Layout";
-import { useAppSlice } from "hooks/selector";
-import type { NextPage } from "next";
-import type { AppProps } from "next/app";
-import { MaterialDesignContent, SnackbarProvider } from "notistack";
-import { ReactElement, ReactNode, useEffect, useMemo } from "react";
-import { Provider } from "react-redux";
-import { store } from "redux/store";
-import "styles/globals.css";
-import { theme } from "styles/material-ui-theme";
-import { SnackbarUtilsConfigurator } from "utils/snackbarUtils";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { createAppKit } from "@reown/appkit/react";
+import { Fade, ThemeProvider, styled } from '@mui/material';
+import { Layout } from 'components/layout/Layout';
+import { useAppSlice } from 'hooks/selector';
+import type { NextPage } from 'next';
+import type { AppProps } from 'next/app';
+import { MaterialDesignContent, SnackbarProvider } from 'notistack';
+import { ReactElement, ReactNode, useEffect, useMemo } from 'react';
+import { Provider } from 'react-redux';
+import { store } from 'redux/store';
+import 'styles/globals.css';
+import { theme } from 'styles/material-ui-theme';
+import { SnackbarUtilsConfigurator } from 'utils/snackbarUtils';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { createAppKit } from '@reown/appkit/react';
 
-import { WagmiProvider } from "wagmi";
-import { WagmiAdapter } from "@reown/appkit-adapter-wagmi";
-import { isDev } from "config/env";
-import { pulsechain, pulsechainV4 } from "viem/chains";
-import { useAppKitTheme } from "@reown/appkit/react";
+import { WagmiProvider } from 'wagmi';
+import { WagmiAdapter } from '@reown/appkit-adapter-wagmi';
+import { isDev } from 'config/env';
+import { pulsechain, pulsechainV4 } from 'viem/chains';
+import { useAppKitTheme } from '@reown/appkit/react';
 
 export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
   getLayout?: (page: ReactElement) => ReactNode;
@@ -34,15 +34,15 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
     let html = document.documentElement;
     let clientW = html.clientWidth;
     let htmlRem = (clientW * 100) / designSize;
-    html.style.fontSize = Math.min(htmlRem, 100) + "px";
+    html.style.fontSize = Math.min(htmlRem, 100) + 'px';
   };
 
   useEffect(() => {
-    window.addEventListener("resize", resizeListener);
+    window.addEventListener('resize', resizeListener);
     resizeListener();
 
     return () => {
-      window.removeEventListener("resize", resizeListener);
+      window.removeEventListener('resize', resizeListener);
     };
   }, []);
 
@@ -58,14 +58,14 @@ export default MyApp;
 const queryClient = new QueryClient();
 
 // 1. Get projectId from https://cloud.reown.com
-const projectId = "773e240347e5c760d1cc49e512d0d86c";
+const projectId = '773e240347e5c760d1cc49e512d0d86c';
 
 // 2. Create a metadata object - optional
 const metadata = {
-  name: "Vouch",
-  description: "Vouch Validator App",
-  url: "https://val.vouch.run", // origin must match your domain & subdomain
-  icons: ["https://val.vouch.run/_next/static/media/appIconDark.3c9ae27e.svg"],
+  name: 'Vouch',
+  description: 'Vouch Validator App',
+  url: 'https://val.vouch.run', // origin must match your domain & subdomain
+  icons: ['https://val.vouch.run/_next/static/media/appIconDark.3c9ae27e.svg'],
 };
 
 // 3. Create Wagmi Adapter
@@ -82,7 +82,7 @@ createAppKit({
   metadata,
   projectId,
   featuredWalletIds: [
-    "d69877e50c4aa2360d723065716609f1e2698e45fc210438da8c325b65922735",
+    'd69877e50c4aa2360d723065716609f1e2698e45fc210438da8c325b65922735',
   ],
   features: {
     analytics: true, // Optional - defaults to your Cloud configuration
@@ -102,24 +102,31 @@ const MyAppWrapper = ({ Component, pageProps }: any) => {
   const { themeMode, setThemeMode } = useAppKitTheme();
 
   const StyledMaterialDesignContent = useMemo(() => {
-    const successBg = darkMode ? "#5A5DE0" : "#E8EFFD";
-    const successTextColor = darkMode ? "#E8EFFD" : "#1B1B1F";
-    setThemeMode(darkMode ? "dark" : "light");
+    const successBg = darkMode ? '#5A5DE0' : '#E8EFFD';
+    const successTextColor = darkMode ? '#E8EFFD' : '#1B1B1F';
+    const infoBg = darkMode ? '#3b82f6' : '#dbeafe';
+    const infoTextColor = darkMode ? '#ffffff' : '#1e40af';
+    setThemeMode(darkMode ? 'dark' : 'light');
     return styled(MaterialDesignContent)(() => ({
-      "&.notistack-MuiContent-success": {
+      '&.notistack-MuiContent-success': {
         backgroundColor: successBg,
         color: successTextColor,
-        fontSize: ".16rem",
+        fontSize: '.16rem',
       },
-      "&.notistack-MuiContent-error": {
-        backgroundColor: "rgba(255,82,196, 0.9) !important",
-        color: "#ffffff",
-        fontSize: ".16rem",
+      '&.notistack-MuiContent-error': {
+        backgroundColor: 'rgba(255,82,196, 0.9) !important',
+        color: '#ffffff',
+        fontSize: '.16rem',
       },
-      "&.notistack-MuiContent-warning": {
-        backgroundColor: "rgba(255, 204, 0, 0.9) !important",
-        color: "#ffffff",
-        fontSize: ".16rem",
+      '&.notistack-MuiContent-warning': {
+        backgroundColor: 'rgba(255, 204, 0, 0.9) !important',
+        color: '#ffffff',
+        fontSize: '.16rem',
+      },
+      '&.notistack-MuiContent-info': {
+        backgroundColor: infoBg,
+        color: infoTextColor,
+        fontSize: '.16rem',
       },
     }));
   }, [darkMode]);
@@ -130,14 +137,15 @@ const MyAppWrapper = ({ Component, pageProps }: any) => {
         maxSnack={1}
         autoHideDuration={3000}
         anchorOrigin={{
-          vertical: "top",
-          horizontal: "center",
+          vertical: 'top',
+          horizontal: 'center',
         }}
         TransitionComponent={Fade as React.ComponentType}
         Components={{
           success: StyledMaterialDesignContent,
           error: StyledMaterialDesignContent,
           warning: StyledMaterialDesignContent,
+          info: StyledMaterialDesignContent,
         }}
       >
         <WagmiProvider config={wagmiAdapter.wagmiConfig}>

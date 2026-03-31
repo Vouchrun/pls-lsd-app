@@ -157,4 +157,30 @@ body {
     line-height: normal;
   }
 }
-.tab-active div {color: #000 !important;}
+
+.tab-active div {
+  color: #000 !important;
+}
+
+.gef_selct {
+  color: #fff;
+  font-size: 16px;
+  font-weight: 400;
+}
+
+.max_btn {
+  font-size: 14px !important;
+  color: #000 !important;
+  font-weight: 400 !important;
+  text-decoration: underline;
+  height: 0;
+  width: 0;
+  background: transparent !important;
+  border: none !important;
+  align-items: flex-start !important;
+  margin-top: 5px !important;
+}
+
+.dark .max_btn {
+  color: #fff !important;
+}
