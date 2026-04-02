@@ -45,7 +45,7 @@ export default function StakingPools() {
         <div className='flex  bg-[#e2e0d0] dark:bg-[#333] rounded-tl-[30px] rounded-tr-[30px] '>
           <div
             className={classNames(
-              'flex-1 py-[20px] cursor-pointer text-center text-[24px] max-md:text-[20px] font-normal transition-colors rounded-tl-[30px] rounded-tr-[30px]',
+              'flex-1 py-[20px] cursor-pointer text-center text-[24px] max-md:text-[20px] max-sm:text-[16px] font-normal transition-colors rounded-tl-[30px] rounded-tr-[30px]',
               mainTab === 'vouch'
                 ? 'bg-gradient-to-r from-[#ff8533] to-[#ffa162] text-[#000]'
                 : 'bg-[#e2e0d0] dark:bg-[#333] text-color-text1'
@@ -56,7 +56,7 @@ export default function StakingPools() {
           </div>
           <div
             className={classNames(
-              'flex-1 py-[20px] cursor-pointer text-center text-[24px] max-md:text-[20px] font-normal transition-colors rounded-tl-[30px] rounded-tr-[30px]',
+              'flex-1 py-[20px] cursor-pointer text-center text-[24px] max-md:text-[20px] max-sm:text-[16px] font-normal transition-colors rounded-tl-[30px] rounded-tr-[30px]',
               mainTab === 'lp'
                 ? 'bg-gradient-to-r from-[#ff8533] to-[#ffa162] text-[#000]'
                 : 'bg-[#e2e0d0] dark:bg-[#333] text-color-text1'
