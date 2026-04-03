@@ -57,9 +57,9 @@ export const RewardPoolCard: React.FC<RewardPoolCardProps> = ({
 
   return (
     <div className=''>
-      <div className='flex justify-between'>
+      <div className='flex flex-col sm:flex-row justify-between gap-4 sm:gap-0'>
         {/* Header with badge and title */}
-        <div className='flex items-center mb-[40px]'>
+        <div className='flex items-center mb-[20px] sm:mb-[40px]'>
           <div className='w-[66px] h-[66px] mr-[16px]'>
             <img src='/favicon.png' alt='icon' className='w-[66px] h-[66px]' />
           </div>
@@ -87,12 +87,12 @@ export const RewardPoolCard: React.FC<RewardPoolCardProps> = ({
         </div>
 
         {/* Balance Section */}
-        <div className='flex justify-between mb-[40px]'>
-          <div className='flex flex-col items-end'>
+        <div className='flex justify-between sm:justify-end mb-[20px] sm:mb-[40px]'>
+          <div className='flex flex-col items-start sm:items-end'>
             <p className='text-[15px] font-normal text-color-text1 mb-[6px]'>
               Available Balance
             </p>
-            <p className='text-[18px] max-sm:text-[18px] font-normal text-[#A6A6A6]'>
+            <p className='text-[18px] font-normal text-[#A6A6A6]'>
               <span className='text-color-text1 mr-[3px]'>
                 {selectedTab === 'stake'
                   ? tokensLoading
@@ -358,19 +358,19 @@ export const RewardPoolCard: React.FC<RewardPoolCardProps> = ({
             <p className='text-[#A6A6A6] text-[13px] font-medium'>Staked</p>
             <div className='flex gap-[6px] mt-[10px]'>
               <div className='h-[11px] w-[11px] rounded-[2px] bg-gradient-to-r from-[#ff8533] to-[#ffa162]'></div>
-               <p className='text-[13px] font-normal text-[#A6A6A6]'>
-                      {loading
-                        ? '-'
-                        : formatNumber(
-                            Web3.utils.fromWei(
-                              vouchPoolInfo.totalStaked,
-                              'ether'
-                            ),
-                            {
-                              decimals: 2,
-                            }
-                          )}{' '}
-                    </p>
+                <p className='text-[13px] font-normal text-[#A6A6A6]'>
+                       {loading
+                         ? '-'
+                         : formatNumber(
+                             Web3.utils.fromWei(
+                               vouchPoolInfo.totalStaked,
+                               'ether'
+                             ),
+                             {
+                               decimals: 2,
+                             }
+                           )}{' '}
+                      </p>
             </div>
           </div>
           <div>

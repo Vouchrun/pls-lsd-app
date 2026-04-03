@@ -435,7 +435,7 @@ export const CapitalPoolCard: React.FC<CapitalPoolCardProps> = ({
 
   return (
     <div className=''>
-      <div className='flex justify-between'>
+      <div className='flex flex-col sm:flex-row justify-between gap-4'>
         {/* Header with badge and title */}
         <div className='flex items-center'>
           <div className='w-[66px] h-[66px] mr-[16px]'>
@@ -443,13 +443,15 @@ export const CapitalPoolCard: React.FC<CapitalPoolCardProps> = ({
           </div>
           <div>
             <p className='text-[18px] font-normal text-color-text1 flex mb-[10px]'>
-              vPLS{' '}
-              <img
-                src='/images/pls_ic.svg'
-                alt='icon'
-                className='ml-[6px] invert-0 dark:invert'
-              />
-              <span className='ml-[10px] px-[10px] py-[2px] pr-[5px] bg-[#FE8A3C] text-[#000] text-[15px] font-normal rounded-[10px] flex gap-[8px]'>
+              <span className='flex items-center'>
+                vPLS{' '}
+                <img
+                  src='/images/pls_ic.svg'
+                  alt='icon'
+                  className='ml-[6px] invert-0 dark:invert'
+                />
+              </span>
+              <span className='ml-[10px] px-[10px] py-[2px] pr-[5px] bg-[#FE8A3C] text-[#000] text-[15px] font-normal rounded-[10px] flex items-center gap-[8px]'>
                 Capital Pool
                 <Tooltip title="In return for stakers giving up a portion of their PLS Yield (at the Pool Rate), Capital Pools stakers get larger VOUCH, vPLS and PLS rewards." placement="top" arrow>
                   <span>
@@ -464,35 +466,37 @@ export const CapitalPoolCard: React.FC<CapitalPoolCardProps> = ({
           </div>
         </div>
 
-        {/* Balance Section */}
-        <div className='flex justify-between mt-[5px]'>
-          <div className='flex flex-col items-end'>
-            <p className='text-[15px] font-normal text-color-text1 mb-[6px] '>
+{/* Balance Section */}
+        <div className='flex justify-between sm:justify-end mt-[5px] sm:mt-0'>
+          <div className='flex flex-col items-start sm:items-end'>
+            <p className='text-[15px] font-normal text-color-text1 mb-[6px]'>
               Available Balance
             </p>
-            <p className='text-[18px] max-sm:text-[18px] font-normal text-[#A6A6A6]'>
-              <span className=' mr-[3px] text-[18px] text-color-text1'>
+            <p className='text-[18px] font-normal text-[#A6A6A6]'>
+              <span className='text-color-text1 mr-[3px]'>
                 {selectedTab === 'stake'
                   ? formatNumber(vplsBalance.balance, { decimals: 2 })
                   : formatNumber(poolData.userPosition.vplsValue, { decimals: 2 })}
               </span>
-{selectedTab === 'stake'
-                  ? depositType === 'vpls'
-                    ? 'vPLS'
-                    : 'PLS'
-                  : 'vPLS (Staked)'}
+              {selectedTab === 'stake'
+                ? depositType === 'vpls'
+                  ? 'vPLS'
+                  : 'PLS'
+                : 'vPLS (Staked)'}
             </p>
-           {selectedTab === 'stake' && <p className='text-[18px] max-sm:text-[18px] font-normal text-color-text1 mt-[6px]'>
-              {formatNumber(plsBalance || '0', { decimals: 2 })}
-              <span className=' ml-[3px] text-[18px] text-[#A6A6A6]'>PLS</span>
-            </p>}
+            {selectedTab === 'stake' && (
+              <p className='text-[18px] font-normal text-color-text1 mt-[6px]'>
+                {formatNumber(plsBalance || '0', { decimals: 2 })}
+                <span className='ml-[3px] text-[#A6A6A6]'>PLS</span>
+              </p>
+            )}
           </div>
         </div>
       </div>
 
       {/* Stats Section */}
       <div className='border-color-border1 border rounded-[8px] my-[37px] relative p-l[8px]'>
-        <div className='grid grid-cols-3 gap-4 py-[18px]'>
+        <div className='grid grid-cols-1 sm:grid-cols-3 gap-4 py-[18px]'>
           {/* Pool Column */}
           <div className='flex flex-col items-center'>
             <p className='text-[14px] font-medium text-[#8E9397] mb-[7px] text-center'>
@@ -521,7 +525,7 @@ export const CapitalPoolCard: React.FC<CapitalPoolCardProps> = ({
           </div>
 
           {/* Staked Column */}
-          <div className='flex flex-col items-start'>
+          <div className='flex flex-col items-center sm:items-start'>
             <p className='text-[14px] font-medium text-[#8E9397] mb-[7px] text-center'>
               Staked 
               <Tooltip title="Your total staked balance, in Capital Pools PLS amount will Increase but vPLS amount will decrease over time." placement="top" arrow>
@@ -548,17 +552,17 @@ export const CapitalPoolCard: React.FC<CapitalPoolCardProps> = ({
           <div className='flex flex-col items-center'>
             <p className='text-[14px] font-medium text-[#8E9397] mb-[7px] text-center'>
               Unstaking 
-              <Tooltip title="Tokens in unlocking period." placement="top" arrow>
+              <Tooltip title="Your tokens in unlocking period." placement="top" arrow>
                 <span>
                  <Icomoon icon='tip' size='.12rem' color='#333333' />
                 </span>
               </Tooltip>
             </p>
             <p className='text-[16px] font-normal text-color-text1 mb-[7px] text-center'>
-              {formatNumber(poolData.stats.totalUnlocking, { decimals: 2 })} <span className='text-[#A6A6A6]'>vPLS</span>
+              {formatNumber(poolData.unlockInfo.vplsAmount, { decimals: 2 })} <span className='text-[#A6A6A6]'>vPLS</span>
             </p>
             <p className='text-[13px] font-normal text-[#A6A6A6] mb-[7px] text-center'>
-              ${formatNumber(Number(poolData.stats.totalUnlocking) * vplsPrice, { decimals: 2 })}
+              ${formatNumber(Number(poolData.unlockInfo.vplsAmount) * vplsPrice, { decimals: 2 })}
             </p>
           </div>
         </div>
@@ -595,7 +599,7 @@ export const CapitalPoolCard: React.FC<CapitalPoolCardProps> = ({
         </div>
 
         {/* Rewards and Pool Info Section */}
-        <div className='grid grid-flow-col grid-rows-1 max-sm:grid-rows-2 gap-4 max-sm:gap-2 mt-[20px] pt-[20px]'>
+        <div className='grid grid-cols-1 sm:grid-cols-2 gap-4 mt-[20px] pt-[20px]'>
           <div>
             <p className='text-[14px] font-medium text-[#8E9397] mb-[13px] text-center relative z-[1]'>
               Staking Rewards
@@ -655,29 +659,6 @@ export const CapitalPoolCard: React.FC<CapitalPoolCardProps> = ({
   </div>
 </div>
 
-          {/* <div>
-            <p className='text-[13px] font-medium text-[#8E9397] mb-[13px] text-center relative z-[1]'>
-              Pool Info
-            </p>
-            <div className='flex max-w-[160px] justify-between mx-auto mt-[20px] mb-[8px]'>
-              <p className='text-[14px] font-normal text-color-text1 text-center'>
-                Total Staked:
-              </p>
-              <p className='text-[14px] font-normal text-[#A6A6A6] text-center'>
-                {formatNumber(poolData.stats.totalVplsDeposited, { decimals: 2 })}
-              </p>
-            </div>
-            <div className='flex max-w-[160px] justify-between mx-auto mb-[10px]'>
-              <p className='text-[14px] font-normal text-color-text1 text-center'>
-                Unlock Period:
-              </p>
-              <p className='text-[14px] font-normal text-[#A6A6A6] text-center'>
-                {poolData.unlockPeriodDays} days
-              </p>
-            </div>
-          </div> */}
-          <div className='bg-[#cdcccc] dark:bg-[#333] h-[1px] w-[140px] absolute top-[49%]'></div>
-          <div className='bg-[#cdcccc] dark:bg-[#333] h-[1px] w-[140px] absolute right-0 top-[49%]'></div>
         </div>
       </div>
 
@@ -690,7 +671,7 @@ export const CapitalPoolCard: React.FC<CapitalPoolCardProps> = ({
         >
           <div
             className={classNames(
-              'cursor-pointer flex items-center justify-center rounded-tl-[.3rem] text-[.16rem] text-color-text1 border-[0.01rem]',
+              'cursor-pointer flex items-center justify-center rounded-tl-[.3rem] text-[16px] text-color-text1 border-[0.01rem]',
               selectedTab === 'stake'
                 ? 'font-[700] border-[#ff4400]/30 bg-gradient-to-r from-[#ff8533] to-[#ffa162]'
                 : 'border-color-border1 bg-[#E2E0D0] dark:bg-[#333333]'
@@ -701,7 +682,7 @@ export const CapitalPoolCard: React.FC<CapitalPoolCardProps> = ({
           </div>
           <div
             className={classNames(
-              'cursor-pointer flex items-center justify-center rounded-tr-[.3rem] text-[.16rem] text-color-text1 border-[0.01rem]',
+              'cursor-pointer flex items-center justify-center rounded-tr-[.3rem] text-[16px] text-color-text1 border-[0.01rem]',
               selectedTab === 'unstake'
                 ? 'font-[700] border-[#ff4400]/30 bg-gradient-to-r from-[#ff8533] to-[#ffa162]'
                 : 'border-color-border1 bg-[#E2E0D0] dark:bg-[#333333]'
@@ -721,7 +702,7 @@ export const CapitalPoolCard: React.FC<CapitalPoolCardProps> = ({
                 <path d='M8 0C3.584 0 0 3.584 0 8s3.584 8 8 8 8-3.584 8-8S12.416 0 8 0zm1 12H7V7h2v5zm0-6H7V4h2v2z' />
               </svg>
             </div>
-            <div className='text-[.12rem] text-[#666666] dark:text-[#aaaaaa] leading-[1.4]'>
+            <div className='text-[13px] sm:text-[14px] text-[#666666] dark:text-[#aaaaaa] leading-[1.4]'>
               Staked tokens have a{' '}
               {/* <span className='font-semibold'>
                 {poolData.unlockPeriodDays} day
@@ -745,17 +726,17 @@ export const CapitalPoolCard: React.FC<CapitalPoolCardProps> = ({
                   </svg>
                 </div>
                 <div>
-                  <div className='text-[.12rem] font-semibold text-[#856404] dark:text-[#ffecb5]'>
+                  <div className='text-[14px] sm:text-[15px] font-semibold text-[#856404] dark:text-[#ffecb5]'>
                     Active Unstake in Progress
                   </div>
-                  <div className='text-[.11rem] text-[#856404] dark:text-[#ffecb5] mt-[.04rem]'>
+                  <div className='text-[13px] sm:text-[14px] text-[#856404] dark:text-[#ffecb5] mt-[.04rem]'>
                     Amount: {formatNumber(poolData.unlockInfo.vplsAmount, { decimals: 4 })}{' '}
                     vPLS
                   </div>
                 </div>
               </div>
               <div className='text-right'>
-                <div className='text-[.11rem] text-[#856404] dark:text-[#ffecb5]'>
+                <div className='text-[13px] sm:text-[14px] text-[#856404] dark:text-[#ffecb5]'>
                   {poolData.unlockInfo.isReady ? (
                     <span className='font-semibold text-green-600 dark:text-green-400'>
                       Ready!
@@ -776,17 +757,17 @@ export const CapitalPoolCard: React.FC<CapitalPoolCardProps> = ({
         <div className='mt-[.18rem] pt-[.24rem] mx-[.24rem] bg-[#edece3] dark:bg-[#111111] rounded-[.3rem]'>
           <div className='mx-[.12rem] flex items-start'>
             <div className='flex-1 flex justify-start flex-col pl-[.14rem]'>
-              <div className='flex items-center h-[.42rem]'>
+              <div className='flex items-start'>
                 <CustomNumberInput
                   value={amount}
                   handleValueChange={setAmount}
                   fontSize='.24rem'
                   placeholder='Amount'
                 />
-                <div className='flex flex-col items-center relative top-[25px]'>
+                <div className='flex flex-col items-start ml-2'>
                   {selectedTab === 'stake' && (
                     <select 
-                      className='gef_selct bg-[#1A1A1A] border border-[#6C86AD80] outline-none h-[36px] w-[100px] justify-center text-center rounded-[30px]'
+                      className='gef_selct bg-[#1A1A1A] border border-[#6C86AD80] outline-none h-[32px] w-[70px] sm:w-[80px] justify-center text-center rounded-[30px] text-[14px]'
                       value={depositType}
                       onChange={(e) => setDepositType(e.target.value as 'vpls' | 'pls')}
                     >
@@ -796,22 +777,18 @@ export const CapitalPoolCard: React.FC<CapitalPoolCardProps> = ({
                   )}
                   {selectedTab === 'unstake' && (
                     <select 
-                      className='gef_selct bg-[#1A1A1A] border border-[#6C86AD80] outline-none h-[36px] w-[100px] justify-center text-center rounded-[30px]'
+                      className='gef_selct bg-[#1A1A1A] border border-[#6C86AD80] outline-none h-[32px] w-[70px] sm:w-[80px] justify-center text-center rounded-[30px] text-[14px]'
                       value={depositType}
                       onChange={(e) => setDepositType(e.target.value as 'vpls' | 'pls')}
                     >
                       <option value='vpls'>vPLS</option>
                     </select>
                   )}
-                    
+                  
                   <CustomButton
-                    // type='stroke'
-                    // width='.63rem'
-                    // height='.36rem'
-                    // fontSize='.16rem'
-                    className='text-[14px] max_btn'
+                    className='text-[14px] max_btn mt-2 sm:w-auto'
+                    width='70px'
                     onClick={handleMax}
-                  // border='0.01rem solid #6C86AD80'
                   >
                     Max
                   </CustomButton>
@@ -819,10 +796,10 @@ export const CapitalPoolCard: React.FC<CapitalPoolCardProps> = ({
               </div>
 
               {/* Balance Info */}
-              <div className='mt-[.22rem] text-[.14rem]'>
+              <div className='text-[13px] sm:text-[.14rem]'>
                 <div className='grid grid-cols-2 gap-0'>
                   <div></div>
-                  <div className='text-color-text2 mt-[7px] mb-[14px]'>
+                  <div className='text-color-text2 mb-[14px]'>
                     Balance: {formatNumber(maxAmount, { decimals: 2 })}{' '}
                     {selectedTab === 'stake'
                       ? depositType === 'vpls'
@@ -837,7 +814,7 @@ export const CapitalPoolCard: React.FC<CapitalPoolCardProps> = ({
         </div>
 
         {/* Action Buttons */}
-        <div className='mt-[20px] flex justify-center gap-4 mb-[20px]'>
+        <div className='mt-[20px] flex flex-col sm:flex-row justify-center gap-4 mb-[20px] px-4 sm:px-0'>
           {/* First button - Deposit/Unstake/Approve */}
           {selectedTab === 'stake' && depositType === 'vpls' && needsApproval ? (
             <button
@@ -848,7 +825,7 @@ export const CapitalPoolCard: React.FC<CapitalPoolCardProps> = ({
                 !amount ||
                 !isValidAmount
               }
-              className='h-[45px] w-[160px] bg-gradient-to-r from-[#3b82f6] to-[#2563eb] hover:from-[#2563eb] hover:to-[#1d4ed8] disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium rounded-[50px] transition-all duration-200'
+              className='h-[45px] w-full sm:w-[160px] bg-gradient-to-r from-[#3b82f6] to-[#2563eb] hover:from-[#2563eb] hover:to-[#1d4ed8] disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium text-[16px] rounded-[50px] transition-all duration-200'
             >
               {isApproveProcessing ? 'Approving...' : 'Approve vPLS'}
             </button>
@@ -862,7 +839,7 @@ export const CapitalPoolCard: React.FC<CapitalPoolCardProps> = ({
                 !isValidAmount ||
                 (selectedTab === 'stake' && depositType === 'vpls' && needsApproval)
               }
-              className='h-[45px] w-[160px] bg-gradient-to-r from-[#ff8533] to-[#ffa162] hover:from-[#ff7520] hover:to-[#ff9550] disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium rounded-[50px] transition-all duration-200'
+              className='h-[45px] w-full sm:w-[160px] bg-gradient-to-r from-[#ff8533] to-[#ffa162] hover:from-[#ff7520] hover:to-[#ff9550] disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium text-[16px] rounded-[50px] transition-all duration-200'
             >
               {isProcessing
                 ? selectedTab === 'stake'
@@ -883,7 +860,7 @@ export const CapitalPoolCard: React.FC<CapitalPoolCardProps> = ({
                 isClaimProcessing ||
                 poolData.vouchStakingPid === null
               }
-              className='h-[45px] w-[160px] bg-gradient-to-r from-[#ff8533] to-[#ffa162] hover:from-[#ff7520] hover:to-[#ff9550] disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium rounded-[50px] transition-all duration-200'
+              className='h-[45px] w-full sm:w-[160px] bg-gradient-to-r from-[#ff8533] to-[#ffa162] hover:from-[#ff7520] hover:to-[#ff9550] disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium text-[16px] rounded-[50px] transition-all duration-200'
             >
               {isClaimProcessing ? 'Claiming...' : 'Claim Rewards'}
             </button>
@@ -892,7 +869,7 @@ export const CapitalPoolCard: React.FC<CapitalPoolCardProps> = ({
               <button
                 onClick={handleFinalizeUnlock}
                 disabled={!metaMaskAccount || isUnlockProcessing}
-                className='h-[45px] w-[160px] bg-gradient-to-r from-[#28a745] to-[#20c997] hover:from-[#218838] hover:to-[#1aa179] disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium rounded-[50px] transition-all duration-200'
+                className='h-[45px] w-full sm:w-[160px] bg-gradient-to-r from-[#28a745] to-[#20c997] hover:from-[#218838] hover:to-[#1aa179] disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium text-[16px] rounded-[50px] transition-all duration-200'
               >
                 {isUnlockProcessing ? 'Processing...' : 'Claim Unstake'}
               </button>
@@ -900,7 +877,7 @@ export const CapitalPoolCard: React.FC<CapitalPoolCardProps> = ({
               <button
                 onClick={handleCancelUnlock}
                 disabled={!metaMaskAccount || isUnlockProcessing}
-                className='h-[45px] w-[160px] bg-gradient-to-r from-[#dc3545] to-[#c82333] hover:from-[#c82333] hover:to-[#bd2130] disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium rounded-[50px] transition-all duration-200'
+                className='h-[45px] w-full sm:w-[160px] bg-gradient-to-r from-[#dc3545] to-[#c82333] hover:from-[#c82333] hover:to-[#bd2130] disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium text-[16px] rounded-[50px] transition-all duration-200'
               >
                 {isUnlockProcessing ? 'Processing...' : 'Cancel Unstake'}
               </button>
@@ -913,7 +890,7 @@ export const CapitalPoolCard: React.FC<CapitalPoolCardProps> = ({
                 isClaimProcessing ||
                 poolData.vouchStakingPid === null
               }
-              className='h-[45px] w-[160px] bg-gradient-to-r from-[#ff8533] to-[#ffa162] hover:from-[#ff7520] hover:to-[#ff9550] disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium rounded-[50px] transition-all duration-200'
+              className='h-[45px] w-full sm:w-[160px] bg-gradient-to-r from-[#ff8533] to-[#ffa162] hover:from-[#ff7520] hover:to-[#ff9550] disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium text-[16px] rounded-[50px] transition-all duration-200'
             >
               {isClaimProcessing ? 'Claiming...' : 'Claim Rewards'}
             </button>
@@ -922,29 +899,29 @@ export const CapitalPoolCard: React.FC<CapitalPoolCardProps> = ({
       </div>
 
       {/* Price and Market Cap Section */}
-      <div className='px-[30px]'>
-        <div className='mt-[37px] flex justify-between mb-[20px]'>
+      <div className='px-[16px] sm:px-[30px]'>
+        <div className='mt-[37px] flex flex-col sm:flex-row justify-between gap-6 sm:gap-0 mb-[20px]'>
           <div>
             <p className='text-[13px] font-normal text-[#A6A6A6] mb-[8px]'>VPLS Price</p>
-            <p className='text-[23px] font-normal text-color-text1'>
+            <p className='text-[20px] sm:text-[23px] font-normal text-color-text1'>
               ${tokensLoading ? '...' : vplsInfo.price}
             </p>
-            <p className='text-[#A6A6A6] text-[13px] mt-[3px]'>
+            <p className='text-[#A6A6A6] text-[12px] sm:text-[13px] mt-[3px]'>
               VPLS Token Supply:{' '}
               {tokensLoading
                 ? '...'
                 : formatNumber(vplsInfo.totalSupply, { decimals: 2 })}
             </p>
           </div>
-          <div>
+          <div className='sm:text-right'>
             <p className='text-[13px] font-normal text-[#A6A6A6]'>Market Cap</p>
-            <p className='text-[23px] font-normal text-color-text1 mt-[9px]'>
+            <p className='text-[20px] sm:text-[23px] font-normal text-color-text1 mt-[9px]'>
               ${tokensLoading ? '...' : vplsInfo.marketCap}
             </p>
           </div>
         </div>
       </div>
-      <div className='mt-[24px] px-[30px]'>
+      <div className='mt-[24px] px-[16px] sm:px-[30px]'>
         <div className='h-[38px] border border-[#333] rounded-[8px] p-[3px] flex'>
             <div 
               className='bg-[#4F8CEF] rounded-l-[6px]' 
@@ -959,7 +936,7 @@ export const CapitalPoolCard: React.FC<CapitalPoolCardProps> = ({
               style={{ width: `${poolStats.otherPercentage}%` }}
             ></div>
         </div>
-        <div className='flex align-middle justify-between mt-[40px]'>
+        <div className='flex flex-col sm:flex-row align-middle justify-between mt-[40px] gap-4 sm:gap-0'>
           <div>
             <p className='text-[#A6A6A6] text-[13px] font-medium'>Unstaking</p>
             <div className='flex gap-[6px] mt-[10px]'>

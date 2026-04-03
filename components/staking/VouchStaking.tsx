@@ -245,7 +245,7 @@ export const VouchStaking: React.FC<VouchStakingProps> = ({
       >
         <div
           className={classNames(
-            'cursor-pointer flex items-center justify-center rounded-tl-[.3rem] text-[.16rem] text-color-text1 border-[0.01rem]',
+            'cursor-pointer flex items-center justify-center rounded-tl-[.3rem] text-[16px] text-color-text1 border-[0.01rem]',
             selectedTab === 'stake'
               ? 'font-[700] border-[#ff4400]/30 bg-gradient-to-r from-[#ff8533] to-[#ffa162]'
               : 'border-color-border1 bg-[#E2E0D0] dark:bg-[#333333]'
@@ -256,7 +256,7 @@ export const VouchStaking: React.FC<VouchStakingProps> = ({
         </div>
         <div
           className={classNames(
-            'cursor-pointer flex items-center justify-center rounded-tr-[.3rem] text-[.16rem] text-color-text1 border-[0.01rem]',
+            'cursor-pointer flex items-center justify-center rounded-tr-[.3rem] text-[16px] text-color-text1 border-[0.01rem]',
             selectedTab === 'unstake'
               ? 'font-[700] border-[#ff4400]/30 bg-gradient-to-r from-[#ff8533] to-[#ffa162]'
               : 'border-color-border1 bg-[#E2E0D0] dark:bg-[#333333]'
@@ -275,7 +275,7 @@ export const VouchStaking: React.FC<VouchStakingProps> = ({
               <path d='M8 0C3.584 0 0 3.584 0 8s3.584 8 8 8 8-3.584 8-8S12.416 0 8 0zm1 12H7V7h2v5zm0-6H7V4h2v2z' />
             </svg>
           </div>
-          <div className='text-[.12rem] text-[#666666] dark:text-[#aaaaaa] leading-[1.4]'>
+          <div className='text-[13px] sm:text-[14px] text-[#666666] dark:text-[#aaaaaa] leading-[1.4]'>
             Staked tokens have a{' '}
             <span className='font-semibold'>
               {vouchUnlockPeriod} day{vouchUnlockPeriod !== 1 ? 's' : ''}
@@ -302,17 +302,17 @@ export const VouchStaking: React.FC<VouchStakingProps> = ({
                 </svg>
               </div>
               <div>
-                <div className='text-[.12rem] font-semibold text-[#856404] dark:text-[#ffecb5]'>
+                <div className='text-[14px] sm:text-[15px] font-semibold text-[#856404] dark:text-[#ffecb5]'>
                   Active Unstake in Progress
                 </div>
-                <div className='text-[.11rem] text-[#856404] dark:text-[#ffecb5] mt-[.04rem]'>
+                <div className='text-[13px] sm:text-[14px] text-[#856404] dark:text-[#ffecb5] mt-[.04rem]'>
                   Amount:{' '}
                   {formatNumber(vouchUnlockInfo.amount, { decimals: 4 })} VOUCH
                 </div>
               </div>
             </div>
             <div className='text-right'>
-              <div className='text-[.11rem] text-[#856404] dark:text-[#ffecb5]'>
+              <div className='text-[13px] sm:text-[14px] text-[#856404] dark:text-[#ffecb5]'>
                 {vouchUnlockInfo.ready ? (
                   <span className='font-semibold text-green-600 dark:text-green-400'>
                     Ready!
@@ -334,25 +334,21 @@ export const VouchStaking: React.FC<VouchStakingProps> = ({
         <div className='mx-[.12rem] flex items-start'>
           <div className='flex-1 flex justify-start flex-col pl-[.14rem]'>
             {/* Amount Input */}
-            <div className='flex items-center h-[.42rem]'>
+            <div className='flex items-start'>
               <CustomNumberInput
                 value={amount}
                 handleValueChange={setAmount}
                 fontSize='.24rem'
                 placeholder='Amount'
               />
-              <div className='flex flex-col items-center relative top-[25px]'>
-                <select className='gef_selct bg-[#1A1A1A] border border-[#6C86AD80] outline-none h-[36px] w-[100px] justify-center text-center rounded-[30px]'>
+              <div className='flex flex-col items-start ml-2'>
+                <select className='gef_selct bg-[#1A1A1A] border border-[#6C86AD80] outline-none h-[32px] w-[70px] sm:w-[80px] justify-center text-center rounded-[30px] text-[14px]'>
                   <option >VOUCH</option>
                 </select>
                 <CustomButton
-                  // type='stroke'
-                  // width='.63rem'
-                  // height='.36rem'
-                  // fontSize='.16rem'
-                  className='text-[14px] max_btn'
+                  className='text-[14px] max_btn mt-2 sm:w-auto'
+                  width='70px'
                   onClick={handleMax}
-                // border='0.01rem solid #6C86AD80'
                 >
                   Max
                 </CustomButton>
@@ -360,10 +356,10 @@ export const VouchStaking: React.FC<VouchStakingProps> = ({
             </div>
 
             {/* Balance Info */}
-            <div className='mt-[.22rem] text-[.13rem]'>
+            <div className='text-[13px] sm:text-[.13rem]'>
               <div className='grid grid-cols-2 gap-0'>
                 <div></div>
-                <div className='text-color-text2 mt-[7px] mb-[14px]'>
+                <div className='text-color-text2 mb-[14px]'>
                   Balance: {formatNumber(maxAmount, { decimals: 2 })}{' '}
                   {selectedTab === 'stake' ? 'VOUCH' : 'VOUCH (Staked)'}
                 </div>
@@ -373,7 +369,7 @@ export const VouchStaking: React.FC<VouchStakingProps> = ({
         </div>
       </div>
       {/* Action Buttons */}
-      <div className='mt-[20px] flex justify-center gap-4 mb-[20px]'>
+      <div className='mt-[20px] flex flex-col sm:flex-row justify-center gap-4 mb-[20px] px-4 sm:px-0'>
         {/* First button - Stake/Unstake/Approve */}
         {selectedTab === 'stake' && needsApproval ? (
           <button
@@ -384,7 +380,7 @@ export const VouchStaking: React.FC<VouchStakingProps> = ({
               !amount ||
               !isValidAmount
             }
-            className='h-[45px] w-[160px] bg-gradient-to-r from-[#3b82f6] to-[#2563eb] hover:from-[#2563eb] hover:to-[#1d4ed8] disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium rounded-[50px] transition-all duration-200'
+            className='h-[45px] w-full sm:w-[160px] bg-gradient-to-r from-[#3b82f6] to-[#2563eb] hover:from-[#2563eb] hover:to-[#1d4ed8] disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium text-[16px] rounded-[50px] transition-all duration-200'
           >
             {isApproveProcessing ? 'Approving...' : 'Approve VOUCH'}
           </button>
@@ -398,7 +394,7 @@ export const VouchStaking: React.FC<VouchStakingProps> = ({
               !isValidAmount ||
               (selectedTab === 'stake' && needsApproval)
             }
-            className='h-[45px] w-[160px] bg-gradient-to-r from-[#ff8533] to-[#ffa162] hover:from-[#ff7520] hover:to-[#ff9550] disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium rounded-[50px] transition-all duration-200'
+            className='h-[45px] w-full sm:w-[160px] bg-gradient-to-r from-[#ff8533] to-[#ffa162] hover:from-[#ff7520] hover:to-[#ff9550] disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium text-[16px] rounded-[50px] transition-all duration-200'
           >
             {isStakeProcessing
               ? selectedTab === 'stake'
@@ -416,7 +412,7 @@ export const VouchStaking: React.FC<VouchStakingProps> = ({
           <button
             onClick={handleClaim}
             disabled={!metaMaskAccount || isClaimProcessing}
-            className='h-[45px] w-[160px] bg-gradient-to-r from-[#ff8533] to-[#ffa162] hover:from-[#ff7520] hover:to-[#ff9550] disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium rounded-[50px] transition-all duration-200'
+            className='h-[45px] w-full sm:w-[160px] bg-gradient-to-r from-[#ff8533] to-[#ffa162] hover:from-[#ff7520] hover:to-[#ff9550] disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium text-[16px] rounded-[50px] transition-all duration-200'
           >
             {isClaimProcessing ? 'Claiming...' : 'Claim Rewards'}
           </button>
@@ -426,7 +422,7 @@ export const VouchStaking: React.FC<VouchStakingProps> = ({
               <button
                 onClick={handleFinalizeUnlock}
                 disabled={!metaMaskAccount || isUnlockProcessing}
-                className='h-[45px] w-[160px] bg-gradient-to-r from-[#28a745] to-[#20c997] hover:from-[#218838] hover:to-[#1aa179] disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium rounded-[50px] transition-all duration-200'
+                className='h-[45px] w-full sm:w-[160px] bg-gradient-to-r from-[#28a745] to-[#20c997] hover:from-[#218838] hover:to-[#1aa179] disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium text-[16px] rounded-[50px] transition-all duration-200'
               >
                 {isUnlockProcessing ? 'Processing...' : 'Claim Unstake'}
               </button>
@@ -434,7 +430,7 @@ export const VouchStaking: React.FC<VouchStakingProps> = ({
               <button
                 onClick={handleCancelUnlock}
                 disabled={!metaMaskAccount || isUnlockProcessing}
-                className='h-[45px] w-[160px] bg-gradient-to-r from-[#dc3545] to-[#c82333] hover:from-[#c82333] hover:to-[#bd2130] disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium rounded-[50px] transition-all duration-200'
+                className='h-[45px] w-full sm:w-[160px] bg-gradient-to-r from-[#dc3545] to-[#c82333] hover:from-[#c82333] hover:to-[#bd2130] disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium text-[16px] rounded-[50px] transition-all duration-200'
               >
                 {isUnlockProcessing ? 'Processing...' : 'Cancel Unstake'}
               </button>
@@ -444,7 +440,7 @@ export const VouchStaking: React.FC<VouchStakingProps> = ({
             <button
               onClick={handleClaim}
               disabled={!metaMaskAccount || isClaimProcessing}
-              className='h-[45px] w-[160px] bg-gradient-to-r from-[#ff8533] to-[#ffa162] hover:from-[#ff7520] hover:to-[#ff9550] disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium rounded-[50px] transition-all duration-200'
+              className='h-[45px] w-full sm:w-[160px] bg-gradient-to-r from-[#ff8533] to-[#ffa162] hover:from-[#ff7520] hover:to-[#ff9550] disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium text-[16px] rounded-[50px] transition-all duration-200'
             >
               {isClaimProcessing ? 'Claiming...' : 'Claim Rewards'}
             </button>
