@@ -552,17 +552,17 @@ export const CapitalPoolCard: React.FC<CapitalPoolCardProps> = ({
           <div className='flex flex-col items-center'>
             <p className='text-[14px] font-medium text-[#8E9397] mb-[7px] text-center'>
               Unstaking 
-              <Tooltip title="Tokens in unlocking period." placement="top" arrow>
+              <Tooltip title="Your tokens in unlocking period." placement="top" arrow>
                 <span>
                  <Icomoon icon='tip' size='.12rem' color='#333333' />
                 </span>
               </Tooltip>
             </p>
             <p className='text-[16px] font-normal text-color-text1 mb-[7px] text-center'>
-              {formatNumber(poolData.stats.totalUnlocking, { decimals: 2 })} <span className='text-[#A6A6A6]'>vPLS</span>
+              {formatNumber(poolData.unlockInfo.vplsAmount, { decimals: 2 })} <span className='text-[#A6A6A6]'>vPLS</span>
             </p>
             <p className='text-[13px] font-normal text-[#A6A6A6] mb-[7px] text-center'>
-              ${formatNumber(Number(poolData.stats.totalUnlocking) * vplsPrice, { decimals: 2 })}
+              ${formatNumber(Number(poolData.unlockInfo.vplsAmount) * vplsPrice, { decimals: 2 })}
             </p>
           </div>
         </div>
