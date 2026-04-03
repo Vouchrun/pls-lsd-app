@@ -552,17 +552,17 @@ export const CapitalPoolCard: React.FC<CapitalPoolCardProps> = ({
           <div className='flex flex-col items-center'>
             <p className='text-[14px] font-medium text-[#8E9397] mb-[7px] text-center'>
               Unstaking 
-              <Tooltip title="Your tokens in unlocking period." placement="top" arrow>
+              <Tooltip title="Tokens in unlocking period." placement="top" arrow>
                 <span>
                  <Icomoon icon='tip' size='.12rem' color='#333333' />
                 </span>
               </Tooltip>
             </p>
             <p className='text-[16px] font-normal text-color-text1 mb-[7px] text-center'>
-              {formatNumber(poolData.unlockInfo.vplsAmount, { decimals: 2 })} <span className='text-[#A6A6A6]'>vPLS</span>
+              {formatNumber(poolData.stats.totalUnlocking, { decimals: 2 })} <span className='text-[#A6A6A6]'>vPLS</span>
             </p>
             <p className='text-[13px] font-normal text-[#A6A6A6] mb-[7px] text-center'>
-              ${formatNumber(Number(poolData.unlockInfo.vplsAmount) * vplsPrice, { decimals: 2 })}
+              ${formatNumber(Number(poolData.stats.totalUnlocking) * vplsPrice, { decimals: 2 })}
             </p>
           </div>
         </div>
@@ -703,11 +703,13 @@ export const CapitalPoolCard: React.FC<CapitalPoolCardProps> = ({
               </svg>
             </div>
             <div className='text-[13px] sm:text-[14px] text-[#666666] dark:text-[#aaaaaa] leading-[1.4]'>
-              Staked tokens have a{' '}
+              THIS POOL IS BEING RETIRED, YOU NEED TO UNSTAKE YOUR vPLS AND CLAIM THE UNSTAKED TOKENS. Select the Unstake vPLS TAB.
+              <br /> <br /> After unstaking you will see a green Claim Unstake Button.
               {/* <span className='font-semibold'>
                 {poolData.unlockPeriodDays} day
                 {poolData.unlockPeriodDays !== 1 ? 's' : ''}
               </span>{' '} */}
+              <br />Staked tokens have a{' '}
               <span className='font-semibold'>1 second</span>{' '}
               cool down period to unstake. During this period unstaked tokens will
               not accrue staking rewards.
