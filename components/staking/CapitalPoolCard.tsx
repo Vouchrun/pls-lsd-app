@@ -559,10 +559,10 @@ export const CapitalPoolCard: React.FC<CapitalPoolCardProps> = ({
               </Tooltip>
             </p>
             <p className='text-[16px] font-normal text-color-text1 mb-[7px] text-center'>
-              {formatNumber(poolData.stats.totalUnlocking, { decimals: 2 })} <span className='text-[#A6A6A6]'>vPLS</span>
+              {formatNumber(poolData.unlockInfo.vplsAmount, { decimals: 2 })} <span className='text-[#A6A6A6]'>vPLS</span>
             </p>
             <p className='text-[13px] font-normal text-[#A6A6A6] mb-[7px] text-center'>
-              ${formatNumber(Number(poolData.stats.totalUnlocking) * vplsPrice, { decimals: 2 })}
+              ${formatNumber(Number(poolData.unlockInfo.vplsAmount) * vplsPrice, { decimals: 2 })}
             </p>
           </div>
         </div>
