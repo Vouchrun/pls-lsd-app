@@ -703,7 +703,7 @@ export const CapitalPoolCard: React.FC<CapitalPoolCardProps> = ({
               </svg>
             </div>
             <div className='text-[13px] sm:text-[14px] text-[#666666] dark:text-[#aaaaaa] leading-[1.4]'>
-              THIS POOL IS BEING RETIRED, YOU NEED TO UNSTAKE YOUR vPLS AND CLAIM THE UNSTAKED TOKENS ON THE "Unstake vPLS" TAB.
+              THIS POOL IS BEING RETIRED, YOU NEED TO UNSTAKE YOUR vPLS AND CLAIM THE UNSTAKED TOKENS. Select the Unstake vPLS TAB.
               <br /> <br /> After unstaking you will see a green "Claim Unstake" Button.
               {/* <span className='font-semibold'>
                 {poolData.unlockPeriodDays} day
