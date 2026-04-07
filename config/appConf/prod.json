@@ -38,6 +38,15 @@
     },
     "capitalPoolFactoryContract": {
       "address": "0x8A0798aF1be06cba0F670957163491400C9feb17"
+    },
+    "vouchStakingContractLegacy": {
+      "address": "0x0c2a662668D90B2B9Bd2605D234F949399e79869"
+    },
+    "stakingRewardPoolContractLegacy": {
+      "address": "0xCE9A749d575742cDcD469FC11bd515496A0d26D8"
+    },
+    "capitalPoolFactoryContractLegacy": {
+      "address": "0x8A0798aF1be06cba0F670957163491400C9feb17"
     }
   },
   "networkBalanceContractDeploymentBlock": 21740533
