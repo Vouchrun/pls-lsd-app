@@ -182,3 +182,23 @@ export function getCapitalPoolFactoryContractLegacy() {
   }
   return appProdConfig.contracts.capitalPoolFactoryContractLegacy.address;
 }
+
+/**
+ * get legacy holderRewardsVault contract address
+ */
+export function getHolderRewardsVaultContractLegacy() {
+  if (isDev()) {
+    return appDevConfig.contracts.holderRewardsVaultContractLegacy.address;
+  }
+  return appProdConfig.contracts.holderRewardsVaultContractLegacy.address;
+}
+
+/**
+ * get legacy lpRewardPool contract address
+ */
+export function getLPRewardPoolContractLegacy() {
+  if (isDev()) {
+    return appDevConfig.contracts.lpRewardPoolContractLegacy.address;
+  }
+  return appProdConfig.contracts.lpRewardPoolContractLegacy.address;
+}

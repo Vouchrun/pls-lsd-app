@@ -57,13 +57,13 @@ export default function StakingPools() {
   return (
     <div className='mt-[37px] px-[30px] max-md:px-[15px] pt-[40px]'>
       <div className='max-w-[1360px] bg-color-bg2 border-color-border1 border justify-center m-auto rounded-[30px] min-h-[800px] flex flex-col'>
-        <div className='flex bg-[#e2e0d0] dark:bg-[#333] rounded-tl-[30px] rounded-tr-[30px]'>
+        <div className='flex gap-[10px] bg-[#cdcabb] dark:bg-[#2a2a2a] rounded-tl-[30px] rounded-tr-[30px]'>
           <div
             className={classNames(
-              'flex-1 py-[20px] cursor-pointer text-center text-[24px] max-md:text-[20px] max-sm:text-[16px] font-normal transition-colors rounded-tl-[30px]',
+              'flex-1 py-[20px] cursor-pointer text-center text-[24px] max-md:text-[20px] max-sm:text-[16px] font-normal transition-colors rounded-tl-[30px] rounded-tr-[30px]',
               mainTab === 'new'
                 ? 'bg-gradient-to-r from-[#ff8533] to-[#ffa162] text-[#000]'
-                : 'bg-[#e2e0d0] dark:bg-[#333] text-color-text1 border border-[#FE8A3C]'
+                : 'bg-[#e2e0d0] dark:bg-[#333] text-color-text1'
             )}
             onClick={() => setMainTab('new')}
           >
@@ -71,10 +71,10 @@ export default function StakingPools() {
           </div>
           <div
             className={classNames(
-              'flex-1 py-[20px] cursor-pointer text-center text-[24px] max-md:text-[20px] max-sm:text-[16px] font-normal transition-colors',
+              'flex-1 py-[20px] cursor-pointer text-center text-[24px] max-md:text-[20px] max-sm:text-[16px] font-normal transition-colors rounded-tl-[30px] rounded-tr-[30px]',
               mainTab === 'legacy'
                 ? 'bg-gradient-to-r from-[#ff8533] to-[#ffa162] text-[#000]'
-                : 'bg-[#e2e0d0] dark:bg-[#333] text-color-text1 border border-[#FE8A3C]'
+                : 'bg-[#e2e0d0] dark:bg-[#333] text-color-text1'
             )}
             onClick={() => setMainTab('legacy')}
           >
@@ -82,10 +82,10 @@ export default function StakingPools() {
           </div>
           <div
             className={classNames(
-              'flex-1 py-[20px] cursor-pointer text-center text-[24px] max-md:text-[20px] max-sm:text-[16px] font-normal transition-colors rounded-tr-[30px]',
+              'flex-1 py-[20px] cursor-pointer text-center text-[24px] max-md:text-[20px] max-sm:text-[16px] font-normal transition-colors rounded-tl-[30px] rounded-tr-[30px]',
               mainTab === 'lp'
                 ? 'bg-gradient-to-r from-[#ff8533] to-[#ffa162] text-[#000]'
-                : 'bg-[#e2e0d0] dark:bg-[#333] text-color-text1 border border-[#FE8A3C]'
+                : 'bg-[#e2e0d0] dark:bg-[#333] text-color-text1'
             )}
             onClick={() => setMainTab('lp')}
           >
