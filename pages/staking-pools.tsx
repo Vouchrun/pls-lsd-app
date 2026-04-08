@@ -78,7 +78,7 @@ export default function StakingPools() {
             )}
             onClick={() => setMainTab('legacy')}
           >
-            Old Pools Unstaking
+            Old Pools (Unstake Only)
           </div>
           <div
             className={classNames(
