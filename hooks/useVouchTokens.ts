@@ -360,20 +360,11 @@ export function useVouchTokens() {
     [getTokenContract]
   );
 
-  // Refresh all token data
-  const refreshTokenData = useCallback(async () => {
-    if (!metaMaskAccount) return;
-
+  // Refresh token info (totalSupply, price, marketCap) - no wallet required
+  const refreshTokenInfo = useCallback(async () => {
     setLoading(true);
     try {
-      // Fetch balances if token addresses are available
       if (TOKEN_ADDRESSES.VOUCH && TOKEN_ADDRESSES.VOUCH !== '0x') {
-        const vouchBalanceData = await fetchTokenBalance(
-          TOKEN_ADDRESSES.VOUCH,
-          metaMaskAccount
-        );
-        setVouchBalance(vouchBalanceData);
-
         const vouchInfoData = await fetchTokenInfo(
           TOKEN_ADDRESSES.VOUCH,
           'vouch'
@@ -382,14 +373,36 @@ export function useVouchTokens() {
       }
 
       if (TOKEN_ADDRESSES.VPLS && TOKEN_ADDRESSES.VPLS !== '0x') {
+        const vplsInfoData = await fetchTokenInfo(TOKEN_ADDRESSES.VPLS, 'vpls');
+        setVplsInfo(vplsInfoData);
+      }
+    } catch (error) {
+      console.error('Error refreshing token info:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, [fetchTokenInfo]);
+
+  // Refresh user balances - wallet required
+  const refreshTokenBalances = useCallback(async () => {
+    if (!metaMaskAccount) return;
+
+    setLoading(true);
+    try {
+      if (TOKEN_ADDRESSES.VOUCH && TOKEN_ADDRESSES.VOUCH !== '0x') {
+        const vouchBalanceData = await fetchTokenBalance(
+          TOKEN_ADDRESSES.VOUCH,
+          metaMaskAccount
+        );
+        setVouchBalance(vouchBalanceData);
+      }
+
+      if (TOKEN_ADDRESSES.VPLS && TOKEN_ADDRESSES.VPLS !== '0x') {
         const vplsBalanceData = await fetchTokenBalance(
           TOKEN_ADDRESSES.VPLS,
           metaMaskAccount
         );
         setVplsBalance(vplsBalanceData);
-
-        const vplsInfoData = await fetchTokenInfo(TOKEN_ADDRESSES.VPLS, 'vpls');
-        setVplsInfo(vplsInfoData);
       }
 
       if (TOKEN_ADDRESSES.PLS && TOKEN_ADDRESSES.PLS !== '0x') {
@@ -400,20 +413,34 @@ export function useVouchTokens() {
         setWplsBalance(wplsBalanceData);
       }
 
-      // Fetch PLS balance
       const plsBalanceData = await fetchPlsBalance(metaMaskAccount);
       setPlsBalance(plsBalanceData);
     } catch (error) {
-      console.error('Error refreshing token data:', error);
+      console.error('Error refreshing token balances:', error);
     } finally {
       setLoading(false);
     }
-  }, [metaMaskAccount, fetchTokenBalance, fetchTokenInfo, fetchPlsBalance]);
+  }, [metaMaskAccount, fetchTokenBalance, fetchPlsBalance]);
 
-  // Effect to refresh data when dependencies change
+  // Refresh all token data (balances + info)
+  const refreshTokenData = useCallback(async () => {
+    await refreshTokenInfo();
+    if (metaMaskAccount) {
+      await refreshTokenBalances();
+    }
+  }, [refreshTokenInfo, refreshTokenBalances, metaMaskAccount]);
+
+  // Effect to refresh token info on mount (no wallet required)
   useEffect(() => {
-    refreshTokenData();
-  }, [metaMaskAccount]);
+    refreshTokenInfo();
+  }, [refreshTokenInfo]);
+
+  // Effect to refresh user balances when wallet connects
+  useEffect(() => {
+    if (metaMaskAccount) {
+      refreshTokenBalances();
+    }
+  }, [metaMaskAccount, refreshTokenBalances]);
 
   // Effect to update VPLS info when price changes
   useEffect(() => {
