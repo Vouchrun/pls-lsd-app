@@ -36,6 +36,21 @@
     },
     "capitalPoolFactoryContract": {
       "address": "0xf7E7e96a3A08403AB528Bb970c6622D5A8Eb0e7c"
+    },
+    "vouchStakingContractLegacy": {
+      "address": "0x2fc9A89DB2676311eA208CaCd344b1025F67FA24"
+    },
+    "holderRewardsVaultContractLegacy": {
+      "address": "0xC6C26c60904EC7f3080d56E0240CC5334ED2D389"
+    },
+    "lpRewardPoolContractLegacy": {
+      "address": "0xBE76b28F3eA958c883adAfd1d4f83170aACf3D55"
+    },
+    "stakingRewardPoolContractLegacy": {
+      "address": "0x674823457Efe02f7f698Ff2676819905d415Fc4c"
+    },
+    "capitalPoolFactoryContractLegacy": {
+      "address": "0xf7E7e96a3A08403AB528Bb970c6622D5A8Eb0e7c"
     }
   },
   "networkBalanceContractDeploymentBlock": 19612112
