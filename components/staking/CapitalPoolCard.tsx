@@ -3,6 +3,7 @@ import Tooltip from '@mui/material/Tooltip';
 import { CapitalPoolData } from 'hooks/useCapitalPools';
 import { useWalletAccount } from 'hooks/useWalletAccount';
 import { useVouchTokens } from 'hooks/useVouchTokens';
+import { useMinimumStakeLimit } from 'hooks/useMinimumStakeLimit';
 import { formatNumber } from 'utils/numberUtils';
 import { CustomButton } from '../common/CustomButton';
 import { CustomNumberInput } from '../common/CustomNumberInput';
@@ -47,6 +48,7 @@ export const CapitalPoolCard: React.FC<CapitalPoolCardProps> = ({
   const { darkMode } = useAppSlice();
   const { metaMaskAccount } = useWalletAccount();
   const { vplsBalance, plsBalance, vplsInfo, loading: tokensLoading } = useVouchTokens();
+  const { minimumDeposit: minPlsDeposit } = useMinimumStakeLimit();
   const { apr: systemApr7Day } = useApr();
   const { vplsPrice } = useVplsPrice();
   const { vouchPrice } = useVouchPrice();
@@ -131,6 +133,12 @@ export const CapitalPoolCard: React.FC<CapitalPoolCardProps> = ({
     }
     return Number(amount) <= Number(maxAmount);
   }, [amount, maxAmount]);
+
+  const isBelowMinimum = useMemo(() => {
+    if (depositType !== 'pls' || selectedTab !== 'stake') return false;
+    if (!minPlsDeposit || !amount) return false;
+    return Number(amount) < Number(minPlsDeposit);
+  }, [depositType, selectedTab, minPlsDeposit, amount]);
 
   // Fetch pool allocation point, total allocation points, and yield scrape BPS
   useEffect(() => {
@@ -837,6 +845,7 @@ export const CapitalPoolCard: React.FC<CapitalPoolCardProps> = ({
                 isProcessing ||
                 !amount ||
                 !isValidAmount ||
+                isBelowMinimum ||
                 (selectedTab === 'stake' && depositType === 'vpls' && needsApproval)
               }
               className='h-[45px] w-full sm:w-[160px] bg-gradient-to-r from-[#ff8533] to-[#ffa162] hover:from-[#ff7520] hover:to-[#ff9550] disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium text-[16px] rounded-[50px] transition-all duration-200'
@@ -845,9 +854,11 @@ export const CapitalPoolCard: React.FC<CapitalPoolCardProps> = ({
                 ? selectedTab === 'stake'
                   ? 'Depositing...'
                   : 'Unstaking...'
-                : selectedTab === 'stake'
-                  ? `Stake ${depositType.toUpperCase()}`
-                  : 'Unstake'}
+                : isBelowMinimum
+                  ? `Min. ${minPlsDeposit} PLS`
+                  : selectedTab === 'stake'
+                    ? `Stake ${depositType.toUpperCase()}`
+                    : 'Unstake'}
             </button>
           )}
 
