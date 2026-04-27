@@ -10,6 +10,7 @@ import {
   getEthDepositContract,
   getEthWithdrawContract,
   getLsdEthTokenContract,
+  getVouchTokenContract,
 } from 'config/contract';
 import { getEtherScanAccountUrl } from 'config/explorer';
 import { useEthUnclaimedWithdrawls } from 'hooks/useUnclaimedWithdrawals';
@@ -391,6 +392,25 @@ const ETHPage = () => {
                 >
                   <span className='mr-[.12rem] flex-1 break-all leading-normal dark:text-linkDark/50'>
                     {getEthWithdrawContract()}
+                  </span>
+
+                  <div className='min-w-[.12rem]'>
+                    <Icomoon icon='share' size='.12rem' />
+                  </div>
+                </div>
+
+                <div className='mt-[.16rem] text-color-text1 font-[700]'>
+                  VOUCH Token Contract Address
+                </div>
+
+                <div
+                  className='cursor-pointer mt-[.12rem] text-color-link flex items-center'
+                  onClick={() => {
+                    openLink(getEtherScanAccountUrl(getVouchTokenContract()));
+                  }}
+                >
+                  <span className='mr-[.12rem] flex-1 break-all leading-normal dark:text-linkDark/50'>
+                    {getVouchTokenContract()}
                   </span>
 
                   <div className='min-w-[.12rem]'>

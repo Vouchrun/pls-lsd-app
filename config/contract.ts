@@ -51,6 +51,16 @@ export function getNetworkBalanceContract() {
 }
 
 /**
+ * get vouchToken contract address
+ */
+export function getVouchTokenContract() {
+  if (isDev()) {
+    return appDevConfig.contracts.vouchTokenContract.address;
+  }
+  return appProdConfig.contracts.vouchTokenContract.address;
+}
+
+/**
  * get vouchStaking contract address
  */
 export function getVouchStakingContract() {
