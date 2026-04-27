@@ -1,0 +1,247 @@
+{
+  "timestamp": "2026-04-27T10:41:58.654Z",
+  "rpcResults": {
+    "vouch.run": {
+      "connected": true,
+      "currentBlock": 26391613,
+      "approaches": {
+        "1_singleQueryAllEvents": {
+          "success": false,
+          "elapsed": 30136,
+          "error": "Returned error: request timed out",
+          "errorName": "Error"
+        },
+        "2_singleQueryTopicFilter": {
+          "success": true,
+          "elapsed": 23762,
+          "blockRange": 3153600,
+          "balancesUpdatedEventsFound": 1280,
+          "firstEventBlock": 23242588,
+          "lastEventBlock": 26389641,
+          "daysBetween": 373.92743055555553,
+          "apr": 11.402706866246763,
+          "beginRate": 1.0431269066633053,
+          "endRate": 1.159942930769438
+        },
+        "3_snapshotFirstEvent": {
+          "success": true,
+          "elapsed": 2377,
+          "chunksQueried": 1,
+          "firstEventBlock": 23242588,
+          "currentBlock": 26391613,
+          "daysBetween": 374.15856481481484,
+          "usedSnapshotInsteadOfLastEvent": true,
+          "beginTotalEth": "8330830413609059124864340...",
+          "beginLsdTokenSupply": "7986401616517823939542605...",
+          "steps": [
+            "call balancesSnapshot()",
+            "snapshot: totalEth=15379393386141317159..., totalLsdToken=13258750045521232224..., rate=1.1599429308",
+            "searching for first event from block 23238013 in 50000-block chunks",
+            "found first event at block 23242588 after 1 chunk(s)"
+          ],
+          "apr": 11.395662910948332,
+          "beginRate": 1.0431269066633053,
+          "endRate": 1.159942930769438
+        },
+        "4_batchedSequential": {
+          "success": true,
+          "elapsed": 99674,
+          "chunksQueried": 64,
+          "chunksFailed": 0,
+          "totalEventsSearched": 1280,
+          "firstEventBlock": 23242588,
+          "lastEventBlock": 26389641,
+          "daysBetween": 373.92743055555553,
+          "steps": [
+            "total chunks: 64, concurrency: 1"
+          ],
+          "apr": 11.402706866246763,
+          "beginRate": 1.0431269066633053,
+          "endRate": 1.159942930769438
+        },
+        "5_batchedConcurrent5": {
+          "success": true,
+          "elapsed": 48502,
+          "chunksQueried": 64,
+          "chunksFailed": 0,
+          "totalEventsSearched": 1280,
+          "firstEventBlock": 23242588,
+          "lastEventBlock": 26389641,
+          "daysBetween": 373.92743055555553,
+          "steps": [
+            "total chunks: 64, concurrency: 5"
+          ],
+          "apr": 11.402706866246763,
+          "beginRate": 1.0431269066633053,
+          "endRate": 1.159942930769438
+        }
+      }
+    },
+    "pulsechain.com": {
+      "connected": true,
+      "currentBlock": 26391634,
+      "approaches": {
+        "1_singleQueryAllEvents": {
+          "success": true,
+          "elapsed": 2285,
+          "blockRange": 3153600,
+          "totalEventsSearched": 1280,
+          "balancesUpdatedEventsFound": 1280,
+          "firstEventBlock": 23242588,
+          "lastEventBlock": 26389641,
+          "daysBetween": 373.92743055555553,
+          "apr": 11.402706866246763,
+          "beginRate": 1.0431269066633053,
+          "endRate": 1.159942930769438
+        },
+        "2_singleQueryTopicFilter": {
+          "success": true,
+          "elapsed": 1419,
+          "blockRange": 3153600,
+          "balancesUpdatedEventsFound": 1280,
+          "firstEventBlock": 23242588,
+          "lastEventBlock": 26389641,
+          "daysBetween": 373.92743055555553,
+          "apr": 11.402706866246763,
+          "beginRate": 1.0431269066633053,
+          "endRate": 1.159942930769438
+        },
+        "3_snapshotFirstEvent": {
+          "success": true,
+          "elapsed": 993,
+          "chunksQueried": 1,
+          "firstEventBlock": 23242588,
+          "currentBlock": 26391634,
+          "daysBetween": 374.16099537037036,
+          "usedSnapshotInsteadOfLastEvent": true,
+          "beginTotalEth": "8330830413609059124864340...",
+          "beginLsdTokenSupply": "7986401616517823939542605...",
+          "steps": [
+            "call balancesSnapshot()",
+            "snapshot: totalEth=15379393386141317159..., totalLsdToken=13258750045521232224..., rate=1.1599429308",
+            "searching for first event from block 23238034 in 50000-block chunks",
+            "found first event at block 23242588 after 1 chunk(s)"
+          ],
+          "apr": 11.395588884547557,
+          "beginRate": 1.0431269066633053,
+          "endRate": 1.159942930769438
+        },
+        "4_batchedSequential": {
+          "success": true,
+          "elapsed": 29832,
+          "chunksQueried": 64,
+          "chunksFailed": 0,
+          "totalEventsSearched": 1280,
+          "firstEventBlock": 23242588,
+          "lastEventBlock": 26389641,
+          "daysBetween": 373.92743055555553,
+          "steps": [
+            "total chunks: 64, concurrency: 1"
+          ],
+          "apr": 11.402706866246763,
+          "beginRate": 1.0431269066633053,
+          "endRate": 1.159942930769438
+        },
+        "5_batchedConcurrent5": {
+          "success": true,
+          "elapsed": 6644,
+          "chunksQueried": 64,
+          "chunksFailed": 0,
+          "totalEventsSearched": 1280,
+          "firstEventBlock": 23242588,
+          "lastEventBlock": 26389641,
+          "daysBetween": 373.92743055555553,
+          "steps": [
+            "total chunks: 64, concurrency: 5"
+          ],
+          "apr": 11.402706866246763,
+          "beginRate": 1.0431269066633053,
+          "endRate": 1.159942930769438
+        }
+      }
+    },
+    "g4mm4.io": {
+      "connected": true,
+      "currentBlock": 26391639,
+      "approaches": {
+        "1_singleQueryAllEvents": {
+          "success": true,
+          "elapsed": 1486,
+          "blockRange": 3153600,
+          "totalEventsSearched": 1280,
+          "balancesUpdatedEventsFound": 1280,
+          "firstEventBlock": 23242588,
+          "lastEventBlock": 26389641,
+          "daysBetween": 373.92743055555553,
+          "apr": 11.402706866246763,
+          "beginRate": 1.0431269066633053,
+          "endRate": 1.159942930769438
+        },
+        "2_singleQueryTopicFilter": {
+          "success": true,
+          "elapsed": 1590,
+          "blockRange": 3153600,
+          "balancesUpdatedEventsFound": 1280,
+          "firstEventBlock": 23242588,
+          "lastEventBlock": 26389641,
+          "daysBetween": 373.92743055555553,
+          "apr": 11.402706866246763,
+          "beginRate": 1.0431269066633053,
+          "endRate": 1.159942930769438
+        },
+        "3_snapshotFirstEvent": {
+          "success": true,
+          "elapsed": 735,
+          "chunksQueried": 1,
+          "firstEventBlock": 23242588,
+          "currentBlock": 26391639,
+          "daysBetween": 374.16157407407405,
+          "usedSnapshotInsteadOfLastEvent": true,
+          "beginTotalEth": "8330830413609059124864340...",
+          "beginLsdTokenSupply": "7986401616517823939542605...",
+          "steps": [
+            "call balancesSnapshot()",
+            "snapshot: totalEth=15379393386141317159..., totalLsdToken=13258750045521232224..., rate=1.1599429308",
+            "searching for first event from block 23238039 in 50000-block chunks",
+            "found first event at block 23242588 after 1 chunk(s)"
+          ],
+          "apr": 11.395571259355796,
+          "beginRate": 1.0431269066633053,
+          "endRate": 1.159942930769438
+        },
+        "4_batchedSequential": {
+          "success": true,
+          "elapsed": 23647,
+          "chunksQueried": 64,
+          "chunksFailed": 0,
+          "totalEventsSearched": 1280,
+          "firstEventBlock": 23242588,
+          "lastEventBlock": 26389641,
+          "daysBetween": 373.92743055555553,
+          "steps": [
+            "total chunks: 64, concurrency: 1"
+          ],
+          "apr": 11.402706866246763,
+          "beginRate": 1.0431269066633053,
+          "endRate": 1.159942930769438
+        },
+        "5_batchedConcurrent5": {
+          "success": true,
+          "elapsed": 5302,
+          "chunksQueried": 64,
+          "chunksFailed": 0,
+          "totalEventsSearched": 1280,
+          "firstEventBlock": 23242588,
+          "lastEventBlock": 26389641,
+          "daysBetween": 373.92743055555553,
+          "steps": [
+            "total chunks: 64, concurrency: 5"
+          ],
+          "apr": 11.402706866246763,
+          "beginRate": 1.0431269066633053,
+          "endRate": 1.159942930769438
+        }
+      }
+    }
+  }
+}
