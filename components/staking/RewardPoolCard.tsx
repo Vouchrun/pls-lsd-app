@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Tooltip from '@mui/material/Tooltip';
 import { VouchStaking } from './VouchStaking';
 import { useVouchStaking } from 'hooks/useVouchStaking';
@@ -6,6 +6,8 @@ import { useVouchTokens } from 'hooks/useVouchTokens';
 import { formatNumber } from 'utils/numberUtils';
 import Web3 from 'web3';
 import { Icomoon } from '../icon/Icomoon';
+import { getEthWeb3 } from 'utils/web3Utils';
+import { getVouchStakingContract, getVouchStakingContractAbi, getStakingRewardPoolContract } from 'config/contract';
 
 interface RewardPoolCardProps {
   selectedTab: 'stake' | 'unstake';
@@ -32,6 +34,28 @@ export const RewardPoolCard: React.FC<RewardPoolCardProps> = ({
   } = useVouchStaking();
 
   const { vouchBalance, vouchInfo, loading: tokensLoading } = useVouchTokens();
+
+  const [vouchPoolAllocPoint, setVouchPoolAllocPoint] = useState<number>(0);
+
+  useEffect(() => {
+    const fetchPoolData = async () => {
+      try {
+        const web3 = getEthWeb3();
+        const vouchStakingContract = new web3.eth.Contract(
+          getVouchStakingContractAbi(),
+          getVouchStakingContract()
+        );
+
+        const poolInfo = await vouchStakingContract.methods.getPoolInfo(1).call();
+        setVouchPoolAllocPoint(Number(poolInfo.allocPoint) || 0);
+      } catch (error) {
+        console.error('Error fetching VOUCH pool allocation:', error);
+        setVouchPoolAllocPoint(0);
+      }
+    };
+
+    fetchPoolData();
+  }, []);
 
   // Calculate bar chart percentages for VOUCH (based on total supply)
   const vouchUnstakingAmount = Number(totalVouchUnlocking) || 0;
@@ -201,7 +225,7 @@ export const RewardPoolCard: React.FC<RewardPoolCardProps> = ({
               </span>
             </Tooltip>
           </p>
-          <p className='text-[13px] font-normal text-[#8E9397]'> Allocation <span className='text-color-text1'>100</span></p>
+          <p className='text-[13px] font-normal text-[#8E9397]'> Allocation <span className='text-color-text1'>{vouchPoolAllocPoint > 0 ? formatNumber(vouchPoolAllocPoint, { decimals: 0 }) : '...'}</span></p>
         </div>
 
         {/* Rewards Section */}
