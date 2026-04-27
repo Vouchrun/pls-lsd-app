@@ -1,4 +1,4 @@
-# pls-lsd-app
+# pls-lsd-app - pulsechain
 
 PLS LSD App is a user interface where users can stake, unstake and get latest information about the project. As a convention in web3 all API users interact with are directly from the RPC configured in wallet, so the app is a pure DApp.
 
