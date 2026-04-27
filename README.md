@@ -1,6 +1,6 @@
-# eth-lsd-app
+# pls-lsd-app - pulsechain
 
-ETH LSD App is a user interface where users can stake, unstake and get latest information about the project. As a convention in web3 all API users interact with are directly from the RPC configured in wallet, so the app is a pure DApp.
+PLS LSD App is a user interface where users can stake, unstake and get latest information about the project. As a convention in web3 all API users interact with are directly from the RPC configured in wallet, so the app is a pure DApp.
 
 ## Setup Node.js env
 
@@ -28,3 +28,4 @@ Run `yarn build` or `yarn build:dev` to build your app, the static files will be
 ## Other resources
 
 You can find more details here: [lsaas-docs](https://lsaas-docs.stafi.io/docs/developethlsd/ethlsdapp.html)
+ 
