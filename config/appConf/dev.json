@@ -37,6 +37,9 @@
     "capitalPoolFactoryContract": {
       "address": "0xf7E7e96a3A08403AB528Bb970c6622D5A8Eb0e7c"
     },
+    "referralDepositContract": {
+      "address": "0x04988E655163f7368683C9c6d668A8ccc7b142ad"
+    },
     "vouchStakingContractLegacy": {
       "address": "0x2fc9A89DB2676311eA208CaCd344b1025F67FA24"
     },

@@ -8,6 +8,7 @@ import depositContractAbi from './abi/deposit.json';
 import vouchStakingContractAbi from './abi/vouchStaking.json';
 import capitalPoolFactoryContractAbi from './abi/capitalPoolFactory.json';
 import capitalPoolContractAbi from './abi/capitalPool.json';
+import referralDepositContractAbi from './abi/referralDeposit.json';
 import { AbiItem } from 'web3-utils';
 
 /**
@@ -147,6 +148,23 @@ export function getCapitalPoolFactoryContractAbi() {
  */
 export function getCapitalPoolContractAbi() {
   return capitalPoolContractAbi as AbiItem[];
+}
+
+/**
+ * get ReferralDeposit contract address
+ */
+export function getReferralDepositContract() {
+  if (isDev()) {
+    return appDevConfig.contracts.referralDepositContract.address;
+  }
+  return appProdConfig.contracts.referralDepositContract.address;
+}
+
+/**
+ * get ReferralDeposit contract ABI
+ */
+export function getReferralDepositContractAbi() {
+  return referralDepositContractAbi as AbiItem[];
 }
 
 /**
