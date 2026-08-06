@@ -1,14 +1,17 @@
 import classNames from 'classnames';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useAccount, usePublicClient, useWriteContract } from 'wagmi';
-import { decodeEventLog, isAddress, keccak256, parseEther, toHex } from 'viem';
-import { waitForTransactionReceipt } from 'viem/actions';
-import type { Address, Hex } from 'viem';
+import { getEthereumChainId, getEthereumChainName } from 'config/env';
 import { getReferralDepositContract, getReferralDepositContractAbi } from 'config/contract';
 import { CustomButton } from 'components/common/CustomButton';
 import { CustomNumberInput } from 'components/common/CustomNumberInput';
+import { useAppDispatch } from 'hooks/common';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { setMetaMaskDisconnected } from 'redux/reducers/WalletSlice';
+import { decodeEventLog, isAddress, keccak256, parseEther, toHex } from 'viem';
+import { waitForTransactionReceipt } from 'viem/actions';
+import type { Address, Hex } from 'viem';
+import { useAccount, useConnect, usePublicClient, useSwitchChain, useWriteContract } from 'wagmi';
 
-const REFERRAL_DEPOSIT_DEPLOYED_BLOCK = 27320028n;
+const REFERRAL_DEPOSIT_DEPLOYED_BLOCK = 27215580n;
 const BPS_DENOMINATOR = 10_000n;
 const WAD = 10n ** 18n;
 
@@ -23,12 +26,14 @@ interface OwnedCode {
   maxFeePls: bigint;
 }
 
-function referralUrl(id: bigint): string {
-  return `https://app.vouch.run/PLS/?ref=${id.toString()}`;
-}
+const SDK_INSTRUCTIONS_URL =
+  'https://github.com/Vouchrun/referral-sdk/blob/main/docs/ONBOARDING.md';
 
 export default function Referral() {
-  const { address: account, isConnected, chainId } = useAccount();
+  const dispatch = useAppDispatch();
+  const { address: account, chainId } = useAccount();
+  const { connectAsync, connectors } = useConnect();
+  const { switchChainAsync } = useSwitchChain();
   const publicClient = usePublicClient();
   const { writeContractAsync } = useWriteContract();
 
@@ -43,10 +48,15 @@ export default function Referral() {
   const [created, setCreated] = useState<OwnedCode | null>(null);
   const [creating, setCreating] = useState(false);
   const [txError, setTxError] = useState<string | null>(null);
-  const [copied, setCopied] = useState(false);
 
   const contractAddress = getReferralDepositContract();
   const referralAbi = getReferralDepositContractAbi();
+
+  const walletNotConnected = useMemo(() => !account, [account]);
+  const isWrongNetwork = useMemo(
+    () => Number(chainId) !== getEthereumChainId(),
+    [chainId]
+  );
 
   useEffect(() => {
     if (!publicClient) return;
@@ -106,7 +116,8 @@ export default function Referral() {
         return { id: args.id, wallet: args.wallet, feeBps: args.feeBps, maxFeePls: args.maxFeePls };
       });
       setMyCodes(codes);
-    } catch {
+    } catch (err) {
+      console.error('Failed to load referral codes', err);
       setMyCodes([]);
     } finally {
       setLoadingCodes(false);
@@ -121,7 +132,7 @@ export default function Referral() {
     const trimmed = payoutWallet.trim();
     if (trimmed === '') return account ?? null;
     if (!isAddress(trimmed)) return null;
-    return trimmed.toLowerCase() === (account ?? '').toLowerCase() ? (account as Address) : (trimmed as Address);
+    return trimmed as Address;
   }, [payoutWallet, account]);
 
   const feeBpsBig = useMemo(() => {
@@ -139,32 +150,70 @@ export default function Referral() {
 
   const feePreviewPls = useMemo(() => {
     if (!rate || feeBpsBig === null) return null;
-    const bps = feeBpsBig > (globalMaxFeeBps ?? 500n) ? (globalMaxFeeBps ?? 500n) : feeBpsBig;
+    const cap = globalMaxFeeBps ?? 500n;
+    const bps = feeBpsBig > cap ? cap : feeBpsBig;
     const amount = 100_000n * WAD;
     const estVpls = (amount * WAD) / rate;
     const rawFee = (estVpls * bps) / BPS_DENOMINATOR;
-    const cap = maxFeePlsBig > 0n ? (maxFeePlsBig * WAD) / rate : rawFee;
-    const fee = rawFee > cap ? cap : rawFee;
+    const feeCap = maxFeePlsBig > 0n ? (maxFeePlsBig * WAD) / rate : rawFee;
+    const fee = rawFee > feeCap ? feeCap : rawFee;
     return (fee * rate) / WAD;
   }, [rate, feeBpsBig, maxFeePlsBig, globalMaxFeeBps]);
 
   const formValid = useMemo(() => {
     return (
-      !!resolvedPayoutWallet &&
-      feeBpsBig !== null &&
-      feeBpsBig <= (globalMaxFeeBps ?? 500n) &&
-      maxFeePlsBig >= 0n
+      !!resolvedPayoutWallet && feeBpsBig !== null && feeBpsBig <= (globalMaxFeeBps ?? 500n)
     );
-  }, [resolvedPayoutWallet, feeBpsBig, maxFeePlsBig, globalMaxFeeBps]);
+  }, [resolvedPayoutWallet, feeBpsBig, globalMaxFeeBps]);
+
+  const [buttonDisabled, buttonText, isButtonSecondary] = useMemo(() => {
+    if (!contractAvailable) {
+      return [true, 'Not available on this network'];
+    }
+    if (walletNotConnected) {
+      return [false, 'Connect Wallet'];
+    }
+    if (isWrongNetwork) {
+      return [
+        false,
+        `Wrong network, click to change into ${getEthereumChainName()}`,
+        true,
+      ];
+    }
+    if (!formValid) {
+      return [true, 'Create Referral Link'];
+    }
+    return [false, 'Create Referral Link'];
+  }, [contractAvailable, walletNotConnected, isWrongNetwork, formValid]);
+
+  const clickConnectWallet = async () => {
+    if (isWrongNetwork) {
+      await (switchChainAsync && switchChainAsync({ chainId: getEthereumChainId() }));
+      return;
+    }
+    const metamaskConnector = connectors.find(
+      (c) => c.name === 'MetaMask' || c.name === 'Rabby Wallet'
+    );
+    if (!metamaskConnector) {
+      return;
+    }
+    try {
+      dispatch(setMetaMaskDisconnected(false));
+      await connectAsync({
+        chainId: getEthereumChainId(),
+        connector: metamaskConnector,
+      });
+    } catch (err: any) {
+      if (err.code === 4001) {
+        return;
+      }
+      console.error(err);
+    }
+  };
 
   const handleCreate = useCallback(async () => {
     if (!publicClient || !resolvedPayoutWallet || feeBpsBig === null || creating) return;
-    if (!contractAvailable) {
-      setTxError('ReferralDeposit is not available on this network.');
-      return;
-    }
     setTxError(null);
-    setCopied(false);
     setCreating(true);
     try {
       const hash = await writeContractAsync({
@@ -207,167 +256,238 @@ export default function Referral() {
     feeBpsBig,
     maxFeePlsBig,
     creating,
-    contractAvailable,
     contractAddress,
     referralAbi,
     writeContractAsync,
   ]);
 
-  const handleCopy = useCallback(async (id: bigint) => {
-    try {
-      await navigator.clipboard.writeText(referralUrl(id));
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch {
-      setCopied(false);
+  const clickCreate = () => {
+    if (walletNotConnected || isWrongNetwork) {
+      clickConnectWallet();
+      return;
     }
-  }, []);
+    handleCreate();
+  };
 
-  const onWrongNetwork = !!chainId && chainId !== 369;
+
+
+  const fieldCard = 'bg-[#edece3] dark:bg-[#111111] rounded-[.3rem] p-[.16rem]';
+  const fieldPill =
+    'h-[.42rem] bg-color-bg2 rounded-[.3rem] flex items-center px-[.16rem] whitespace-nowrap';
+  const fieldLabel = 'text-color-text1 text-[.16rem]';
+  const fieldInput =
+    'w-full bg-color-bg2 border-none outline-none py-[10px] px-[20px] rounded-[35px] h-[.42rem] text-color-text1 placeholder:text-text2/50 dark:placeholder:text-text2Dark/50';
+  const helperText = 'text-[.14rem] text-color-text2 mt-[.08rem]';
 
   return (
     <div className='mt-[37px] px-[30px] max-md:px-[15px] pt-[40px]'>
-      <div className='max-w-[1360px] m-auto'>
-        <div className='bg-color-bg2 border-color-border1 border rounded-[30px] p-[40px] max-sm:p-[25px]'>
-          <h1 className='text-[.32rem] font-semibold text-color-text1'>Referral Link</h1>
-          <p className='mt-[10px] text-[.18rem] text-color-text1/80 dark:text-color-text1Dark/80'>
-            Create a referral code to earn vPLS referral fees when your links deposit PLS into Vouch
-            liquid staking. The fee is taken from the vPLS minted — nothing extra for the depositor.
-          </p>
+      <div className='max-w-[1080px] m-auto'>
+        <h1 className='text-center text-[.3rem] font-semibold text-color-text1'>
+          Referral Code Creation
+        </h1>
+        <p className='mt-[.08rem] text-center text-[.17rem] text-color-text2'>
+          Create your referral code settings and earn fees when integrating Vouch PLS staking into
+          your site or protocol.
+        </p>
 
-          {!isConnected && (
-            <div className='mt-[20px] text-[.18rem] text-color-text1/70'>
-              Connect your wallet to create a referral link.
-            </div>
-          )}
-
-          {onWrongNetwork && (
-            <div className='mt-[20px] p-[15px] rounded-[15px] bg-[#ff8a3b]/15 border border-[#ff8a3b] text-[.18rem] text-color-text1'>
-              Switch to PulseChain to use referral links.
-            </div>
-          )}
-
-          {!contractAvailable && (
-            <div className='mt-[20px] p-[15px] rounded-[15px] bg-[#ff8a3b]/15 border border-[#ff8a3b] text-[.18rem] text-color-text1'>
-              ReferralDeposit is not deployed on this network.
-            </div>
-          )}
-
-          <div className='mt-[30px] grid grid-cols-1 lg:grid-cols-2 gap-[30px]'>
-            <div>
-              <div className='text-[.2rem] mb-[10px] text-color-text1'>Payout wallet</div>
-              <input
-                className='w-full bg-color-bg2 border-none outline-none py-[10px] px-[20px] rounded-[35px] h-[.42rem] text-color-text1 placeholder:text-text2/50 dark:placeholder:text-text2Dark/50'
-                style={{ fontSize: '.2rem' }}
-                value={payoutWallet}
-                placeholder={account ?? '0x...'}
-                onChange={(e) => setPayoutWallet(e.target.value)}
-              />
-              {payoutWallet.trim() !== '' && !resolvedPayoutWallet && (
-                <div className='mt-[8px] text-[.15rem] text-[#c0392b]'>Invalid wallet address.</div>
-              )}
-
-              <div className='text-[.2rem] mt-[25px] mb-[10px] text-color-text1'>Fee rate (bps)</div>
-              <CustomNumberInput value={feeBps} handleValueChange={setFeeBps} fontSize='.2rem' />
-              <div className='mt-[8px] text-[.15rem] text-color-text1/60 dark:text-color-text1Dark/60'>
-                1% = 100 bps. Global maximum is {globalMaxFeeBps !== null ? Number(globalMaxFeeBps) : 300} bps.
-              </div>
-              {feeBpsBig !== null && feeBpsBig > (globalMaxFeeBps ?? 500n) && (
-                <div className='mt-[8px] text-[.15rem] text-[#c0392b]'>
-                  Fee rate exceeds the global maximum.
+        <div className='mt-[.25rem] grid grid-cols-1 lg:grid-cols-2 gap-[.25rem] items-start'>
+          <div>
+            <div className='bg-color-bg2 border border-color-border1 rounded-[30px] p-[.24rem] max-sm:p-[.16rem]'>
+              <div className={fieldCard}>
+                <div className={classNames(fieldPill, 'w-max')}>
+                  <span className={fieldLabel}>Payout Wallet</span>
                 </div>
-              )}
-
-              <div className='text-[.2rem] mt-[25px] mb-[10px] text-color-text1'>Max fee per deposit (PLS)</div>
-              <CustomNumberInput value={maxFeePls} handleValueChange={setMaxFeePls} fontSize='.2rem' />
-              <div className='mt-[8px] text-[.15rem] text-color-text1/60 dark:text-color-text1Dark/60'>
-                Absolute cap in PLS value. 0 disables the fee entirely (promo links).
+                <div className='mt-[.08rem]'>
+                  <input
+                    className={fieldInput}
+                    style={{ fontSize: '.14rem', fontFamily: 'monospace' }}
+                    value={payoutWallet}
+                    placeholder={account ?? '0x...'}
+                    onChange={(e) => setPayoutWallet(e.target.value)}
+                  />
+                </div>
+                <div className={helperText}>
+                  Fees are paid to this wallet. Defaults to your connected wallet.
+                </div>
+                {payoutWallet.trim() !== '' && !resolvedPayoutWallet && (
+                  <div className='text-[.14rem] text-error mt-[.06rem]'>
+                    Invalid wallet address.
+                  </div>
+                )}
               </div>
 
-              {feePreviewPls !== null && (
-                <div className='mt-[15px] text-[.17rem] text-color-text1/80 dark:text-color-text1Dark/80'>
-                  On a 100,000 PLS deposit you would earn ~{' '}
-                  {(Number(feePreviewPls) / 1e18).toLocaleString(undefined, {
-                    maximumFractionDigits: 2,
-                  })}{' '}
-                  PLS worth of vPLS.
+              <div className={classNames(fieldCard, 'mt-[.16rem]')}>
+                <div className='flex items-center'>
+                  <div className={fieldPill}>
+                    <span className={fieldLabel}>Fee Rate</span>
+                  </div>
+                  <div className='flex-1 pl-[.14rem]'>
+                    <CustomNumberInput
+                      value={feeBps}
+                      handleValueChange={setFeeBps}
+                      fontSize='.2rem'
+                    />
+                  </div>
                 </div>
-              )}
+                <div className={helperText}>
+                  Fee in basis points — 1% = 100 bps. Global maximum is{' '}
+                  {globalMaxFeeBps !== null ? Number(globalMaxFeeBps) : 300} bps.
+                </div>
+                {feeBpsBig !== null && feeBpsBig > (globalMaxFeeBps ?? 500n) && (
+                  <div className='text-[.14rem] text-error mt-[.06rem]'>
+                    Fee rate exceeds the global maximum.
+                  </div>
+                )}
+              </div>
+
+              <div className={classNames(fieldCard, 'mt-[.16rem]')}>
+                <div className='flex items-center'>
+                  <div className={fieldPill}>
+                    <span className={fieldLabel}>Max Fee (PLS)</span>
+                  </div>
+                  <div className='flex-1 pl-[.14rem]'>
+                    <CustomNumberInput
+                      value={maxFeePls}
+                      handleValueChange={setMaxFeePls}
+                      fontSize='.2rem'
+                    />
+                  </div>
+                </div>
+                <div className={helperText}>
+                  Absolute fee cap per deposit, in PLS value. Set 0 for a fee-free promo link.
+                </div>
+              </div>
 
               <CustomButton
-                type='primary'
-                mt='.3rem'
-                disabled={!formValid || creating || !contractAvailable || onWrongNetwork}
                 loading={creating}
-                onClick={handleCreate}
+                disabled={buttonDisabled}
+                mt='.18rem'
+                height='.56rem'
+                type={isButtonSecondary ? 'secondary' : 'primary'}
+                onClick={clickCreate}
+                border='none'
+                width='100%'
               >
-                {creating ? 'Creating...' : 'Create Referral Link'}
+                {creating ? 'Creating...' : buttonText}
               </CustomButton>
 
               {txError && (
-                <div className='mt-[15px] text-[.16rem] text-[#c0392b]'>{txError}</div>
+                <div className='text-[.14rem] text-error mt-[.1rem] text-center'>{txError}</div>
               )}
 
-              {created && (
-                <div className='mt-[25px] p-[20px] rounded-[20px] bg-color-bg1 dark:bg-color-bg1Dark border border-[#FE8A3C]'>
-                  <div className='text-[.2rem] font-semibold text-color-text1'>
-                    Your referral code: {created.id.toString()}
+              <div
+                className='mx-[.5rem] my-[.2rem] grid items-stretch font-[500]'
+                style={{ gridTemplateColumns: '40% 30% 30%' }}
+              >
+                <div className='flex justify-start'>
+                  <div className='flex flex-col items-center'>
+                    <div className='text-text2/50 dark:text-text2Dark/50 text-[.14rem]'>
+                      Fee @100k PLS
+                    </div>
+                    <div className='mt-[.1rem] text-color-text2 text-[.16rem]'>
+                      {feePreviewPls !== null
+                        ? `${(Number(feePreviewPls) / 1e18).toLocaleString(undefined, {
+                            maximumFractionDigits: 2,
+                          })} PLS`
+                        : '--'}
+                    </div>
                   </div>
-                  <div className='mt-[8px] text-[.16rem] break-all text-color-text1/80 dark:text-color-text1Dark/80'>
-                    {referralUrl(created.id)}
-                  </div>
-                  <CustomButton
-                    type='secondary'
-                    mt='.15rem'
-                    onClick={() => handleCopy(created.id)}
-                  >
-                    {copied ? 'Copied!' : 'Copy Link'}
-                  </CustomButton>
                 </div>
-              )}
+
+                <div className='flex flex-col items-center'>
+                  <div className='text-text2/50 dark:text-text2Dark/50 text-[.14rem]'>Fee Rate</div>
+                  <div className='mt-[.1rem] text-color-text2 text-[.16rem]'>
+                    {feeBpsBig !== null
+                      ? `${(Number(feeBpsBig) / 100).toLocaleString(undefined, {
+                          maximumFractionDigits: 2,
+                        })}%`
+                      : '--'}
+                  </div>
+                </div>
+
+                <div className='flex justify-end'>
+                  <div className='flex flex-col items-center'>
+                    <div className='text-text2/50 dark:text-text2Dark/50 text-[.14rem]'>
+                      Global Cap
+                    </div>
+                    <div className='mt-[.1rem] text-color-text2 text-[.16rem]'>
+                      {globalMaxFeeBps !== null ? `${Number(globalMaxFeeBps)} bps` : '--'}
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
 
-            <div>
-              <div className='text-[.2rem] mb-[10px] text-color-text1'>Your codes</div>
-              {loadingCodes ? (
-                <div className='text-[.16rem] text-color-text1/60'>Loading...</div>
-              ) : myCodes.length === 0 ? (
-                <div className='text-[.16rem] text-color-text1/60'>
-                  {isConnected
-                    ? 'No referral codes yet — create one to get started.'
-                    : 'Connect your wallet to see your referral codes.'}
+            {created && (
+              <div
+                className={classNames(
+                  fieldCard,
+                  'mt-[.16rem] border border-[#FE8A3C]'
+                )}
+              >
+                <div className='text-[.2rem] font-semibold text-color-text1'>
+                  Code #{created.id.toString()} created
                 </div>
-              ) : (
-                <div className='flex flex-col gap-[15px]'>
-                  {myCodes.map((code) => (
-                    <div
-                      key={code.id.toString()}
-                      className={classNames(
-                        'p-[20px] rounded-[20px] bg-color-bg1 dark:bg-color-bg1Dark border',
-                        created?.id === code.id ? 'border-[#FE8A3C]' : 'border-color-border1'
-                      )}
-                    >
-                      <div className='flex items-center justify-between gap-[15px]'>
-                        <div className='text-[.2rem] font-semibold text-color-text1'>
-                          Code #{code.id.toString()}
-                        </div>
-                        <div className='text-[.16rem] text-color-text1/70'>
-                          {(Number(code.feeBps) / 100).toLocaleString(undefined, {
-                            maximumFractionDigits: 2,
-                          })}
-                          % fee · cap {(Number(code.maxFeePls) / 1e18).toLocaleString()} PLS
-                        </div>
+                <div className='mt-[.06rem] text-[.16rem] text-color-text2'>
+                  {(Number(created.feeBps) / 100).toLocaleString(undefined, {
+                    maximumFractionDigits: 2,
+                  })}
+                  % fee · cap {(Number(created.maxFeePls) / 1e18).toLocaleString()} PLS · payouts to
+                  your chosen wallet
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className='bg-color-bg2 border border-color-border1 rounded-[30px] p-[.24rem] max-sm:p-[.16rem]'>
+            <div className='text-[.2rem] font-semibold text-color-text1'>Your codes</div>
+
+            {loadingCodes ? (
+              <div className='text-[.16rem] text-color-text2 mt-[.15rem]'>Loading...</div>
+            ) : myCodes.length === 0 ? (
+              <div className='text-[.16rem] text-color-text2 mt-[.15rem]'>
+                {walletNotConnected
+                  ? 'Connect your wallet to see your referral codes.'
+                  : 'No referral codes yet — create one on the left.'}
+              </div>
+            ) : (
+              <div className='mt-[.15rem] flex flex-col gap-[.16rem]'>
+                {myCodes.map((code) => (
+                  <div
+                    key={code.id.toString()}
+                    className={classNames(
+                      fieldCard,
+                      created?.id === code.id && 'border border-[#FE8A3C]'
+                    )}
+                  >
+                    <div className='flex items-center justify-between gap-[.15rem]'>
+                      <div className='text-[.2rem] font-semibold text-color-text1'>
+                        Code #{code.id.toString()}
                       </div>
-                      <div className='mt-[8px] text-[.15rem] break-all text-color-text1/60 dark:text-color-text1Dark/60'>
-                        Payout: {code.wallet}
+                      <div className='text-[.15rem] text-color-text2'>
+                        {(Number(code.feeBps) / 100).toLocaleString(undefined, {
+                          maximumFractionDigits: 2,
+                        })}
+                        % fee · cap {(Number(code.maxFeePls) / 1e18).toLocaleString()} PLS
                       </div>
-                      <CustomButton type='small' mt='.15rem' onClick={() => handleCopy(code.id)}>
-                        Copy Link
-                      </CustomButton>
                     </div>
-                  ))}
-                </div>
-              )}
+                    <div className='mt-[.06rem] break-all text-[.14rem] text-color-text2'>
+                      Payout: {code.wallet}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <div className='mt-[.15rem] text-center'>
+              <a
+                href={SDK_INSTRUCTIONS_URL}
+                target='_blank'
+                rel='noreferrer'
+                className='text-color-link text-[.16rem] underline'
+              >
+                How to use your codes — SDK instructions
+              </a>
             </div>
           </div>
         </div>
