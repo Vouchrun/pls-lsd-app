@@ -1,4 +1,4 @@
-# eth-lsd-app
+# pls-lsd-app - Pulsechain
 
 PLS LSD App is a user interface where users can stake, unstake and get latest information about the project. As a convention in web3 all API users interact with are directly from the RPC configured in wallet, so the app is a pure DApp.
 
@@ -25,5 +25,4 @@ You can change color config in `tailwind.config.js`, each color has light & dark
 
 Run `yarn build` or `yarn build:dev` to build your app, the static files will be placed in `out` folder. Upload those files to any static web hosting services you like.
 
-## Other resources
-
+ 
