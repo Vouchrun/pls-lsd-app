@@ -1,11 +1,12 @@
 import React from "react";
 import { useAppSlice } from "hooks/selector";
+import { version } from "../../package.json";
 
 export default function Footer() {
   const { darkMode, unreadNoticeFlag } = useAppSlice();
   return (
     <div className="w-smallContentW xl:w-contentW 2xl:w-largeContentW mx-auto pb-1 flex flex-row justify-between items-center">
-      <div className="text-color-text1">v2.5.0</div>
+      <div className="text-color-text1">v{version}</div>
       <a
         href="https://www.stafi.io/"
         target="_blank"
