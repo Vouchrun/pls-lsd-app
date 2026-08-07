@@ -22,6 +22,9 @@
     "networkBalanceContract": {
       "address": "0x47e97e7971D13936667EE0E0b44a4Fc1eBD871Ff"
     },
+    "vouchTokenContract": {
+      "address": "0xD34f5ADC24d8Cc55C1e832Bdf65fFfDF80D1314f"
+    },
     "vouchStakingContract": {
       "address": "0x2fc9A89DB2676311eA208CaCd344b1025F67FA24"
     },
