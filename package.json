@@ -1,6 +1,6 @@
 {
   "name": "eth-lsd-app",
-  "version": "2.5.1",
+  "version": "2.5.2",
   "scripts": {
     "dev": "NEXT_PUBLIC_ENV=production next dev -p 5009",
     "build:dev": "NEXT_PUBLIC_ENV=dev next build",

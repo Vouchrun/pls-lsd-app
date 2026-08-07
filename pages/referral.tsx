@@ -37,7 +37,7 @@ interface OwnedCode {
 }
 
 const REFERRAL_OVERVIEW_URL =
-  'https://docs.vouch.run/docs/referral/';
+  'https://vouch.run/docs/referral/';
 
 export default function Referral() {
   const dispatch = useAppDispatch();
