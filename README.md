@@ -25,7 +25,4 @@ You can change color config in `tailwind.config.js`, each color has light & dark
 
 Run `yarn build` or `yarn build:dev` to build your app, the static files will be placed in `out` folder. Upload those files to any static web hosting services you like.
 
-## Other resources
-
-You can find more details here: [lsaas-docs](https://lsaas-docs.stafi.io/docs/developethlsd/ethlsdapp.html)
  

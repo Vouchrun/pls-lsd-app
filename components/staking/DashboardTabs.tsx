@@ -36,20 +36,23 @@ export const DashboardTabs = (props: Props) => {
         onClick={handleClick}
       />
       <div
-        className={`w-[280px] sm:w-[280px] xl:w-[650px] h-auto p-[20px] lg:p-[.04rem] items-stretch bg-[#edece3] dark:bg-[#111111] rounded-[15px] lg:rounded-[.6rem] xl:grid absolute xl:relative top-[40px] xl:top-0 gap-0
+        className={`w-[280px] sm:w-[280px] xl:w-[780px] h-auto p-[20px] lg:p-[.04rem] items-stretch bg-[#edece3] dark:bg-[#111111] rounded-[15px] lg:rounded-[.6rem] xl:grid absolute xl:relative top-[40px] xl:top-0 gap-[.06rem]
   ${isActive ? 'flex flex-col' : 'hidden'}
   [&>*:not(:last-child):after]:content-['|'] 
   [&>*:not(:last-child):after]:absolute 
-  [&>*:not(:last-child):after]:right-[-1px] 
+  [&>*:not(:last-child):after]:right-[-.04rem] 
   [&>*:not(:last-child):after]:top-1/2 
   [&>*:not(:last-child):after]:-translate-y-1/2 
+  [&>*:not(:last-child):after]:z-10
   [&>*:not(:last-child):after]:text-color-text1 
   [&>*:not(:last-child):after]:opacity-30
+  [&>*]:overflow-hidden
   [&>*]:relative
   [&>*.tab-active:after]:hidden
   [&>*:has(+_.tab-active):after]:hidden`}
         style={{
-          gridTemplateColumns: '20% 20% 20% 20% 20%',
+          gridAutoFlow: 'column',
+          gridAutoColumns: 'minmax(0, 1fr)',
         }}
       >
         <Link
@@ -59,7 +62,8 @@ export const DashboardTabs = (props: Props) => {
               props.selectedTab === 'unstake' ||
               router.pathname.startsWith('/PLS/')) &&
               !router.pathname.startsWith('/dashboard') &&
-              !router.pathname.startsWith('/staking-pools')
+              !router.pathname.startsWith('/staking-pools') &&
+              !router.pathname.startsWith('/referral')
               ? 'text-color-highlight bg-color-highlight'
               : 'text-color-text1'
           )}
@@ -116,6 +120,20 @@ export const DashboardTabs = (props: Props) => {
             // onClick={() => props.onChangeTab("withdraw")}
           >
             Staking Pools
+          </Link>
+        </div>
+
+        <div className='flex items-stretch'>
+          <Link
+            className={classNames(
+              'h-[35px] flex-1 ml-[.1rem] cursor-pointer flex items-center justify-center text-[.15rem] rounded-[.3rem] whitespace-nowrap',
+              router.pathname.startsWith('/referral')
+                ? 'text-color-highlight bg-color-highlight'
+                : 'text-color-text1'
+            )}
+            href='/referral'
+          >
+            Referral
           </Link>
         </div>
 

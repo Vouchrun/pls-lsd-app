@@ -63,9 +63,9 @@ const projectId = '773e240347e5c760d1cc49e512d0d86c';
 // 2. Create a metadata object - optional
 const metadata = {
   name: 'Vouch',
-  description: 'Vouch Validator App',
-  url: 'https://val.vouch.run', // origin must match your domain & subdomain
-  icons: ['https://val.vouch.run/_next/static/media/appIconDark.3c9ae27e.svg'],
+  description: 'Vouch User App',
+  url: typeof window !== 'undefined' ? window.location.origin : 'https://app.vouch.run',
+  icons: ['https://app.vouch.run/_next/static/media/appIconDark.3c9ae27e.svg'],
 };
 
 // 3. Create Wagmi Adapter
