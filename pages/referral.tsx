@@ -39,6 +39,40 @@ interface OwnedCode {
 const REFERRAL_OVERVIEW_URL =
   'https://vouch.run/docs/referral/';
 
+const getWidgetLink = (id: bigint) => `https://refwidget.vouch.run/?ref=${id.toString()}`;
+
+function WidgetLinkRow({
+  id,
+  copiedId,
+  onCopy,
+}: {
+  id: bigint;
+  copiedId: string | null;
+  onCopy: (id: bigint) => void;
+}) {
+  const link = getWidgetLink(id);
+  const isCopied = copiedId === id.toString();
+  return (
+    <div className='mt-[.08rem] flex items-center gap-[.08rem]'>
+      <a
+        href={link}
+        target='_blank'
+        rel='noreferrer'
+        className='flex-1 truncate text-[.14rem] text-color-link underline'
+        title={link}
+      >
+        {link}
+      </a>
+      <button
+        className='shrink-0 h-[.36rem] px-[.16rem] rounded-[.3rem] bg-color-bgPage border border-color-border1 text-color-text1 text-[.14rem] cursor-pointer hover:opacity-70'
+        onClick={() => onCopy(id)}
+      >
+        {isCopied ? 'Copied!' : 'Copy Link'}
+      </button>
+    </div>
+  );
+}
+
 export default function Referral() {
   const dispatch = useAppDispatch();
   const { address: account, chainId } = useAccount();
@@ -58,6 +92,7 @@ export default function Referral() {
   const [created, setCreated] = useState<OwnedCode | null>(null);
   const [creating, setCreating] = useState(false);
   const [txError, setTxError] = useState<string | null>(null);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
 
   const contractAddress = getReferralDepositContract();
   const referralAbi = getReferralDepositContractAbi();
@@ -144,6 +179,16 @@ export default function Referral() {
   useEffect(() => {
     loadMyCodes();
   }, [loadMyCodes]);
+
+  const copyWidgetLink = useCallback(async (id: bigint) => {
+    try {
+      await navigator.clipboard.writeText(getWidgetLink(id));
+      setCopiedId(id.toString());
+      setTimeout(() => setCopiedId(null), 2000);
+    } catch {
+      // clipboard unavailable (non-secure context)
+    }
+  }, []);
 
   const resolvedPayoutWallet = useMemo<Address | null>(() => {
     const trimmed = payoutWallet.trim();
@@ -454,6 +499,7 @@ export default function Referral() {
                   % fee · cap {(Number(created.maxFeePls) / 1e18).toLocaleString()} PLS · payouts to
                   your chosen wallet
                 </div>
+                <WidgetLinkRow id={created.id} copiedId={copiedId} onCopy={copyWidgetLink} />
               </div>
             )}
           </div>
@@ -493,6 +539,7 @@ export default function Referral() {
                     <div className='mt-[.06rem] break-all text-[.14rem] text-color-text2'>
                       Payout: {code.wallet}
                     </div>
+                    <WidgetLinkRow id={code.id} copiedId={copiedId} onCopy={copyWidgetLink} />
                   </div>
                 ))}
               </div>
