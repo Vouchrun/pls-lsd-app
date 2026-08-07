@@ -72,17 +72,6 @@ export default function StakingPools() {
           <div
             className={classNames(
               'flex-1 py-[20px] cursor-pointer text-center text-[24px] max-md:text-[20px] max-sm:text-[16px] font-normal transition-colors rounded-tl-[30px] rounded-tr-[30px]',
-              mainTab === 'legacy'
-                ? 'bg-gradient-to-r from-[#ff8533] to-[#ffa162] text-[#000]'
-                : 'bg-[#e2e0d0] dark:bg-[#333] text-color-text1'
-            )}
-            onClick={() => setMainTab('legacy')}
-          >
-            Old Pools (Unstake Only)
-          </div>
-          <div
-            className={classNames(
-              'flex-1 py-[20px] cursor-pointer text-center text-[24px] max-md:text-[20px] max-sm:text-[16px] font-normal transition-colors rounded-tl-[30px] rounded-tr-[30px]',
               mainTab === 'lp'
                 ? 'bg-gradient-to-r from-[#ff8533] to-[#ffa162] text-[#000]'
                 : 'bg-[#e2e0d0] dark:bg-[#333] text-color-text1'
@@ -90,6 +79,25 @@ export default function StakingPools() {
             onClick={() => setMainTab('lp')}
           >
             LP Token Staking Pools
+          </div>
+          <div
+            className={classNames(
+              'relative group flex items-center justify-center w-[100px] cursor-pointer transition-colors rounded-tl-[30px] rounded-tr-[30px]',
+              mainTab === 'legacy'
+                ? 'bg-gradient-to-r from-[#ff8533] to-[#ffa162]'
+                : 'bg-[#e2e0d0] dark:bg-[#333] hover:bg-[#d0cebe] dark:hover:bg-[#444]'
+            )}
+            onClick={() => setMainTab('legacy')}
+          >
+            <svg className='w-[.24rem] h-[.24rem]' viewBox='0 0 24 24' fill='none' stroke='#949E9E' strokeWidth='1.8' strokeLinecap='round' strokeLinejoin='round'>
+              <circle cx='12' cy='12' r='9' />
+              <polyline points='12 7 12 12 15 15' />
+              <path d='M3 12a9 9 0 1 1 9 9' />
+              <path d='M3 3v5h5' />
+            </svg>
+            <div className='absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block whitespace-nowrap bg-[#333] text-white text-[.14rem] px-[.12rem] py-[.06rem] rounded-[.08rem] z-50 shadow-lg pointer-events-none'>
+              Old Pools (Unstake Only)
+            </div>
           </div>
         </div>
 
