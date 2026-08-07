@@ -8,6 +8,7 @@ import depositContractAbi from './abi/deposit.json';
 import vouchStakingContractAbi from './abi/vouchStaking.json';
 import capitalPoolFactoryContractAbi from './abi/capitalPoolFactory.json';
 import capitalPoolContractAbi from './abi/capitalPool.json';
+import referralDepositContractAbi from './abi/referralDeposit.json';
 import { AbiItem } from 'web3-utils';
 
 /**
@@ -147,4 +148,75 @@ export function getCapitalPoolFactoryContractAbi() {
  */
 export function getCapitalPoolContractAbi() {
   return capitalPoolContractAbi as AbiItem[];
+}
+
+/**
+ * get ReferralDeposit contract address
+ */
+export function getReferralDepositContract() {
+  if (isDev()) {
+    return appDevConfig.contracts.referralDepositContract.address;
+  }
+  return appProdConfig.contracts.referralDepositContract.address;
+}
+
+/**
+ * get ReferralDeposit contract ABI
+ */
+export function getReferralDepositContractAbi() {
+  return referralDepositContractAbi as AbiItem[];
+}
+
+/**
+ * LEGACY CONTRACTS - Old pools for unstaking only
+ */
+
+/**
+ * get legacy vouchStaking contract address
+ */
+export function getVouchStakingContractLegacy() {
+  if (isDev()) {
+    return appDevConfig.contracts.vouchStakingContractLegacy.address;
+  }
+  return appProdConfig.contracts.vouchStakingContractLegacy.address;
+}
+
+/**
+ * get legacy stakingRewardPool contract address
+ */
+export function getStakingRewardPoolContractLegacy() {
+  if (isDev()) {
+    return appDevConfig.contracts.stakingRewardPoolContractLegacy.address;
+  }
+  return appProdConfig.contracts.stakingRewardPoolContractLegacy.address;
+}
+
+/**
+ * get legacy CapitalPoolFactory contract address
+ */
+export function getCapitalPoolFactoryContractLegacy() {
+  if (isDev()) {
+    return appDevConfig.contracts.capitalPoolFactoryContractLegacy.address;
+  }
+  return appProdConfig.contracts.capitalPoolFactoryContractLegacy.address;
+}
+
+/**
+ * get legacy holderRewardsVault contract address
+ */
+export function getHolderRewardsVaultContractLegacy() {
+  if (isDev()) {
+    return appDevConfig.contracts.holderRewardsVaultContractLegacy.address;
+  }
+  return appProdConfig.contracts.holderRewardsVaultContractLegacy.address;
+}
+
+/**
+ * get legacy lpRewardPool contract address
+ */
+export function getLPRewardPoolContractLegacy() {
+  if (isDev()) {
+    return appDevConfig.contracts.lpRewardPoolContractLegacy.address;
+  }
+  return appProdConfig.contracts.lpRewardPoolContractLegacy.address;
 }
