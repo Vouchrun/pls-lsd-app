@@ -181,9 +181,9 @@ export default function Referral() {
       ];
     }
     if (!formValid) {
-      return [true, 'Create Referral Link'];
+      return [true, 'Create Referral Code'];
     }
-    return [false, 'Create Referral Link'];
+    return [false, 'Create Referral Code'];
   }, [contractAvailable, walletNotConnected, isWrongNetwork, formValid]);
 
   const clickConnectWallet = async () => {
@@ -426,7 +426,7 @@ export default function Referral() {
                 )}
               >
                 <div className='text-[.2rem] font-semibold text-color-text1'>
-                  Code #{created.id.toString()} created
+                  Referrence ID: {created.id.toString()} created
                 </div>
                 <div className='mt-[.06rem] text-[.16rem] text-color-text2'>
                   {(Number(created.feeBps) / 100).toLocaleString(undefined, {
@@ -462,7 +462,7 @@ export default function Referral() {
                   >
                     <div className='flex items-center justify-between gap-[.15rem]'>
                       <div className='text-[.2rem] font-semibold text-color-text1'>
-                        Code #{code.id.toString()}
+                        Referrence ID: {code.id.toString()}
                       </div>
                       <div className='text-[.15rem] text-color-text2'>
                         {(Number(code.feeBps) / 100).toLocaleString(undefined, {

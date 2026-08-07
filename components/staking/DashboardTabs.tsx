@@ -36,7 +36,7 @@ export const DashboardTabs = (props: Props) => {
         onClick={handleClick}
       />
       <div
-        className={`w-[280px] sm:w-[280px] xl:w-[650px] h-auto p-[20px] lg:p-[.04rem] items-stretch bg-[#edece3] dark:bg-[#111111] rounded-[15px] lg:rounded-[.6rem] xl:grid absolute xl:relative top-[40px] xl:top-0 gap-[.06rem]
+        className={`w-[280px] sm:w-[280px] xl:w-[780px] h-auto p-[20px] lg:p-[.04rem] items-stretch bg-[#edece3] dark:bg-[#111111] rounded-[15px] lg:rounded-[.6rem] xl:grid absolute xl:relative top-[40px] xl:top-0 gap-[.06rem]
   ${isActive ? 'flex flex-col' : 'hidden'}
   [&>*:not(:last-child):after]:content-['|'] 
   [&>*:not(:last-child):after]:absolute 
