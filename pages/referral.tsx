@@ -6,7 +6,7 @@ import { CustomNumberInput } from 'components/common/CustomNumberInput';
 import { useAppDispatch } from 'hooks/common';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { setMetaMaskDisconnected } from 'redux/reducers/WalletSlice';
-import { decodeEventLog, isAddress, keccak256, parseEther, toHex } from 'viem';
+import { decodeEventLog, getEventSelector, isAddress, parseEther } from 'viem';
 import { waitForTransactionReceipt } from 'viem/actions';
 import type { Address, Hex } from 'viem';
 import { useAccount, useConnect, usePublicClient, useSwitchChain, useWriteContract } from 'wagmi';
@@ -15,9 +15,19 @@ const REFERRAL_DEPOSIT_DEPLOYED_BLOCK = 27215580n;
 const BPS_DENOMINATOR = 10_000n;
 const WAD = 10n ** 18n;
 
-const REFERRER_REGISTERED_TOPIC = keccak256(
-  toHex('ReferrerRegistered(uint256,address,address,uint256,uint256)'),
-);
+const REFERRER_REGISTERED_EVENT = {
+  type: 'event' as const,
+  name: 'ReferrerRegistered',
+  inputs: [
+    { type: 'uint256', name: 'id', indexed: true },
+    { type: 'address', name: 'owner', indexed: true },
+    { type: 'address', name: 'wallet', indexed: true },
+    { type: 'uint256', name: 'feeBps', indexed: false },
+    { type: 'uint256', name: 'maxFeePls', indexed: false },
+  ],
+};
+
+const REFERRER_REGISTERED_TOPIC = getEventSelector(REFERRER_REGISTERED_EVENT);
 
 interface OwnedCode {
   id: bigint;
@@ -26,8 +36,8 @@ interface OwnedCode {
   maxFeePls: bigint;
 }
 
-const SDK_INSTRUCTIONS_URL =
-  'https://github.com/Vouchrun/referral-sdk/blob/main/docs/ONBOARDING.md';
+const REFERRAL_OVERVIEW_URL =
+  'https://docs.vouch.run/docs/referral/';
 
 export default function Referral() {
   const dispatch = useAppDispatch();
@@ -94,13 +104,13 @@ export default function Referral() {
     if (!account || !publicClient) return;
     setLoadingCodes(true);
     try {
-      const ownerTopic = `0x${account.toLowerCase().replace(/^0x/, '').padStart(64, '0')}` as Hex;
       const logs = await publicClient.getLogs({
         address: contractAddress as Address,
+        event: REFERRER_REGISTERED_EVENT,
+        args: { owner: account },
         fromBlock: REFERRAL_DEPOSIT_DEPLOYED_BLOCK,
         toBlock: 'latest',
-        topics: [REFERRER_REGISTERED_TOPIC, null, ownerTopic] as [Hex, ...unknown[]],
-      } as never);
+      });
       const codes = logs
         .map((log) => {
           const decoded = decodeEventLog({
@@ -490,12 +500,12 @@ export default function Referral() {
 
             <div className='mt-[.15rem] text-center'>
               <a
-                href={SDK_INSTRUCTIONS_URL}
+                href={REFERRAL_OVERVIEW_URL}
                 target='_blank'
                 rel='noreferrer'
                 className='text-color-link text-[.16rem] underline'
               >
-                How to use your codes — SDK instructions
+                How to use your codes — Referral guide
               </a>
             </div>
           </div>
