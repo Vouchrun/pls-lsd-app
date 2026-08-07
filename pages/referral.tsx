@@ -26,8 +26,8 @@ interface OwnedCode {
   maxFeePls: bigint;
 }
 
-const SDK_INSTRUCTIONS_URL =
-  'https://github.com/Vouchrun/referral-sdk/blob/main/docs/ONBOARDING.md';
+const REFERRAL_OVERVIEW_URL =
+  'https://docs.vouch.run/docs/referral/';
 
 export default function Referral() {
   const dispatch = useAppDispatch();
@@ -490,12 +490,12 @@ export default function Referral() {
 
             <div className='mt-[.15rem] text-center'>
               <a
-                href={SDK_INSTRUCTIONS_URL}
+                href={REFERRAL_OVERVIEW_URL}
                 target='_blank'
                 rel='noreferrer'
                 className='text-color-link text-[.16rem] underline'
               >
-                How to use your codes — SDK instructions
+                How to use your codes — Referral guide
               </a>
             </div>
           </div>
