@@ -64,7 +64,11 @@ function WidgetLinkRow({
         {link}
       </a>
       <button
-        className='shrink-0 h-[.36rem] px-[.16rem] rounded-[.3rem] bg-color-bgPage border border-color-border1 text-color-text1 text-[.14rem] cursor-pointer hover:opacity-70'
+        className='shrink-0 h-[.36rem] px-[.16rem] rounded-[.3rem] text-[.14rem] cursor-pointer hover:opacity-70'
+        style={{
+          background: 'linear-gradient(90deg, #FF8533, #F6995C 50%, #FF8533)',
+          color: '#1B1B1F',
+        }}
         onClick={() => onCopy(id)}
       >
         {isCopied ? 'Copied!' : 'Copy Link'}
