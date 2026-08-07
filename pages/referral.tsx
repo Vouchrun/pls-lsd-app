@@ -108,12 +108,17 @@ export default function Referral() {
             data: log.data,
             topics: log.topics,
           });
-          const args = decoded.args as Record<string, unknown>;
+          const args = decoded.args as unknown as {
+            id: bigint;
+            wallet: Address;
+            feeBps: bigint;
+            maxFeePls: bigint;
+          };
           return {
-            id: args.id as bigint | undefined,
-            wallet: args.wallet as Address | undefined,
-            feeBps: args.feeBps as bigint | undefined,
-            maxFeePls: args.maxFeePls as bigint | undefined,
+            id: args.id,
+            wallet: args.wallet,
+            feeBps: args.feeBps,
+            maxFeePls: args.maxFeePls,
           };
         })
         .filter((code): code is OwnedCode => code.id != null);
