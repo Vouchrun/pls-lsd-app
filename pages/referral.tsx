@@ -101,20 +101,22 @@ export default function Referral() {
         toBlock: 'latest',
         topics: [REFERRER_REGISTERED_TOPIC, null, ownerTopic] as [Hex, ...unknown[]],
       } as never);
-      const codes = logs.map((log) => {
-        const decoded = decodeEventLog({
-          abi: referralAbi as never,
-          data: log.data,
-          topics: log.topics,
-        });
-        const args = decoded.args as unknown as {
-          id: bigint;
-          wallet: Address;
-          feeBps: bigint;
-          maxFeePls: bigint;
-        };
-        return { id: args.id, wallet: args.wallet, feeBps: args.feeBps, maxFeePls: args.maxFeePls };
-      });
+      const codes = logs
+        .map((log) => {
+          const decoded = decodeEventLog({
+            abi: referralAbi as never,
+            data: log.data,
+            topics: log.topics,
+          });
+          const args = decoded.args as Record<string, unknown>;
+          return {
+            id: args.id as bigint | undefined,
+            wallet: args.wallet as Address | undefined,
+            feeBps: args.feeBps as bigint | undefined,
+            maxFeePls: args.maxFeePls as bigint | undefined,
+          };
+        })
+        .filter((code): code is OwnedCode => code.id != null);
       setMyCodes(codes);
     } catch (err) {
       console.error('Failed to load referral codes', err);
@@ -237,8 +239,10 @@ export default function Referral() {
           feeBps: args.feeBps,
           maxFeePls: args.maxFeePls,
         };
-        setCreated(code);
-        setMyCodes((prev) => [code, ...prev.filter((c) => c.id !== code.id)]);
+        if (code.id != null) {
+          setCreated(code);
+          setMyCodes((prev) => [code, ...prev.filter((c) => c.id !== code.id)]);
+        }
       }
     } catch (err) {
       const e = err as { code?: number };
@@ -452,7 +456,7 @@ export default function Referral() {
               </div>
             ) : (
               <div className='mt-[.15rem] flex flex-col gap-[.16rem]'>
-                {myCodes.map((code) => (
+                {myCodes.filter((c) => c.id != null).map((code) => (
                   <div
                     key={code.id.toString()}
                     className={classNames(
