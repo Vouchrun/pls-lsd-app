@@ -38,6 +38,15 @@ export const CustomButton = (props: ButtonProps) => {
     ? '#6C86AD80'
     : '#1B1B1F';
 
+  // Stroke buttons flip their text color via the `dark:` CSS class (like the
+  // rest of the UI) instead of an inline hex from redux. The inline hex was
+  // baked into the SSG HTML with darkMode=false at build time and could go
+  // stale until the component remounted — e.g. the stake tab Max button stayed
+  // dark until switching tabs. A CSS-derived color flips the instant the
+  // `dark` class is applied.
+  const useCssTextColor =
+    props.type === 'stroke' && !props.disabled && !props.textColor;
+
   return (
     <div
       className={classNames(
@@ -60,12 +69,13 @@ export const CustomButton = (props: ButtonProps) => {
           : styles['button'],
         { 'opacity-50': props.loading },
         'px-[.28rem] cursor-pointer overflow-hidden',
+        useCssTextColor ? 'text-color-text1' : '',
         props.className || '',
         'active:opacity-50'
       )}
       style={{
         ...(props.width ? { width: props.width } : {}),
-        color: props.textColor || textColor,
+        color: props.textColor || (useCssTextColor ? undefined : textColor),
         height: props.height || '.42rem',
         marginTop: props.mt || '0',
         fontSize: props.fontSize || '0.16rem',
