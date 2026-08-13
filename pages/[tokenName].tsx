@@ -2,7 +2,7 @@ import classNames from 'classnames';
 import { CustomTag } from 'components/common/CustomTag';
 import { FaqItem } from 'components/common/FaqItem';
 import { PageTitleContainer } from 'components/common/PageTitleContainer';
-import { DashboardTabs } from 'components/staking/DashboardTabs';
+import { StakePageTabs } from 'components/staking/StakePageTabs';
 import { WithdrawUnstaked } from 'components/staking/WithdrawUnstaked';
 import { Icomoon } from 'components/icon/Icomoon';
 import { useAppSlice } from 'hooks/selector';
@@ -74,6 +74,8 @@ const ETHPage = () => {
   const {
     overallAmount,
     claimableAmount,
+    overallWei,
+    claimableWei,
     claimableWithdrawals,
     willReceiveAmount,
   } = useEthUnclaimedWithdrawls();
@@ -111,13 +113,11 @@ const ETHPage = () => {
     return 'stake';
   }, [router.query]);
 
+  // Withdraw tab appears exactly when the user has pending withdrawals.
+  // Gate on the wei sum (BigInt) — cannot be NaN in any locale.
   const showWithdrawTab = useMemo(() => {
-    return (
-      !!overallAmount &&
-      !isNaN(Number(overallAmount)) &&
-      Number(overallAmount) > 0
-    );
-  }, [overallAmount]);
+    return overallWei > 0n;
+  }, [overallWei]);
 
   const updateTab = (tab: string) => {
     router.replace({
@@ -258,13 +258,13 @@ const ETHPage = () => {
 
       <div className='w-smallContentW xl:w-contentW 2xl:w-largeContentW mx-auto'>
         <div className='my-[.36rem] mr-[.56rem]'>
-          {/* {showWithdrawTab && (
-            <DashboardTabs
+          {showWithdrawTab && (
+            <StakePageTabs
               selectedTab={selectedTab}
               onChangeTab={updateTab}
               showWithdrawTab={showWithdrawTab}
             />
-          )} */}
+          )}
 
           <div className='mt-[.36rem] flex '>
             <div className={classNames('flex-1 min-w-[6.2rem] w-[6.2rem]')}>
@@ -276,6 +276,8 @@ const ETHPage = () => {
                 <WithdrawUnstaked
                   overallAmount={overallAmount}
                   willReceiveAmount={willReceiveAmount}
+                  overallWei={overallWei}
+                  claimableWei={claimableWei}
                   claimableAmount={claimableAmount}
                   claimableWithdrawals={claimableWithdrawals}
                 />
