@@ -3,13 +3,22 @@ import {
   getEthWithdrawContractAbi,
 } from 'config/contract';
 import { useEffect, useMemo, useState } from 'react';
-import { RootState } from 'redux/store';
 import { getEthWeb3 } from 'utils/web3Utils';
 import Web3 from 'web3';
-import { useAppSelector } from './common';
 import { useAppSlice } from './selector';
 import { useWalletAccount } from './useWalletAccount';
-import { formatScientificNumber } from 'utils/numberUtils';
+
+/**
+ * Pending (unclaimed) withdrawals for the connected wallet.
+ *
+ * Amount math is done end-to-end in wei (BigInt) and converted to PLS strings
+ * exactly once at the end — never via Number()/locale-dependent formatting.
+ * The old path (formatScientificNumber -> toLocaleString -> Number) mangled
+ * values for comma-decimal locales (e.g. de-DE), turning them into NaN, which
+ * hid the Withdraw tab from affected users (the 2025-05 incident). web3
+ * already returns uint256 values as decimal strings and BigInt handles them
+ * exactly, so no intermediate formatting is needed at all.
+ */
 
 export function useEthUnclaimedWithdrawls() {
   const { updateFlag } = useAppSlice();
@@ -17,20 +26,17 @@ export function useEthUnclaimedWithdrawls() {
 
   const [overallAmount, setOverallAmount] = useState<string>();
   const [claimableAmount, setClaimableAmount] = useState<string>();
+  const [overallWei, setOverallWei] = useState<bigint>(0n);
+  const [claimableWei, setClaimableWei] = useState<bigint>(0n);
   const [claimableWithdrawals, setClaimableWithdrawals] = useState<string[]>(
     []
   );
 
-  const rate = useAppSelector((state: RootState) => {
-    return state.lsdEth.rate;
-  });
-
+  // withdrawalAtIndex._amount is the PLS (ethAmount) owed to the user — what
+  // they receive on claim. (The old rate multiplication was vestigial.)
   const willReceiveAmount = useMemo(() => {
-    if (!rate || isNaN(Number(rate))) {
-      return '--';
-    }
-    return Number(rate) * Number(claimableAmount) + '';
-  }, [rate, claimableAmount]);
+    return claimableAmount ?? '--';
+  }, [claimableAmount]);
 
   useEffect(() => {
     (async () => {
@@ -47,10 +53,9 @@ export function useEthUnclaimedWithdrawls() {
           }
         );
 
-        const unclaimedWithdrawsOfUser = await contract.methods
+        const unclaimedWithdrawsOfUser: string[] = await contract.methods
           .getUnclaimedWithdrawalsOfUser(metaMaskAccount)
           .call();
-        // console.log("res", unclaimedWithdrawsOfUser);
 
         if (
           !unclaimedWithdrawsOfUser ||
@@ -58,52 +63,52 @@ export function useEthUnclaimedWithdrawls() {
         ) {
           setOverallAmount('0');
           setClaimableAmount('0');
+          setOverallWei(0n);
+          setClaimableWei(0n);
+          setClaimableWithdrawals([]);
           return;
         }
 
         const requestList = unclaimedWithdrawsOfUser.map((index: string) => {
           return (async () => {
             try {
-              const withdrawal = await contract.methods
-                .withdrawalAtIndex(index)
-                .call();
-              // console.log("withdrawal", withdrawal);
-
-              return withdrawal;
+              return await contract.methods.withdrawalAtIndex(index).call();
             } catch (err: any) {}
           })();
         });
 
         const withdrawalList = await Promise.all(requestList);
 
-        const maxClaimableWithdrawIndex = await contract.methods
+        const maxClaimableWithdrawIndex: string = await contract.methods
           .maxClaimableWithdrawIndex()
           .call();
-        // console.log("maxClaimableWithdrawIndex", maxClaimableWithdrawIndex);
 
-        let overallAmount = 0;
-        let claimableAmount = 0;
-        let claimableWithdrawals: string[] = [];
+        const maxClaimable = BigInt(maxClaimableWithdrawIndex);
+        let overallWeiSum = 0n;
+        let claimableWeiSum = 0n;
+        const claimableIndexes: string[] = [];
         unclaimedWithdrawsOfUser.forEach(
           (withdrawIndex: string, index: number) => {
             const withdrawal = withdrawalList[index];
-            if (withdrawal) {
-              overallAmount += Number(
-                Web3.utils.fromWei(formatScientificNumber(withdrawal._amount))
-              );
-              if (Number(withdrawIndex) <= Number(maxClaimableWithdrawIndex)) {
-                claimableAmount += Number(
-                  Web3.utils.fromWei(formatScientificNumber(withdrawal._amount))
-                );
-                claimableWithdrawals.push(withdrawIndex);
-              }
+            if (!withdrawal || withdrawal._amount === undefined) {
+              return;
+            }
+            const amountWei = BigInt(withdrawal._amount);
+            overallWeiSum += amountWei;
+            if (BigInt(withdrawIndex) <= maxClaimable) {
+              claimableWeiSum += amountWei;
+              claimableIndexes.push(withdrawIndex);
             }
           }
         );
 
-        setOverallAmount(formatScientificNumber(overallAmount));
-        setClaimableAmount(formatScientificNumber(claimableAmount));
-        setClaimableWithdrawals(claimableWithdrawals);
+        setOverallWei(overallWeiSum);
+        setClaimableWei(claimableWeiSum);
+        // fromWei applied exactly once, on raw wei decimal strings (always
+        // dot-decimal, locale-independent)
+        setOverallAmount(Web3.utils.fromWei(overallWeiSum.toString()));
+        setClaimableAmount(Web3.utils.fromWei(claimableWeiSum.toString()));
+        setClaimableWithdrawals(claimableIndexes);
       } catch (err: any) {
         console.log(err);
       }
@@ -111,8 +116,10 @@ export function useEthUnclaimedWithdrawls() {
   }, [metaMaskAccount, updateFlag]);
 
   return {
-    overallAmount: overallAmount?.replace(',', '.'),
-    claimableAmount: claimableAmount?.replace(',', '.'),
+    overallAmount,
+    claimableAmount,
+    overallWei,
+    claimableWei,
     willReceiveAmount,
     claimableWithdrawals,
   };

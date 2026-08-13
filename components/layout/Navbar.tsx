@@ -8,6 +8,7 @@ import { DashboardTabs } from "components/staking/DashboardTabs";
 import { getEthereumChainId, getEthereumChainName } from "config/env";
 import { useAppDispatch, useAppSelector } from "hooks/common";
 import { useAppSlice } from "hooks/selector";
+import { useEthUnclaimedWithdrawls } from "hooks/useUnclaimedWithdrawals";
 import { useWalletAccount } from "hooks/useWalletAccount";
 import { useRouter } from "next/router";
 import {
@@ -40,7 +41,12 @@ const Navbar = () => {
   const [noticeDrawerOpen, setNoticeDrawerOpen] = useState(false);
   const [settingsDrawerOpen, setSettingsDrawerOpen] = useState(false);
   const [auditExpand, setAuditExpand] = useState(false);
-  const showWithdrawTab = true;
+  // Navbar Withdraw link appears only when the connected wallet actually has
+  // pending withdrawals (same wei-based detection as the page-level
+  // StakePageTabs) — restores the auto-detection that was hard-coded to
+  // `true` during the 2025-08 redesign.
+  const { overallWei } = useEthUnclaimedWithdrawls();
+  const showWithdrawTab = overallWei > 0n;
   const [pageWidth, setPageWidth] = useState(
     document.documentElement.clientWidth
   );
@@ -111,13 +117,13 @@ const Navbar = () => {
               // pageWidth >= 1600 ? "" : "pl-[1.06rem]"
             )}
           >
-            {showWithdrawTab && (
-              <DashboardTabs
-                selectedTab={selectedTab}
-                onChangeTab={updateTab}
-                showWithdrawTab={showWithdrawTab}
-              />
-            )}
+            {/* The nav strip itself is always visible; only the Withdraw
+                link inside is conditional (showWithdrawTab). */}
+            <DashboardTabs
+              selectedTab={selectedTab}
+              onChangeTab={updateTab}
+              showWithdrawTab={showWithdrawTab}
+            />
           </div>
         </div>
         {/* <div

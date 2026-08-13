@@ -22,6 +22,8 @@ import { handleEthWithdraw } from 'redux/reducers/EthSlice';
 interface Props {
   overallAmount: string | undefined;
   claimableAmount: string | undefined;
+  overallWei: bigint;
+  claimableWei: bigint;
   willReceiveAmount: string;
   claimableWithdrawals: string[];
 }
@@ -30,6 +32,8 @@ export const WithdrawUnstaked = (props: Props) => {
   const {
     overallAmount,
     claimableAmount,
+    overallWei,
+    claimableWei,
     willReceiveAmount,
     claimableWithdrawals,
   } = props;
@@ -43,15 +47,15 @@ export const WithdrawUnstaked = (props: Props) => {
 
   const { remainingDays } = useEthWithdrawRemainingTime();
 
+  // Gating uses wei sums (BigInt) — never parseable-with-locale strings —
+  // so the button state is identical in every locale.
   const withdrawDisabled = useMemo(() => {
     return (
       claimableWithdrawals.length === 0 ||
-      !claimableAmount ||
-      isNaN(Number(claimableAmount)) ||
-      Number(claimableAmount) === 0 ||
+      claimableWei <= 0n ||
       withdrawLoading
     );
-  }, [claimableWithdrawals, claimableAmount, withdrawLoading]);
+  }, [claimableWithdrawals, claimableWei, withdrawLoading]);
 
   const clickWithdraw = async () => {
     if (withdrawDisabled) {
@@ -66,11 +70,9 @@ export const WithdrawUnstaked = (props: Props) => {
         willReceiveAmount,
         false,
         (success) => {
-          if (
-            !overallAmount ||
-            isNaN(Number(overallAmount)) ||
-            Number(overallAmount) === 0
-          ) {
+          // Route back to stake once the whole pending set has been claimed
+          // (pre-claim wei sums captured at click time — no polling needed).
+          if (success && claimableWei > 0n && overallWei === claimableWei) {
             router.replace({
               pathname: router.pathname,
               query: {
