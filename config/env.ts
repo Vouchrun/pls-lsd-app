@@ -63,6 +63,67 @@ export function getRpcAtIndex(index: number, customRpc?: string | null): string 
   return rpcs[index % rpcs.length]; // Use modulo to wrap around
 }
 
+/**
+ * Basic URL sanity check for a user-supplied RPC endpoint
+ */
+export function isValidRpcUrl(url: string): boolean {
+  try {
+    const parsedUrl = new URL(url);
+    return (
+      parsedUrl.protocol === 'http:' ||
+      parsedUrl.protocol === 'https:' ||
+      parsedUrl.protocol === 'ws:' ||
+      parsedUrl.protocol === 'wss:'
+    );
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Test whether an RPC endpoint answers an eth_blockNumber request
+ */
+export async function testRpcHealth(rpcUrl: string): Promise<boolean> {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+  try {
+    const response = await fetch(rpcUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        jsonrpc: '2.0',
+        method: 'eth_blockNumber',
+        params: [],
+        id: 1,
+      }),
+      signal: controller.signal,
+    });
+
+    if (!response.ok) {
+      return false;
+    }
+
+    const body = await response.json();
+    return !!body && typeof body.result === 'string';
+  } catch (error) {
+    return false;
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
+
+/**
+ * Validate a custom RPC (format + connectivity) before it is persisted.
+ * Prevents a typo or an unreachable endpoint from being saved as the app RPC.
+ */
+export async function validateCustomRpc(rpcUrl: string): Promise<boolean> {
+  if (!isValidRpcUrl(rpcUrl)) {
+    return false;
+  }
+  return await testRpcHealth(rpcUrl);
+}
+
 export function getExplorerUrl() {
   if (isDev()) {
     return appDevConfig.explorer;
