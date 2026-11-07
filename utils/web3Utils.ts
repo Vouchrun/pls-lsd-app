@@ -11,96 +11,120 @@ declare const window: any;
 const STORAGE_KEY_WORKING_RPC = 'working_rpc';
 const STORAGE_KEY_BAD_RPCS = 'bad_rpcs';
 
+// A failed endpoint is retried after this window. Previously a failed RPC was
+// blacklisted permanently, so a transient outage could stick forever.
+const BAD_RPC_TTL = 30 * 60 * 1000; // 30 minutes
+
 // RPC fallback state management
 let currentRpcIndex = 0;
 let lastRpcSwitchTime = 0;
 const RPC_SWITCH_COOLDOWN = 30000; // 30 seconds in milliseconds
 let cachedCustomRpc: string | null = null;
 let lastRpcUrl: string | null = null; // Track the last RPC URL used
-let badRpcs: Set<string> = new Set(); // Track RPCs that have failed
-let workingRpc: string | null = null; // Current working RPC
+let badRpcs: Map<string, number> = new Map(); // rpcUrl -> time it was marked bad
+// Last RPC that answered successfully in THIS session. Deliberately not
+// persisted: a stale "working" RPC must never override the endpoint the user
+// explicitly selected (see updateCachedCustomRpc).
+let workingRpc: string | null = null;
 
 /**
- * Get the custom RPC from storage
+ * Get the custom RPC from storage.
+ * Always re-reads localStorage so a change made in another tab (or by the
+ * settings drawer) is picked up without a reload.
  */
 function getCustomRpc(): string | null {
-  if (cachedCustomRpc === null) {
-    cachedCustomRpc = getStorage(STORAGE_KEY_CUSTOM_RPC);
+  if (typeof window === 'undefined') {
+    return cachedCustomRpc;
+  }
+  try {
+    const stored = getStorage(STORAGE_KEY_CUSTOM_RPC);
+    cachedCustomRpc = stored && stored.trim() ? stored.trim() : null;
+  } catch (e) {
+    console.error('Error loading custom RPC:', e);
   }
   return cachedCustomRpc;
 }
 
 /**
- * Load bad RPCs from storage
+ * Load bad RPCs from storage, dropping entries older than BAD_RPC_TTL.
+ * The legacy array format is discarded: those entries carry no timestamp and
+ * could otherwise never recover.
  */
-function loadBadRpcs(): Set<string> {
+function loadBadRpcs(): Map<string, number> {
+  const badRpcsMap = new Map<string, number>();
+  const now = Date.now();
   try {
     const badRpcsJson = getStorage(STORAGE_KEY_BAD_RPCS);
-    if (badRpcsJson) {
-      const badRpcsArray = JSON.parse(badRpcsJson);
-      return new Set(badRpcsArray);
+    if (!badRpcsJson) {
+      return badRpcsMap;
+    }
+    const parsed = JSON.parse(badRpcsJson);
+    if (parsed && !Array.isArray(parsed) && typeof parsed === 'object') {
+      Object.keys(parsed).forEach((rpcUrl) => {
+        const markedAt = typeof parsed[rpcUrl] === 'number' ? parsed[rpcUrl] : 0;
+        if (now - markedAt < BAD_RPC_TTL) {
+          badRpcsMap.set(rpcUrl, markedAt);
+        }
+      });
     }
   } catch (e) {
     console.error('Error loading bad RPCs:', e);
   }
-  return new Set();
+  return badRpcsMap;
 }
 
 /**
- * Save bad RPCs to storage
+ * Save bad RPCs to storage as { rpcUrl: markedAt }
  */
-function saveBadRpcs(badRpcsSet: Set<string>) {
+function saveBadRpcs(badRpcsMap: Map<string, number>) {
   try {
-    const badRpcsArray = Array.from(badRpcsSet);
-    saveStorage(STORAGE_KEY_BAD_RPCS, JSON.stringify(badRpcsArray));
+    const serialized: Record<string, number> = {};
+    badRpcsMap.forEach((markedAt, rpcUrl) => {
+      serialized[rpcUrl] = markedAt;
+    });
+    saveStorage(STORAGE_KEY_BAD_RPCS, JSON.stringify(serialized));
   } catch (e) {
     console.error('Error saving bad RPCs:', e);
   }
 }
 
 /**
+ * Check whether an RPC is currently marked as bad (expired marks are dropped)
+ */
+function isRpcMarkedBad(rpcUrl: string): boolean {
+  const markedAt = badRpcs.get(rpcUrl);
+  if (markedAt === undefined) {
+    return false;
+  }
+  if (Date.now() - markedAt >= BAD_RPC_TTL) {
+    badRpcs.delete(rpcUrl);
+    saveBadRpcs(badRpcs);
+    return false;
+  }
+  return true;
+}
+
+/**
  * Mark an RPC as bad/blocked
  */
 function markRpcAsBad(rpcUrl: string) {
-  badRpcs.add(rpcUrl);
+  badRpcs.set(rpcUrl, Date.now());
   saveBadRpcs(badRpcs);
   console.warn(`Marked RPC as bad: ${rpcUrl}`);
   
   // If this was the working RPC, clear it
   if (workingRpc === rpcUrl) {
     workingRpc = null;
-    removeStorage(STORAGE_KEY_WORKING_RPC);
   }
 }
 
 /**
- * Load working RPC from storage
+ * Remember the RPC that last answered successfully for this session only.
+ * Persisting this caused a previously "working" RPC to override the user's
+ * explicit selection on every page load.
  */
-function loadWorkingRpc(): string | null {
-  try {
-    const stored = getStorage(STORAGE_KEY_WORKING_RPC);
-    if (stored) {
-      // Verify it's not in bad RPCs list
-      if (!badRpcs.has(stored)) {
-        return stored;
-      } else {
-        // Clear if it's now bad
-        removeStorage(STORAGE_KEY_WORKING_RPC);
-      }
-    }
-  } catch (e) {
-    console.error('Error loading working RPC:', e);
-  }
-  return null;
-}
-
-/**
- * Save working RPC to storage
- */
-function saveWorkingRpc(rpcUrl: string) {
+function setSessionWorkingRpc(rpcUrl: string) {
   workingRpc = rpcUrl;
-  saveStorage(STORAGE_KEY_WORKING_RPC, rpcUrl);
-  
 }
 
 /**
@@ -108,17 +132,11 @@ function saveWorkingRpc(rpcUrl: string) {
  */
 function initializeRpcState() {
   badRpcs = loadBadRpcs();
-  workingRpc = loadWorkingRpc();
-  
-  // If we have a working RPC, use it
-  if (workingRpc) {
-    const customRpc = getCustomRpc();
-    const allRpcs = getAllRpcUrls(customRpc);
-    const index = allRpcs.indexOf(workingRpc);
-    if (index >= 0) {
-      currentRpcIndex = index;
-    }
-  }
+  // Purge the legacy persisted "working RPC". It must never take priority over
+  // the custom RPC (tried first) or the configured primary.
+  removeStorage(STORAGE_KEY_WORKING_RPC);
+  workingRpc = null;
+  currentRpcIndex = 0;
 }
 
 /**
@@ -134,7 +152,7 @@ export function clearBadRpcs() {
  * Get list of bad RPCs (for debugging)
  */
 export function getBadRpcs(): string[] {
-  return Array.from(badRpcs);
+  return Array.from(badRpcs.keys());
 }
 
 /**
@@ -150,24 +168,29 @@ if (typeof window !== 'undefined') {
 }
 
 /**
- * Update the cached custom RPC (call this when custom RPC changes)
+ * Update the cached custom RPC (call this when custom RPC changes).
+ * The explicit selection always wins: stale failover state is discarded and the
+ * new endpoint becomes active immediately.
  */
 export function updateCachedCustomRpc(customRpc: string | null) {
-  cachedCustomRpc = customRpc;
-  // Reset to first working RPC when custom RPC changes
-  const nextRpc = findNextWorkingRpc();
-  if (nextRpc) {
-    const allRpcs = getAllRpcUrls(customRpc);
-    const index = allRpcs.indexOf(nextRpc);
-    if (index >= 0) {
-      currentRpcIndex = index;
-      saveWorkingRpc(nextRpc);
-    } else {
-      currentRpcIndex = 0;
+  const normalizedRpc = customRpc && customRpc.trim() ? customRpc.trim() : null;
+
+  if (normalizedRpc) {
+    saveStorage(STORAGE_KEY_CUSTOM_RPC, normalizedRpc);
+    // A freshly selected endpoint must not inherit an old "bad" mark.
+    if (badRpcs.delete(normalizedRpc)) {
+      saveBadRpcs(badRpcs);
     }
+    workingRpc = normalizedRpc;
+    // Custom RPC is always placed first, so its index is 0.
+    currentRpcIndex = 0;
   } else {
+    removeStorage(STORAGE_KEY_CUSTOM_RPC);
+    workingRpc = null;
     currentRpcIndex = 0;
   }
+
+  cachedCustomRpc = normalizedRpc;
   ethWeb3 = undefined;
   lastRpcUrl = null;
 }
@@ -181,7 +204,7 @@ function findNextWorkingRpc(currentRpc?: string): string | null {
   const allRpcs = getAllRpcUrls(customRpc);
   
   // Filter out bad RPCs
-  const workingRpcs = allRpcs.filter(rpc => !badRpcs.has(rpc));
+  const workingRpcs = allRpcs.filter(rpc => !isRpcMarkedBad(rpc));
   
   if (workingRpcs.length === 0) {
     console.error('All RPCs are marked as bad. Resetting bad RPCs list.');
@@ -192,13 +215,17 @@ function findNextWorkingRpc(currentRpc?: string): string | null {
   }
   
   // If we have a current RPC and it's not bad, prefer it
-  if (currentRpc && !badRpcs.has(currentRpc) && workingRpcs.includes(currentRpc)) {
+  if (currentRpc && !isRpcMarkedBad(currentRpc) && workingRpcs.includes(currentRpc)) {
     return currentRpc;
   }
   
-  // Find the first working RPC
-  // If we have a working RPC stored, use it if it's still valid
-  if (workingRpc && !badRpcs.has(workingRpc) && workingRpcs.includes(workingRpc)) {
+  // The user's explicit custom RPC always has priority
+  if (customRpc && !isRpcMarkedBad(customRpc) && workingRpcs.includes(customRpc)) {
+    return customRpc;
+  }
+  
+  // Then the RPC that has been working in this session
+  if (workingRpc && !isRpcMarkedBad(workingRpc) && workingRpcs.includes(workingRpc)) {
     return workingRpc;
   }
   
@@ -244,8 +271,8 @@ export function switchToNextRpc(markCurrentAsBad: boolean = false): boolean {
   currentRpcIndex = newIndex;
   lastRpcSwitchTime = Date.now();
   
-  // Save as working RPC
-  saveWorkingRpc(nextRpc);
+  // Save as the working RPC for this session
+  setSessionWorkingRpc(nextRpc);
   
   console.warn(`Switching to working RPC: ${nextRpc} (index ${newIndex})`);
   
@@ -262,38 +289,35 @@ export function switchToNextRpc(markCurrentAsBad: boolean = false): boolean {
  * This function should be side-effect free for reading - only updates state when necessary
  */
 export function getCurrentRpc(): string {
+  const customRpc = getCustomRpc();
+  const allRpcs = getAllRpcUrls(customRpc);
+
   // If we have a working RPC and it's not bad, use it
-  if (workingRpc && !badRpcs.has(workingRpc)) {
-    const customRpc = getCustomRpc();
-    const allRpcs = getAllRpcUrls(customRpc);
-    if (allRpcs.includes(workingRpc)) {
-      const index = allRpcs.indexOf(workingRpc);
-      if (index >= 0 && currentRpcIndex !== index) {
-        // Only update index if it's different (avoid unnecessary state changes)
-        currentRpcIndex = index;
-      }
-      return workingRpc;
+  if (workingRpc && !isRpcMarkedBad(workingRpc) && allRpcs.includes(workingRpc)) {
+    const index = allRpcs.indexOf(workingRpc);
+    if (index >= 0 && currentRpcIndex !== index) {
+      // Only update index if it's different (avoid unnecessary state changes)
+      currentRpcIndex = index;
     }
+    return workingRpc;
   }
   
-  // Find next working RPC (only if we don't have a valid working RPC)
+  // Find the best available RPC: custom first, then the session working RPC,
+  // then the first configured endpoint that is not marked bad
   const nextRpc = findNextWorkingRpc();
   if (nextRpc) {
-    const customRpc = getCustomRpc();
-    const allRpcs = getAllRpcUrls(customRpc);
     const index = allRpcs.indexOf(nextRpc);
     if (index >= 0) {
       // Only update if different to avoid triggering rerenders
       if (currentRpcIndex !== index || workingRpc !== nextRpc) {
         currentRpcIndex = index;
-        saveWorkingRpc(nextRpc);
+        setSessionWorkingRpc(nextRpc);
       }
       return nextRpc;
     }
   }
   
   // Fallback to index-based selection
-  const customRpc = getCustomRpc();
   return getRpcAtIndex(currentRpcIndex, customRpc);
 }
 
@@ -382,10 +406,10 @@ export async function executeWithRpcFallback<T>(
       
       const result = await Promise.race([operation(web3), timeoutPromise]);
       
-      // If successful, mark current RPC as working and save it
+      // If successful, remember the current RPC for this session
       const currentRpc = getCurrentRpc();
-      if (currentRpc && !badRpcs.has(currentRpc)) {
-        saveWorkingRpc(currentRpc);
+      if (currentRpc && !isRpcMarkedBad(currentRpc)) {
+        setSessionWorkingRpc(currentRpc);
       }
       
       return result;
@@ -396,9 +420,8 @@ export async function executeWithRpcFallback<T>(
       
       // If this isn't the last attempt and it's an RPC failure, mark as bad and switch
       if (attempt < maxAttempts && isRpcFailure) {
-        // Mark current RPC as bad and switch to next working RPC
-        const currentRpc = getCurrentRpc();
-        markRpcAsBad(currentRpc);
+        // switchToNextRpc(true) marks the failed RPC as bad itself. Marking it
+        // here as well would blacklist the newly selected fallback instead.
         const switched = switchToNextRpc(true); // Mark current as bad and switch
         if (switched) {
           // Small delay after switching to let the new RPC initialize
@@ -455,10 +478,10 @@ async function callWithRpcFallback<T>(
       // Execute operation (will use current Web3 instance)
       const result = await Promise.race([operationFactory(), timeoutPromise]);
       
-      // If successful, mark current RPC as working and save it
+      // If successful, remember the current RPC for this session
       const currentRpc = getCurrentRpc();
-      if (currentRpc && !badRpcs.has(currentRpc)) {
-        saveWorkingRpc(currentRpc);
+      if (currentRpc && !isRpcMarkedBad(currentRpc)) {
+        setSessionWorkingRpc(currentRpc);
       }
       
       return result;
@@ -472,9 +495,8 @@ async function callWithRpcFallback<T>(
       
       // If this isn't the last attempt and it's an RPC failure, mark as bad and switch
       if (attempt < maxAttempts && isRpcFailure) {
-        // Mark current RPC as bad and switch to next working RPC
-        const currentRpc = getCurrentRpc();
-        markRpcAsBad(currentRpc);
+        // switchToNextRpc(true) marks the failed RPC as bad itself. Marking it
+        // here as well would blacklist the newly selected fallback instead.
         const switched = switchToNextRpc(true); // Mark current as bad and switch
         if (switched) {
           // Recreate Web3 instance with new RPC

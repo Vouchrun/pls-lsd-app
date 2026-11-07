@@ -8,8 +8,10 @@ import { setDarkMode, setCustomRpc } from 'redux/reducers/AppSlice';
 import { RootState } from 'redux/store';
 import { openLink } from 'utils/commonUtils';
 import { getContactList, getExternalLinkList } from 'utils/configUtils';
+import { validateCustomRpc } from 'config/env';
+import snackbarUtil from 'utils/snackbarUtils';
 import { getCurrentRpc, updateCachedCustomRpc } from 'utils/web3Utils';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 interface Props {
   open: boolean;
@@ -25,12 +27,18 @@ export const SettingsDrawer = (props: Props) => {
 
   const [customRpcInput, setCustomRpcInput] = useState('');
   const [currentActiveRpc, setCurrentActiveRpc] = useState('');
+  const [isValidating, setIsValidating] = useState(false);
+  const [validationError, setValidationError] = useState<string | null>(null);
+  // Guards against an in-flight validation applying after the user cleared the
+  // field or started another apply.
+  const applyRequestId = useRef(0);
 
   useEffect(() => {
     // Update current active RPC when drawer opens or custom RPC changes
     if (open) {
       setCurrentActiveRpc(getCurrentRpc());
       setCustomRpcInput(customRpc || '');
+      setValidationError(null);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, customRpc]);
@@ -42,32 +50,82 @@ export const SettingsDrawer = (props: Props) => {
     return type.toLowerCase();
   };
 
-  const handleApplyCustomRpc = () => {
-    const trimmedRpc = customRpcInput.trim();
-    if (trimmedRpc && trimmedRpc !== customRpc) {
-      dispatch(setCustomRpc(trimmedRpc));
-      updateCachedCustomRpc(trimmedRpc);
-      setCurrentActiveRpc(trimmedRpc);
-    } else if (!trimmedRpc && customRpc) {
-      // Clear custom RPC if input is empty
-      dispatch(setCustomRpc(null));
-      updateCachedCustomRpc(null);
-      setCurrentActiveRpc(getCurrentRpc());
-    }
+  const refreshActiveRpc = () => {
+    setCurrentActiveRpc(getCurrentRpc());
   };
 
   const handleClearCustomRpc = () => {
-    dispatch(setCustomRpc(null));
-    updateCachedCustomRpc(null);
+    // Invalidate any in-flight validation/apply
+    applyRequestId.current += 1;
     setCustomRpcInput('');
-    setCurrentActiveRpc(getCurrentRpc());
+    setValidationError(null);
+    dispatch(setCustomRpc(null));
+    // Also clears any stale failover state so the configured RPC is used again
+    updateCachedCustomRpc(null);
+    refreshActiveRpc();
+  };
+
+  const handleApplyCustomRpc = async () => {
+    const trimmedRpc = customRpcInput.trim();
+
+    if (!trimmedRpc) {
+      handleClearCustomRpc();
+      return;
+    }
+
+    if (trimmedRpc === customRpc) {
+      setValidationError(null);
+      refreshActiveRpc();
+      return;
+    }
+
+    const requestId = ++applyRequestId.current;
+    setIsValidating(true);
+    setValidationError(null);
+
+    try {
+      // Test connectivity before persisting so a typo/unreachable endpoint
+      // cannot become the app RPC.
+      const isValid = await validateCustomRpc(trimmedRpc);
+
+      // Superseded by a clear or another apply while the check was running
+      if (requestId !== applyRequestId.current) {
+        return;
+      }
+
+      if (!isValid) {
+        setValidationError('Unable to connect to this RPC endpoint');
+        snackbarUtil.error('RPC did not respond. Keeping the current setting.');
+        refreshActiveRpc();
+        return;
+      }
+
+      dispatch(setCustomRpc(trimmedRpc));
+      // Makes the selected endpoint active immediately (clears stale state)
+      updateCachedCustomRpc(trimmedRpc);
+      refreshActiveRpc();
+      snackbarUtil.success('Custom RPC applied');
+    } catch (error) {
+      if (requestId !== applyRequestId.current) {
+        return;
+      }
+      console.error('RPC validation error:', error);
+      setValidationError('RPC validation failed');
+      snackbarUtil.error('RPC validation failed. Keeping the current setting.');
+    } finally {
+      if (requestId === applyRequestId.current) {
+        setIsValidating(false);
+      }
+    }
   };
 
   const handleClearInputField = () => {
     setCustomRpcInput('');
+    setValidationError(null);
   };
 
-  const isUsingCustomRpc = customRpc && currentActiveRpc === customRpc;
+  const isUsingCustomRpc = !!customRpc && currentActiveRpc === customRpc;
+  const isCustomRpcConfigured = !!customRpc;
 
   return (
     <Drawer
@@ -133,8 +191,16 @@ export const SettingsDrawer = (props: Props) => {
                         (Custom RPC)
                       </div>
                     )}
+                    {isCustomRpcConfigured && !isUsingCustomRpc && (
+                      <div 
+                        className='text-[.11rem] mt-[.04rem]'
+                        style={{ color: darkMode ? "#f87171" : "#b91c1c", fontStyle: 'italic' }}
+                      >
+                        (Saved custom RPC is not in use — using fallback)
+                      </div>
+                    )}
                   </div>
-                  {isUsingCustomRpc && (
+                  {isCustomRpcConfigured && (
                     <button
                       onClick={handleClearCustomRpc}
                       className='ml-[.12rem] flex-shrink-0 w-[.24rem] h-[.24rem] flex items-center justify-center rounded-[.04rem] cursor-pointer transition-colors'
@@ -164,30 +230,49 @@ export const SettingsDrawer = (props: Props) => {
                   <input
                     type='text'
                     value={customRpcInput}
-                    onChange={(e) => setCustomRpcInput(e.target.value)}
+                    disabled={isValidating}
+                    onChange={(e) => {
+                      setCustomRpcInput(e.target.value);
+                      setValidationError(null);
+                    }}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') {
+                        e.preventDefault();
+                        if (!isValidating) {
+                          handleApplyCustomRpc();
+                        }
+                      }
+                    }}
+                    onBlur={() => {
+                      if (!isValidating) {
                         handleApplyCustomRpc();
                       }
                     }}
-                    onBlur={handleApplyCustomRpc}
                     placeholder='https://rpc.pulsechain.com'
                     className='w-full px-[.12rem] py-[.10rem] pr-[.36rem] rounded-[.06rem] text-[.14rem] outline-none transition-colors'
                     style={{
                       background: darkMode ? '#2a2a2a' : '#fff',
-                      border: `1px solid ${darkMode ? '#3a3a3a' : '#ccc'}`,
+                      border: `1px solid ${
+                        validationError
+                          ? darkMode ? '#ef4444' : '#dc2626'
+                          : darkMode ? '#3a3a3a' : '#ccc'
+                      }`,
                       color: darkMode ? '#fff' : '#000',
+                      opacity: isValidating ? 0.7 : 1,
                     }}
                     onFocus={(e) => {
                       e.currentTarget.style.borderColor = darkMode ? '#4ade80' : '#16a34a';
                     }}
                     onBlurCapture={(e) => {
+                      const inputEl = e.currentTarget;
                       setTimeout(() => {
-                        e.currentTarget.style.borderColor = darkMode ? '#3a3a3a' : '#ccc';
+                        // Drop the focus override so the style based on
+                        // validationError (red) is visible again
+                        inputEl.style.borderColor = '';
                       }, 200);
                     }}
                   />
-                  {customRpcInput && (
+                  {customRpcInput && !isValidating && (
                     <button
                       onClick={handleClearInputField}
                       className='absolute right-[.08rem] top-1/2 -translate-y-1/2 w-[.20rem] h-[.20rem] flex items-center justify-center rounded-[.04rem] cursor-pointer transition-colors'
@@ -210,8 +295,24 @@ export const SettingsDrawer = (props: Props) => {
                   className='text-[.10rem] mt-[.08rem] italic'
                   style={{ color: darkMode ? "#888" : "#666" }}
                 >
-                  Press Enter or click outside to apply. Click × to clear and fallback to https://rpc.vouch.run.
+                  Press Enter or click outside to test and apply. The RPC is checked before it is used. Click × to clear and fall back to the configured RPC.
                 </div>
+                {isValidating && (
+                  <div 
+                    className='text-[.10rem] mt-[.08rem] font-semibold'
+                    style={{ color: darkMode ? "#4ade80" : "#16a34a" }}
+                  >
+                    Testing RPC connection...
+                  </div>
+                )}
+                {validationError && !isValidating && (
+                  <div 
+                    className='text-[.10rem] mt-[.08rem]'
+                    style={{ color: darkMode ? "#f87171" : "#dc2626" }}
+                  >
+                    {validationError}
+                  </div>
+                )}
               </div>
             </div>
 
